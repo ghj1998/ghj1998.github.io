@@ -7,13 +7,21 @@ title: 小高同学の技术博客
 subtitle: 人生即是一段艰难曲折的旅程,人生无坦途。
 description: 
 keywords:
-author: Gao HuJun
-language: zh-Hans
+author: 高虎军
+language: zh-CN
 timezone: Asia/Shanghai
 
+
+excerpt:
+  depth: 5  
+  excerpt_excludes: []
+  more_excludes: []
+  hideWholePostExcerpts: true
+
+  
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://example.com
+url: https://ghj1998.github.io
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
