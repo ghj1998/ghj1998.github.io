@@ -398,6 +398,138 @@
       </tags>
   </entry>
   <entry>
+    <title>JAVA - 注解</title>
+    <url>/2021/04/19/JAVA%E6%B3%A8%E8%A7%A3/</url>
+    <content><![CDATA[<h1 id="JAVA注解"><a href="#JAVA注解" class="headerlink" title="JAVA注解"></a>JAVA注解</h1><p>注解是放在Java源码的类、方法、字段、参数前的一种特殊“注释”。</p>
+<h2 id="1-使用注解"><a href="#1-使用注解" class="headerlink" title="1. 使用注解"></a>1. 使用注解</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// this is a component:</span></span><br><span class="line"><span class="meta">@Resource(&quot;hello&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Inject</span></span><br><span class="line">    <span class="keyword">int</span> n;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">(<span class="meta">@Param</span> String name)</span> </span>&#123;</span><br><span class="line">        System.out.println(name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Hello&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注释会被编译器直接忽略，注解则可以被编译器打包进入class文件，因此，注解是一种用作标注的“元数据”。</p>
+<p>Java的注解可以分为三类：</p>
+<p>第一类是由编译器使用的注解，例如：</p>
+<ul>
+<li><code>@Override</code>：让编译器检查该方法是否正确地实现了覆写；</li>
+<li><code>@SuppressWarnings</code>：告诉编译器忽略此处代码产生的警告。</li>
+</ul>
+<p>这类注解不会被编译进入<code>.class</code>文件，它们在编译后就被编译器扔掉了。</p>
+<p>第二类是由工具处理<code>.class</code>文件使用的注解，比如有些工具会在加载class的时候，对class做动态修改，实现一些特殊的功能。这类注解会被编译进入<code>.class</code>文件，但加载结束后并不会存在于内存中。这类注解只被一些底层库使用，一般我们不必自己处理。</p>
+<p>第三类是在程序运行期能够读取的注解，它们在加载后一直存在于JVM中，这也是最常用的注解。例如，一个配置了<code>@PostConstruct</code>的方法会在调用构造方法后自动被调用（这是Java代码读取该注解实现的功能，JVM并不会识别该注解）。</p>
+<p>定义一个注解时，还可以定义配置参数。配置参数可以包括：</p>
+<ul>
+<li>所有基本类型；</li>
+<li>String；</li>
+<li>枚举类型；</li>
+<li>基本类型、String、Class以及枚举的数组。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Check(min=0, max=100, value=55)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> n;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Check(value=99)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> p;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Check(99)</span> <span class="comment">// @Check(value=99)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> x;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Check</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>@Check</code>就是一个注解。第一个<code>@Check(min=0, max=100, value=55)</code>明确定义了三个参数，第二个<code>@Check(value=99)</code>只定义了一个<code>value</code>参数，它实际上和<code>@Check(99)</code>是完全一样的。最后一个<code>@Check</code>表示所有参数都使用默认值。</p>
+<h2 id="2-定义注解"><a href="#2-定义注解" class="headerlink" title="2. 定义注解"></a>2. 定义注解</h2><p>使用<code>@interface</code>语法来定义注解（<code>Annotation</code>），它的格式如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注解的参数类似无参数方法，可以用<code>default</code>设定一个默认值（强烈推荐）。最常用的参数应当命名为<code>value</code>。</p>
+<p><strong>元注解</strong></p>
+<p>元注解：能修饰其他注解的注解。JAVA标准库提供。</p>
+<h3 id="Target"><a href="#Target" class="headerlink" title="@Target"></a>@Target</h3><p>最常用的元注解是<code>@Target</code>。使用<code>@Target</code>可以定义<code>Annotation</code>能够被应用于源码的哪些位置：</p>
+<ul>
+<li>类或接口：<code>ElementType.TYPE</code>；</li>
+<li>字段：<code>ElementType.FIELD</code>；</li>
+<li>方法：<code>ElementType.METHOD</code>；</li>
+<li>构造方法：<code>ElementType.CONSTRUCTOR</code>；</li>
+<li>方法参数：<code>ElementType.PARAMETER</code>。</li>
+</ul>
+<p>例如：<code>@Target(ElementType.METHOD)</code>指定该注解只能用在方法上。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target(ElementType.METHOD)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果要定义该注解只能用在方法和字段上，可以把<code>@Target</code>注解参数变为数组<code>&#123; ElementType.METHOD, ElementType.FIELD &#125;</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target(&#123;</span></span><br><span class="line"><span class="meta">    ElementType.METHOD,</span></span><br><span class="line"><span class="meta">    ElementType.FIELD</span></span><br><span class="line"><span class="meta">&#125;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Retention"><a href="#Retention" class="headerlink" title="@Retention"></a>@Retention</h3><p>另一个重要的元注解<code>@Retention</code>定义了<code>Annotation</code>的生命周期：</p>
+<ul>
+<li>仅编译期：<code>RetentionPolicy.SOURCE</code>；</li>
+<li>仅class文件：<code>RetentionPolicy.CLASS</code>；</li>
+<li>运行期：<code>RetentionPolicy.RUNTIME</code>。</li>
+</ul>
+<p>默认为CLASS，通常我们会要求是RUNTIME类型，所以要加上<code>@Retention(RetentionPolicy.RUNTIME)</code> 。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Repeatable"><a href="#Repeatable" class="headerlink" title="@Repeatable"></a>@Repeatable</h3><p><code>@Repeatable</code>这个元注解可以定义<code>Annotation</code>是否可重复。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Repeatable(Reports.class)</span></span><br><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Reports &#123;</span><br><span class="line">    Report[] value();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>经过<code>@Repeatable</code>修饰后，在某个类型声明处，就可以添加多个<code>@Report</code>注解：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Report(type=1, level=&quot;debug&quot;)</span></span><br><span class="line"><span class="meta">@Report(type=2, level=&quot;warning&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Inherited"><a href="#Inherited" class="headerlink" title="@Inherited"></a>@Inherited</h3><p>使用<code>@Inherited</code>定义子类是否可继承父类定义的<code>Annotation</code>。<code>@Inherited</code>仅针对<code>@Target(ElementType.TYPE)</code>类型的<code>annotation</code>有效，并且仅针对<code>class</code>的继承，对<code>interface</code>的继承无效。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Inherited</span></span><br><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在使用的时候，如果一个类用到了<code>@Report</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Report(type=1)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>则它的子类默认也定义了该注解：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Student</span> <span class="keyword">extends</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="如何定义注解总结"><a href="#如何定义注解总结" class="headerlink" title="如何定义注解总结"></a>如何定义注解总结</h3><p>第一步：用<code>@interface</code>定义注解：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第二步，添加参数、默认值：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public @interface Report &#123;</span><br><span class="line">    int type() default 0;</span><br><span class="line">    String level() default &quot;info&quot;;</span><br><span class="line">    String value() default &quot;&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>把最常用的参数定义为<code>value()</code>，推荐所有参数都尽量设置默认值。</p>
+<p>第三步，用元注解配置注解：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@Target(ElementType.TYPE)</span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">public @interface Report &#123;</span><br><span class="line">    int type() default 0;</span><br><span class="line">    String level() default &quot;info&quot;;</span><br><span class="line">    String value() default &quot;&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中，必须设置<code>@Target</code>和<code>@Retention</code>，<code>@Retention</code>一般设置为<code>RUNTIME</code>，因为我们自定义的注解通常要求在运行期读取。一般情况下，不必写<code>@Inherited</code>和<code>@Repeatable</code>。</p>
+<h2 id="3-处理注解"><a href="#3-处理注解" class="headerlink" title="3. 处理注解"></a>3. 处理注解</h2><p><code>SOURCE</code>类型的注解主要由编译器使用，因此我们一般只使用，不编写。</p>
+<p><code>CLASS</code>类型的注解主要由底层工具库使用，涉及到class的加载，一般我们很少用到。</p>
+<p><code>RUNTIME</code>类型的注解不但要使用，还经常需要编写。</p>
+<p>读取注解，需要使用反射API。</p>
+<p>Java提供的使用反射API读取<code>Annotation</code>的方法包括：</p>
+<p>判断某个注解是否存在于<code>Class</code>、<code>Field</code>、<code>Method</code>或<code>Constructor</code>：</p>
+<ul>
+<li><code>Class.isAnnotationPresent(Class)</code></li>
+<li><code>Field.isAnnotationPresent(Class)</code></li>
+<li><code>Method.isAnnotationPresent(Class)</code></li>
+<li><code>Constructor.isAnnotationPresent(Class)</code></li>
+</ul>
+<p>例如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 判断@Report是否存在于Person类:</span></span><br><span class="line">Person.class.isAnnotationPresent(Report.class);</span><br></pre></td></tr></table></figure>
+
+<p>使用反射API读取Annotation：</p>
+<ul>
+<li><code>Class.getAnnotation(Class)</code></li>
+<li><code>Field.getAnnotation(Class)</code></li>
+<li><code>Method.getAnnotation(Class)</code></li>
+<li><code>Constructor.getAnnotation(Class)</code></li>
+</ul>
+<p>例如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 获取Person定义的@Report注解:</span></span><br><span class="line">Report report = Person.class.getAnnotation(Report.class);</span><br><span class="line"><span class="keyword">int</span> type = report.type();</span><br><span class="line">String level = report.level();</span><br></pre></td></tr></table></figure>
+
+<p>使用反射API读取<code>Annotation</code>有两种方法。</p>
+<p>方法一是先判断<code>Annotation</code>是否存在，如果存在，就直接读取：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Class cls = Person.class;</span><br><span class="line"><span class="keyword">if</span> (cls.isAnnotationPresent(Report.class)) &#123;</span><br><span class="line">    Report report = cls.getAnnotation(Report.class);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第二种方法是直接读取<code>Annotation</code>，如果<code>Annotation</code>不存在，将返回<code>null</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Class cls = Person.class;</span><br><span class="line">Report report = cls.getAnnotation(Report.class);</span><br><span class="line"><span class="keyword">if</span> (report != <span class="keyword">null</span>) &#123;</span><br><span class="line">   ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>读取方法、字段和构造方法的<code>Annotation</code>和Class类似。但要读取方法参数的<code>Annotation</code>必须用一个二维数组。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">(<span class="meta">@NotNull</span> <span class="meta">@Range(max=5)</span> String name, <span class="meta">@NotNull</span> String prefix)</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 获取Method实例:</span></span><br><span class="line">Method m = ...</span><br><span class="line"><span class="comment">// 获取所有参数的Annotation:</span></span><br><span class="line">Annotation[][] annos = m.getParameterAnnotations();</span><br><span class="line"><span class="comment">// 第一个参数（索引为0）的所有Annotation:</span></span><br><span class="line">Annotation[] annosOfName = annos[<span class="number">0</span>];</span><br><span class="line"><span class="keyword">for</span> (Annotation anno : annosOfName) &#123;</span><br><span class="line">    <span class="keyword">if</span> (anno <span class="keyword">instanceof</span> Range) &#123; <span class="comment">// @Range注解</span></span><br><span class="line">        Range r = (Range) anno;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (anno <span class="keyword">instanceof</span> NotNull) &#123; <span class="comment">// @NotNull注解</span></span><br><span class="line">        NotNull n = (NotNull) anno;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>使用注解</strong></p>
+<p>注解如何使用，完全由程序自己决定。例如，JUnit是一个测试框架，它会自动运行所有标记为<code>@Test</code>的方法。</p>
+<p><code>@Range</code>注解，我们希望用它来定义一个<code>String</code>字段的规则：字段长度满足<code>@Range</code>的参数定义：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Target(ElementType.FIELD)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Range &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">min</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">max</span><span class="params">()</span> <span class="keyword">default</span> 255</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Range(min=1, max=20)</span></span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Range(max=10)</span></span><br><span class="line">    <span class="keyword">public</span> String city;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>定义了注解，本身对程序逻辑没有任何影响。我们必须自己编写代码来使用注解。</p>
+<p>例如：编写一个<code>Person</code>实例的检查方法，它可以检查<code>Person</code>实例的<code>String</code>字段长度是否满足<code>@Range</code>的定义。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">check</span><span class="params">(Person person)</span> <span class="keyword">throws</span> IllegalArgumentException, ReflectiveOperationException </span>&#123;</span><br><span class="line">    <span class="comment">// 遍历所有Field:</span></span><br><span class="line">    <span class="keyword">for</span> (Field field : person.getClass().getFields()) &#123;</span><br><span class="line">        <span class="comment">// 获取Field定义的@Range:</span></span><br><span class="line">        Range range = field.getAnnotation(Range.class);</span><br><span class="line">        <span class="comment">// 如果@Range存在:</span></span><br><span class="line">        <span class="keyword">if</span> (range != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 获取Field的值:</span></span><br><span class="line">            Object value = field.get(person);</span><br><span class="line">            <span class="comment">// 如果值是String:</span></span><br><span class="line">            <span class="keyword">if</span> (value <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">                String s = (String) value;</span><br><span class="line">                <span class="comment">// 判断值是否满足@Range的min/max:</span></span><br><span class="line">                <span class="keyword">if</span> (s.length() &lt; range.min() || s.length() &gt; range.max()) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Invalid field: &quot;</span> + field.getName());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>JAVA</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>JAVA - 泛型</title>
     <url>/2021/04/21/JAVA%E6%B3%9B%E5%9E%8B/</url>
     <content><![CDATA[<h1 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h1><h2 id="1-泛型定义"><a href="#1-泛型定义" class="headerlink" title="1. 泛型定义"></a>1. 泛型定义</h2><p>泛型就是定义一种模板，例如<code>ArrayList&lt;T&gt;</code>，然后在代码中为用到的类创建对应的<code>ArrayList&lt;类型&gt;</code>：</p>
@@ -581,138 +713,6 @@
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">T[] createArray(Class&lt;T&gt; cls) &#123;</span><br><span class="line">    <span class="keyword">return</span> (T[]) Array.newInstance(cls, <span class="number">5</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 ]]></content>
-      <tags>
-        <tag>JAVA</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JAVA - 注解</title>
-    <url>/2021/04/19/JAVA%E6%B3%A8%E8%A7%A3/</url>
-    <content><![CDATA[<h1 id="JAVA注解"><a href="#JAVA注解" class="headerlink" title="JAVA注解"></a>JAVA注解</h1><p>注解是放在Java源码的类、方法、字段、参数前的一种特殊“注释”。</p>
-<h2 id="1-使用注解"><a href="#1-使用注解" class="headerlink" title="1. 使用注解"></a>1. 使用注解</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// this is a component:</span></span><br><span class="line"><span class="meta">@Resource(&quot;hello&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Inject</span></span><br><span class="line">    <span class="keyword">int</span> n;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">(<span class="meta">@Param</span> String name)</span> </span>&#123;</span><br><span class="line">        System.out.println(name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Hello&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>注释会被编译器直接忽略，注解则可以被编译器打包进入class文件，因此，注解是一种用作标注的“元数据”。</p>
-<p>Java的注解可以分为三类：</p>
-<p>第一类是由编译器使用的注解，例如：</p>
-<ul>
-<li><code>@Override</code>：让编译器检查该方法是否正确地实现了覆写；</li>
-<li><code>@SuppressWarnings</code>：告诉编译器忽略此处代码产生的警告。</li>
-</ul>
-<p>这类注解不会被编译进入<code>.class</code>文件，它们在编译后就被编译器扔掉了。</p>
-<p>第二类是由工具处理<code>.class</code>文件使用的注解，比如有些工具会在加载class的时候，对class做动态修改，实现一些特殊的功能。这类注解会被编译进入<code>.class</code>文件，但加载结束后并不会存在于内存中。这类注解只被一些底层库使用，一般我们不必自己处理。</p>
-<p>第三类是在程序运行期能够读取的注解，它们在加载后一直存在于JVM中，这也是最常用的注解。例如，一个配置了<code>@PostConstruct</code>的方法会在调用构造方法后自动被调用（这是Java代码读取该注解实现的功能，JVM并不会识别该注解）。</p>
-<p>定义一个注解时，还可以定义配置参数。配置参数可以包括：</p>
-<ul>
-<li>所有基本类型；</li>
-<li>String；</li>
-<li>枚举类型；</li>
-<li>基本类型、String、Class以及枚举的数组。</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Check(min=0, max=100, value=55)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> n;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Check(value=99)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> p;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Check(99)</span> <span class="comment">// @Check(value=99)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> x;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Check</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>@Check</code>就是一个注解。第一个<code>@Check(min=0, max=100, value=55)</code>明确定义了三个参数，第二个<code>@Check(value=99)</code>只定义了一个<code>value</code>参数，它实际上和<code>@Check(99)</code>是完全一样的。最后一个<code>@Check</code>表示所有参数都使用默认值。</p>
-<h2 id="2-定义注解"><a href="#2-定义注解" class="headerlink" title="2. 定义注解"></a>2. 定义注解</h2><p>使用<code>@interface</code>语法来定义注解（<code>Annotation</code>），它的格式如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>注解的参数类似无参数方法，可以用<code>default</code>设定一个默认值（强烈推荐）。最常用的参数应当命名为<code>value</code>。</p>
-<p><strong>元注解</strong></p>
-<p>元注解：能修饰其他注解的注解。JAVA标准库提供。</p>
-<h3 id="Target"><a href="#Target" class="headerlink" title="@Target"></a>@Target</h3><p>最常用的元注解是<code>@Target</code>。使用<code>@Target</code>可以定义<code>Annotation</code>能够被应用于源码的哪些位置：</p>
-<ul>
-<li>类或接口：<code>ElementType.TYPE</code>；</li>
-<li>字段：<code>ElementType.FIELD</code>；</li>
-<li>方法：<code>ElementType.METHOD</code>；</li>
-<li>构造方法：<code>ElementType.CONSTRUCTOR</code>；</li>
-<li>方法参数：<code>ElementType.PARAMETER</code>。</li>
-</ul>
-<p>例如：<code>@Target(ElementType.METHOD)</code>指定该注解只能用在方法上。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target(ElementType.METHOD)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>如果要定义该注解只能用在方法和字段上，可以把<code>@Target</code>注解参数变为数组<code>&#123; ElementType.METHOD, ElementType.FIELD &#125;</code>。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target(&#123;</span></span><br><span class="line"><span class="meta">    ElementType.METHOD,</span></span><br><span class="line"><span class="meta">    ElementType.FIELD</span></span><br><span class="line"><span class="meta">&#125;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="Retention"><a href="#Retention" class="headerlink" title="@Retention"></a>@Retention</h3><p>另一个重要的元注解<code>@Retention</code>定义了<code>Annotation</code>的生命周期：</p>
-<ul>
-<li>仅编译期：<code>RetentionPolicy.SOURCE</code>；</li>
-<li>仅class文件：<code>RetentionPolicy.CLASS</code>；</li>
-<li>运行期：<code>RetentionPolicy.RUNTIME</code>。</li>
-</ul>
-<p>默认为CLASS，通常我们会要求是RUNTIME类型，所以要加上<code>@Retention(RetentionPolicy.RUNTIME)</code> 。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="Repeatable"><a href="#Repeatable" class="headerlink" title="@Repeatable"></a>@Repeatable</h3><p><code>@Repeatable</code>这个元注解可以定义<code>Annotation</code>是否可重复。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Repeatable(Reports.class)</span></span><br><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Reports &#123;</span><br><span class="line">    Report[] value();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>经过<code>@Repeatable</code>修饰后，在某个类型声明处，就可以添加多个<code>@Report</code>注解：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Report(type=1, level=&quot;debug&quot;)</span></span><br><span class="line"><span class="meta">@Report(type=2, level=&quot;warning&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="Inherited"><a href="#Inherited" class="headerlink" title="@Inherited"></a>@Inherited</h3><p>使用<code>@Inherited</code>定义子类是否可继承父类定义的<code>Annotation</code>。<code>@Inherited</code>仅针对<code>@Target(ElementType.TYPE)</code>类型的<code>annotation</code>有效，并且仅针对<code>class</code>的继承，对<code>interface</code>的继承无效。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Inherited</span></span><br><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在使用的时候，如果一个类用到了<code>@Report</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Report(type=1)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>则它的子类默认也定义了该注解：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Student</span> <span class="keyword">extends</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="如何定义注解总结"><a href="#如何定义注解总结" class="headerlink" title="如何定义注解总结"></a>如何定义注解总结</h3><p>第一步：用<code>@interface</code>定义注解：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>第二步，添加参数、默认值：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public @interface Report &#123;</span><br><span class="line">    int type() default 0;</span><br><span class="line">    String level() default &quot;info&quot;;</span><br><span class="line">    String value() default &quot;&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>把最常用的参数定义为<code>value()</code>，推荐所有参数都尽量设置默认值。</p>
-<p>第三步，用元注解配置注解：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@Target(ElementType.TYPE)</span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">public @interface Report &#123;</span><br><span class="line">    int type() default 0;</span><br><span class="line">    String level() default &quot;info&quot;;</span><br><span class="line">    String value() default &quot;&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>其中，必须设置<code>@Target</code>和<code>@Retention</code>，<code>@Retention</code>一般设置为<code>RUNTIME</code>，因为我们自定义的注解通常要求在运行期读取。一般情况下，不必写<code>@Inherited</code>和<code>@Repeatable</code>。</p>
-<h2 id="3-处理注解"><a href="#3-处理注解" class="headerlink" title="3. 处理注解"></a>3. 处理注解</h2><p><code>SOURCE</code>类型的注解主要由编译器使用，因此我们一般只使用，不编写。</p>
-<p><code>CLASS</code>类型的注解主要由底层工具库使用，涉及到class的加载，一般我们很少用到。</p>
-<p><code>RUNTIME</code>类型的注解不但要使用，还经常需要编写。</p>
-<p>读取注解，需要使用反射API。</p>
-<p>Java提供的使用反射API读取<code>Annotation</code>的方法包括：</p>
-<p>判断某个注解是否存在于<code>Class</code>、<code>Field</code>、<code>Method</code>或<code>Constructor</code>：</p>
-<ul>
-<li><code>Class.isAnnotationPresent(Class)</code></li>
-<li><code>Field.isAnnotationPresent(Class)</code></li>
-<li><code>Method.isAnnotationPresent(Class)</code></li>
-<li><code>Constructor.isAnnotationPresent(Class)</code></li>
-</ul>
-<p>例如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 判断@Report是否存在于Person类:</span></span><br><span class="line">Person.class.isAnnotationPresent(Report.class);</span><br></pre></td></tr></table></figure>
-
-<p>使用反射API读取Annotation：</p>
-<ul>
-<li><code>Class.getAnnotation(Class)</code></li>
-<li><code>Field.getAnnotation(Class)</code></li>
-<li><code>Method.getAnnotation(Class)</code></li>
-<li><code>Constructor.getAnnotation(Class)</code></li>
-</ul>
-<p>例如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 获取Person定义的@Report注解:</span></span><br><span class="line">Report report = Person.class.getAnnotation(Report.class);</span><br><span class="line"><span class="keyword">int</span> type = report.type();</span><br><span class="line">String level = report.level();</span><br></pre></td></tr></table></figure>
-
-<p>使用反射API读取<code>Annotation</code>有两种方法。</p>
-<p>方法一是先判断<code>Annotation</code>是否存在，如果存在，就直接读取：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Class cls = Person.class;</span><br><span class="line"><span class="keyword">if</span> (cls.isAnnotationPresent(Report.class)) &#123;</span><br><span class="line">    Report report = cls.getAnnotation(Report.class);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>第二种方法是直接读取<code>Annotation</code>，如果<code>Annotation</code>不存在，将返回<code>null</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Class cls = Person.class;</span><br><span class="line">Report report = cls.getAnnotation(Report.class);</span><br><span class="line"><span class="keyword">if</span> (report != <span class="keyword">null</span>) &#123;</span><br><span class="line">   ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>读取方法、字段和构造方法的<code>Annotation</code>和Class类似。但要读取方法参数的<code>Annotation</code>必须用一个二维数组。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">(<span class="meta">@NotNull</span> <span class="meta">@Range(max=5)</span> String name, <span class="meta">@NotNull</span> String prefix)</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 获取Method实例:</span></span><br><span class="line">Method m = ...</span><br><span class="line"><span class="comment">// 获取所有参数的Annotation:</span></span><br><span class="line">Annotation[][] annos = m.getParameterAnnotations();</span><br><span class="line"><span class="comment">// 第一个参数（索引为0）的所有Annotation:</span></span><br><span class="line">Annotation[] annosOfName = annos[<span class="number">0</span>];</span><br><span class="line"><span class="keyword">for</span> (Annotation anno : annosOfName) &#123;</span><br><span class="line">    <span class="keyword">if</span> (anno <span class="keyword">instanceof</span> Range) &#123; <span class="comment">// @Range注解</span></span><br><span class="line">        Range r = (Range) anno;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (anno <span class="keyword">instanceof</span> NotNull) &#123; <span class="comment">// @NotNull注解</span></span><br><span class="line">        NotNull n = (NotNull) anno;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>使用注解</strong></p>
-<p>注解如何使用，完全由程序自己决定。例如，JUnit是一个测试框架，它会自动运行所有标记为<code>@Test</code>的方法。</p>
-<p><code>@Range</code>注解，我们希望用它来定义一个<code>String</code>字段的规则：字段长度满足<code>@Range</code>的参数定义：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Target(ElementType.FIELD)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Range &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">min</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">max</span><span class="params">()</span> <span class="keyword">default</span> 255</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Range(min=1, max=20)</span></span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Range(max=10)</span></span><br><span class="line">    <span class="keyword">public</span> String city;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>定义了注解，本身对程序逻辑没有任何影响。我们必须自己编写代码来使用注解。</p>
-<p>例如：编写一个<code>Person</code>实例的检查方法，它可以检查<code>Person</code>实例的<code>String</code>字段长度是否满足<code>@Range</code>的定义。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">check</span><span class="params">(Person person)</span> <span class="keyword">throws</span> IllegalArgumentException, ReflectiveOperationException </span>&#123;</span><br><span class="line">    <span class="comment">// 遍历所有Field:</span></span><br><span class="line">    <span class="keyword">for</span> (Field field : person.getClass().getFields()) &#123;</span><br><span class="line">        <span class="comment">// 获取Field定义的@Range:</span></span><br><span class="line">        Range range = field.getAnnotation(Range.class);</span><br><span class="line">        <span class="comment">// 如果@Range存在:</span></span><br><span class="line">        <span class="keyword">if</span> (range != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 获取Field的值:</span></span><br><span class="line">            Object value = field.get(person);</span><br><span class="line">            <span class="comment">// 如果值是String:</span></span><br><span class="line">            <span class="keyword">if</span> (value <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">                String s = (String) value;</span><br><span class="line">                <span class="comment">// 判断值是否满足@Range的min/max:</span></span><br><span class="line">                <span class="keyword">if</span> (s.length() &lt; range.min() || s.length() &gt; range.max()) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Invalid field: &quot;</span> + field.getName());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
       <tags>
         <tag>JAVA</tag>
       </tags>
@@ -1292,209 +1292,6 @@
       </tags>
   </entry>
   <entry>
-    <title>JAVA - 时间和日期</title>
-    <url>/2021/04/22/JAVA%E6%97%B6%E9%97%B4%E5%92%8C%E6%97%A5%E6%9C%9F/</url>
-    <content><![CDATA[<h1 id="时间和日期"><a href="#时间和日期" class="headerlink" title="时间和日期"></a>时间和日期</h1><h2 id="1-概念"><a href="#1-概念" class="headerlink" title="1. 概念"></a>1. 概念</h2><p><strong>时区</strong>：</p>
-<ul>
-<li>以<code>GMT</code>或者<code>UTC</code>加时区偏移表示，例如：<code>GMT+08:00</code>或者<code>UTC+08:00</code>表示东八区。</li>
-<li>缩写，例如，<code>CST</code>表示<code>China Standard Time</code>，也就是中国标准时间。但是<code>CST</code>也可以表示美国中部时间<code>Central Standard Time USA</code>，因此，缩写容易产生混淆，我们尽量不要使用缩写。</li>
-<li>洲／城市表示，例如，<code>Asia/Shanghai</code>，表示上海所在地的时区。</li>
-</ul>
-<p><strong>夏令时</strong>：</p>
-<p>所谓夏令时，就是夏天开始的时候，把时间往后拨1小时，夏天结束的时候，再把时间往前拨1小时。美国仍在用。</p>
-<p> <strong>计算夏令时请使用标准库提供的相关类，不要试图自己计算夏令时。</strong></p>
-<p><strong>本地化</strong></p>
-<p>在计算机中，通常使用<code>Locale</code>表示一个国家或地区的日期、时间、数字、货币等格式。<code>Locale</code>由<code>语言_国家</code>的字母缩写构成，例如，**<code>zh_CN</code><strong>表示中文+中国，</strong><code>en_US</code>**表示英文+美国。语言使用小写，国家使用大写。</p>
-<h2 id="2-Date-和-Calendar"><a href="#2-Date-和-Calendar" class="headerlink" title="2. Date 和 Calendar"></a>2. Date 和 Calendar</h2><p>Java标准库提供的API。Java标准库有两套处理日期和时间的API：</p>
-<ul>
-<li>一套定义在<code>java.util</code>这个包里面，主要包括<code>Date</code>、<code>Calendar</code>和<code>TimeZone</code>这几个类；</li>
-<li>一套新的API是在Java 8引入的，定义在<code>java.time</code>这个包里面，主要包括<code>LocalDateTime</code>、<code>ZonedDateTime</code>、<code>ZoneId</code>等。</li>
-</ul>
-<p>很多源代码仍在使用旧的API，故仍要学习旧的API</p>
-<p><strong>Date</strong></p>
-<p><code>java.util.Date</code>是用于表示一个日期和时间的对象</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 获取当前时间:</span></span><br><span class="line">        Date date = <span class="keyword">new</span> Date();</span><br><span class="line">        System.out.println(date.getYear() + <span class="number">1900</span>); <span class="comment">// 必须加上1900</span></span><br><span class="line">        System.out.println(date.getMonth() + <span class="number">1</span>); <span class="comment">// 0~11，必须加上1</span></span><br><span class="line">        System.out.println(date.getDate()); <span class="comment">// 1~31，不能加1</span></span><br><span class="line">        <span class="comment">// 转换为String:</span></span><br><span class="line">        System.out.println(date.toString());</span><br><span class="line">        <span class="comment">// 转换为GMT时区:</span></span><br><span class="line">        System.out.println(date.toGMTString());</span><br><span class="line">        <span class="comment">// 转换为本地时区:</span></span><br><span class="line">        System.out.println(date.toLocaleString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>SimpleDateFormat</code></p>
-<ul>
-<li>yyyy：年</li>
-<li>MM：月</li>
-<li>dd: 日</li>
-<li>HH: 小时</li>
-<li>mm: 分钟</li>
-<li>ss: 秒</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 获取当前时间:</span></span><br><span class="line">        Date date = <span class="keyword">new</span> Date();</span><br><span class="line">        <span class="keyword">var</span> sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line">        System.out.println(sdf.format(date));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 2021-04-21 14:49:09</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 获取当前时间:</span></span><br><span class="line">        Date date = <span class="keyword">new</span> Date();</span><br><span class="line">        <span class="keyword">var</span> sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">&quot;E MMM dd, yyyy&quot;</span>);</span><br><span class="line">        System.out.println(sdf.format(date));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Wed Apr 21, 2021</span></span><br></pre></td></tr></table></figure>
-
-<p>一般来说，字母越长，输出越长。以<code>M</code>为例，假设当前月份是9月：</p>
-<ul>
-<li><code>M</code>：输出<code>9</code></li>
-<li><code>MM</code>：输出<code>09</code></li>
-<li><code>MMM</code>：输出<code>Sep</code></li>
-<li><code>MMMM</code>：输出<code>September</code></li>
-</ul>
-<p><strong>Calendar</strong></p>
-<p><code>Calendar</code>可以用于获取并设置年、月、日、时、分、秒，它和<code>Date</code>比，主要多了一个可以做简单的日期和时间运算的功能。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 获取当前时间:</span></span><br><span class="line">        Calendar c = Calendar.getInstance();</span><br><span class="line">        <span class="keyword">int</span> y = c.get(Calendar.YEAR);</span><br><span class="line">        <span class="keyword">int</span> m = <span class="number">1</span> + c.get(Calendar.MONTH);</span><br><span class="line">        <span class="keyword">int</span> d = c.get(Calendar.DAY_OF_MONTH);</span><br><span class="line">        <span class="keyword">int</span> w = c.get(Calendar.DAY_OF_WEEK);</span><br><span class="line">        <span class="keyword">int</span> hh = c.get(Calendar.HOUR_OF_DAY);</span><br><span class="line">        <span class="keyword">int</span> mm = c.get(Calendar.MINUTE);</span><br><span class="line">        <span class="keyword">int</span> ss = c.get(Calendar.SECOND);</span><br><span class="line">        <span class="keyword">int</span> ms = c.get(Calendar.MILLISECOND);</span><br><span class="line">        System.out.println(y + <span class="string">&quot;-&quot;</span> + m + <span class="string">&quot;-&quot;</span> + d + <span class="string">&quot; &quot;</span> + w + <span class="string">&quot; &quot;</span> + hh + <span class="string">&quot;:&quot;</span> + mm + <span class="string">&quot;:&quot;</span> + ss + <span class="string">&quot;.&quot;</span> + ms);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 2021-4-21 4 14:50:29.350</span></span><br></pre></td></tr></table></figure>
-
-<p>返回的年份不必转换，返回的月份仍然要加1，返回的星期要特别注意，<code>1</code>~`7`分别表示周日，周一，……，周六。</p>
-<p><code>Calendar</code>只有一种方式获取，即<code>Calendar.getInstance()</code>，而且一获取到就是当前时间。</p>
-<p>设置时间：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 当前时间:</span></span><br><span class="line">        Calendar c = Calendar.getInstance();</span><br><span class="line">        <span class="comment">// 清除所有:</span></span><br><span class="line">        c.clear();    <span class="comment">//一开始获取到当前时间，调用clear()删除掉</span></span><br><span class="line">        <span class="comment">// 设置2019年:</span></span><br><span class="line">        c.set(Calendar.YEAR, <span class="number">2019</span>);</span><br><span class="line">        <span class="comment">// 设置9月:注意8表示9月:</span></span><br><span class="line">        c.set(Calendar.MONTH, <span class="number">8</span>);</span><br><span class="line">        <span class="comment">// 设置2日:</span></span><br><span class="line">        c.set(Calendar.DATE, <span class="number">2</span>);</span><br><span class="line">        <span class="comment">// 设置时间:</span></span><br><span class="line">        c.set(Calendar.HOUR_OF_DAY, <span class="number">21</span>);</span><br><span class="line">        c.set(Calendar.MINUTE, <span class="number">22</span>);</span><br><span class="line">        c.set(Calendar.SECOND, <span class="number">23</span>);</span><br><span class="line">        System.out.println(<span class="keyword">new</span> SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>).format(c.getTime()));</span><br><span class="line">        <span class="comment">// 2019-09-02 21:22:23</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>TimeZone</strong></p>
-<p><code>Calendar</code>和<code>Date</code>相比，它提供了时区转换的功能。时区用<code>TimeZone</code>对象表示：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        TimeZone tzDefault = TimeZone.getDefault(); <span class="comment">// 当前时区</span></span><br><span class="line">        TimeZone tzGMT9 = TimeZone.getTimeZone(<span class="string">&quot;GMT+09:00&quot;</span>); <span class="comment">// GMT+9:00时区</span></span><br><span class="line">        TimeZone tzNY = TimeZone.getTimeZone(<span class="string">&quot;America/New_York&quot;</span>); <span class="comment">// 纽约时区</span></span><br><span class="line">        System.out.println(tzDefault.getID()); <span class="comment">// Asia/Shanghai</span></span><br><span class="line">        System.out.println(tzGMT9.getID()); <span class="comment">// GMT+09:00</span></span><br><span class="line">        System.out.println(tzNY.getID()); <span class="comment">// America/New_York</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Etc/UTC</span></span><br><span class="line"><span class="comment">GMT+09:00</span></span><br><span class="line"><span class="comment">America/New_York</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-<p>时区的唯一标识是以字符串表示的ID，我们获取指定<code>TimeZone</code>对象也是以这个ID为参数获取。</p>
-<p>有了时区，我们就可以对指定时间进行转换。例如，下面的例子演示了如何将北京时间<code>2019-11-20 8:15:00</code>转换为纽约时间：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 当前时间:</span></span><br><span class="line">        Calendar c = Calendar.getInstance();</span><br><span class="line">        <span class="comment">// 清除所有:</span></span><br><span class="line">        c.clear();</span><br><span class="line">        <span class="comment">// 设置为北京时区:</span></span><br><span class="line">        c.setTimeZone(TimeZone.getTimeZone(<span class="string">&quot;Asia/Shanghai&quot;</span>));</span><br><span class="line">        <span class="comment">// 设置年月日时分秒:</span></span><br><span class="line">        c.set(<span class="number">2019</span>, <span class="number">10</span> <span class="comment">/* 11月 */</span>, <span class="number">20</span>, <span class="number">8</span>, <span class="number">15</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="comment">// 显示时间:</span></span><br><span class="line">        <span class="keyword">var</span> sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line">        sdf.setTimeZone(TimeZone.getTimeZone(<span class="string">&quot;America/New_York&quot;</span>));</span><br><span class="line">        System.out.println(sdf.format(c.getTime()));</span><br><span class="line">        <span class="comment">// 2019-11-19 19:15:00</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>利用<code>Calendar</code>进行时区转换的步骤是：</p>
-<ol>
-<li>清除所有字段；</li>
-<li>设定指定时区；</li>
-<li>设定日期和时间；</li>
-<li>创建<code>SimpleDateFormat</code>并设定目标时区；</li>
-<li>格式化获取的<code>Date</code>对象（注意<code>Date</code>对象无时区信息，时区信息存储在<code>SimpleDateFormat</code>中）。</li>
-</ol>
-<p><code>Calendar</code>也可以对日期和时间进行简单的加减：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 当前时间:</span></span><br><span class="line">        Calendar c = Calendar.getInstance();</span><br><span class="line">        <span class="comment">// 清除所有:</span></span><br><span class="line">        c.clear();</span><br><span class="line">        <span class="comment">// 设置年月日时分秒:</span></span><br><span class="line">        c.set(<span class="number">2019</span>, <span class="number">10</span> <span class="comment">/* 11月 */</span>, <span class="number">20</span>, <span class="number">8</span>, <span class="number">15</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="comment">// 加5天并减去2小时:</span></span><br><span class="line">        c.add(Calendar.DAY_OF_MONTH, <span class="number">5</span>);</span><br><span class="line">        c.add(Calendar.HOUR_OF_DAY, -<span class="number">2</span>);</span><br><span class="line">        <span class="comment">// 显示时间:</span></span><br><span class="line">        <span class="keyword">var</span> sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line">        Date d = c.getTime();</span><br><span class="line">        System.out.println(sdf.format(d));</span><br><span class="line">        <span class="comment">// 2019-11-25 6:15:00</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-LocalDateTime"><a href="#3-LocalDateTime" class="headerlink" title="3. LocalDateTime"></a>3. LocalDateTime</h2><p><code>java.time</code>包提供了新的日期和时间API，主要涉及的类型有：</p>
-<ul>
-<li>本地日期和时间：<code>LocalDateTime</code>，<code>LocalDate</code>，<code>LocalTime</code>；</li>
-<li>带时区的日期和时间：<code>ZonedDateTime</code>；</li>
-<li>时刻：<code>Instant</code>；</li>
-<li>时区：<code>ZoneId</code>，<code>ZoneOffset</code>；</li>
-<li>时间间隔：<code>Duration</code>。</li>
-</ul>
-<p>以及一套新的用于取代<code>SimpleDateFormat</code>的格式化类型<code>DateTimeFormatter</code>。</p>
-<p>新API的类型几乎全部是不变类型（和String类似），可以放心使用不必担心被修改。</p>
-<p><strong>LocalDateTime</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">/* </span></span><br><span class="line"><span class="comment">        LocalDate d = LocalDate.now(); // 当前日期</span></span><br><span class="line"><span class="comment">        LocalTime t = LocalTime.now(); // 当前时间</span></span><br><span class="line"><span class="comment">        LocalDateTime dt = LocalDateTime.now(); // 当前日期和时间</span></span><br><span class="line"><span class="comment">        为了避免程序执行时间的不一样，导致时间不准确，采用下面的方法*/</span></span><br><span class="line">        LocalDateTime dt = LocalDateTime.now(); <span class="comment">// 当前日期和时</span></span><br><span class="line">        LocalDate d = dt.toLocalDate(); <span class="comment">// 转换到当前日期</span></span><br><span class="line">        LocalTime t = dt.toLocalTime(); <span class="comment">// 转换到当前时间</span></span><br><span class="line">        System.out.println(d); <span class="comment">// 严格按照ISO 8601格式打印</span></span><br><span class="line">        System.out.println(t); <span class="comment">// 严格按照ISO 8601格式打印</span></span><br><span class="line">        System.out.println(dt); <span class="comment">// 严格按照ISO 8601格式打印</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2021-04-22</span></span><br><span class="line"><span class="comment">11:36:59.238843262</span></span><br><span class="line"><span class="comment">2021-04-22T11:36:59.238871627</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-<p>指定的日期和时间创建<code>LocalDateTime</code>可以通过<code>of()</code>方法：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 指定日期和时间:</span></span><br><span class="line">LocalDate d2 = LocalDate.of(<span class="number">2019</span>, <span class="number">11</span>, <span class="number">30</span>); <span class="comment">// 2019-11-30, 注意11=11月</span></span><br><span class="line">LocalTime t2 = LocalTime.of(<span class="number">15</span>, <span class="number">16</span>, <span class="number">17</span>); <span class="comment">// 15:16:17</span></span><br><span class="line">LocalDateTime dt2 = LocalDateTime.of(<span class="number">2019</span>, <span class="number">11</span>, <span class="number">30</span>, <span class="number">15</span>, <span class="number">16</span>, <span class="number">17</span>);</span><br><span class="line">LocalDateTime dt3 = LocalDateTime.of(d2, t2);</span><br></pre></td></tr></table></figure>
-
-<p>将字符串转换为<code>LocalDateTime</code>就可以传入标准格式：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">LocalDateTime dt = LocalDateTime.parse(<span class="string">&quot;2019-11-19T15:16:17&quot;</span>);</span><br><span class="line">LocalDate d = LocalDate.parse(<span class="string">&quot;2019-11-19&quot;</span>);</span><br><span class="line">LocalTime t = LocalTime.parse(<span class="string">&quot;15:16:17&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<p>注意ISO 8601规定的日期和时间分隔符是<code>T</code>。标准格式如下：</p>
-<ul>
-<li>日期：<code>yyyy-MM-dd</code></li>
-<li>时间：<code>HH:mm:ss</code></li>
-<li>带毫秒的时间：<code>HH:mm:ss.SSS</code></li>
-<li>日期和时间：<code>yyyy-MM-dd&#39;T&#39;HH:mm:ss</code></li>
-<li>带毫秒的日期和时间：<code>yyyy-MM-dd&#39;T&#39;HH:mm:ss.SSS</code></li>
-</ul>
-<p><strong>DateTimeFormatter</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 自定义格式化:</span></span><br><span class="line">        DateTimeFormatter dtf = DateTimeFormatter.ofPattern(<span class="string">&quot;yyyy/MM/dd HH:mm:ss&quot;</span>);</span><br><span class="line">        System.out.println(dtf.format(LocalDateTime.now()));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 用自定义格式解析:</span></span><br><span class="line">        LocalDateTime dt2 = LocalDateTime.parse(<span class="string">&quot;2019/11/30 15:16:17&quot;</span>, dtf);</span><br><span class="line">        System.out.println(dt2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2021/04/22 11:46:18</span></span><br><span class="line"><span class="comment">2019-11-30T15:16:17</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-<p><code>LocalDateTime</code>提供了对日期和时间进行加减的非常简单的链式调用：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        LocalDateTime dt = LocalDateTime.of(<span class="number">2019</span>, <span class="number">10</span>, <span class="number">26</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">59</span>);</span><br><span class="line">        System.out.println(dt);</span><br><span class="line">        <span class="comment">// 加5天减3小时:</span></span><br><span class="line">        LocalDateTime dt2 = dt.plusDays(<span class="number">5</span>).minusHours(<span class="number">3</span>);</span><br><span class="line">        System.out.println(dt2); <span class="comment">// 2019-10-31T17:30:59</span></span><br><span class="line">        <span class="comment">// 减1月:</span></span><br><span class="line">        LocalDateTime dt3 = dt2.minusMonths(<span class="number">1</span>);</span><br><span class="line">        System.out.println(dt3); <span class="comment">// 2019-09-30T17:30:59</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2019-10-26T20:30:59</span></span><br><span class="line"><span class="comment">2019-10-31T17:30:59</span></span><br><span class="line"><span class="comment">2019-09-30T17:30:59</span></span><br><span class="line"><span class="comment">月份加减会自动调整日期，例如从2019-10-31减去1个月得到的结果是2019-09-30，因为9月没有31日。</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-<p>对日期和时间进行调整则使用<code>withXxx()</code>方法</p>
-<ul>
-<li>调整年：<code>withYear()</code></li>
-<li>调整月：<code>withMonth()</code></li>
-<li>调整日：<code>withDayOfMonth()</code></li>
-<li>调整时：<code>withHour()</code></li>
-<li>调整分：<code>withMinute()</code></li>
-<li>调整秒：<code>withSecond()</code></li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        LocalDateTime dt = LocalDateTime.of(<span class="number">2019</span>, <span class="number">10</span>, <span class="number">26</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">59</span>);</span><br><span class="line">        System.out.println(dt);</span><br><span class="line">        <span class="comment">// 日期变为31日:</span></span><br><span class="line">        LocalDateTime dt2 = dt.withDayOfMonth(<span class="number">31</span>);</span><br><span class="line">        System.out.println(dt2); <span class="comment">// 2019-10-31T20:30:59</span></span><br><span class="line">        <span class="comment">// 月份变为9:</span></span><br><span class="line">        LocalDateTime dt3 = dt2.withMonth(<span class="number">9</span>);</span><br><span class="line">        System.out.println(dt3); <span class="comment">// 2019-09-30T20:30:59</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>LocalDateTime</code>还有一个通用的<code>with()</code>方法:</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 本月第一天0:00时刻:</span></span><br><span class="line">        LocalDateTime firstDay = LocalDate.now().withDayOfMonth(<span class="number">1</span>).atStartOfDay();</span><br><span class="line">        System.out.println(firstDay);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 本月最后1天:</span></span><br><span class="line">        LocalDate lastDay = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());</span><br><span class="line">        System.out.println(lastDay);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 下月第1天:</span></span><br><span class="line">        LocalDate nextMonthFirstDay = LocalDate.now().with(TemporalAdjusters.firstDayOfNextMonth());</span><br><span class="line">        System.out.println(nextMonthFirstDay);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 本月第1个周一:</span></span><br><span class="line">        LocalDate firstWeekday = LocalDate.now().with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY));</span><br><span class="line">        System.out.println(firstWeekday);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>要判断两个<code>LocalDateTime</code>的先后，可以使用<code>isBefore()</code>、<code>isAfter()</code>方法。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">LocalDateTime now = LocalDateTime.now();</span><br><span class="line">LocalDateTime target = LocalDateTime.of(<span class="number">2019</span>, <span class="number">11</span>, <span class="number">19</span>, <span class="number">8</span>, <span class="number">15</span>, <span class="number">0</span>);</span><br><span class="line">System.out.println(now.isBefore(target));</span><br><span class="line">System.out.println(LocalDate.now().isBefore(LocalDate.of(<span class="number">2019</span>, <span class="number">11</span>, <span class="number">19</span>)));</span><br><span class="line">System.out.println(LocalTime.now().isAfter(LocalTime.parse(<span class="string">&quot;08:15:00&quot;</span>)));</span><br></pre></td></tr></table></figure>
-
-<p><strong>Duration和Period</strong></p>
-<p><code>Duration</code>表示两个时刻之间的时间间隔。另一个类似的<code>Period</code>表示两个日期之间的天数：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        LocalDateTime start = LocalDateTime.of(<span class="number">2019</span>, <span class="number">11</span>, <span class="number">19</span>, <span class="number">8</span>, <span class="number">15</span>, <span class="number">0</span>);</span><br><span class="line">        LocalDateTime end = LocalDateTime.of(<span class="number">2020</span>, <span class="number">1</span>, <span class="number">9</span>, <span class="number">19</span>, <span class="number">25</span>, <span class="number">30</span>);</span><br><span class="line">        Duration d = Duration.between(start, end);</span><br><span class="line">        System.out.println(d); <span class="comment">// PT1235H10M30S</span></span><br><span class="line"></span><br><span class="line">        Period p = LocalDate.of(<span class="number">2019</span>, <span class="number">11</span>, <span class="number">19</span>).until(LocalDate.of(<span class="number">2020</span>, <span class="number">1</span>, <span class="number">9</span>));</span><br><span class="line">        System.out.println(p); <span class="comment">// P1M21D</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>Duration</code>和<code>Period</code>的表示方法,以<code>P...T...</code>的形式表示，<code>P...T</code>之间表示日期间隔，<code>T</code>后面表示时间间隔。如果是<code>PT...</code>的格式表示仅有时间间隔。</p>
-<p>利用<code>ofXxx()</code>或者<code>parse()</code>方法也可以直接创建<code>Duration</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Duration d1 = Duration.ofHours(<span class="number">10</span>); <span class="comment">// 10 hours</span></span><br><span class="line">Duration d2 = Duration.parse(<span class="string">&quot;P1DT2H3M&quot;</span>); <span class="comment">// 1 day, 2 hours, 3 minutes</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="4-ZonedDateTime"><a href="#4-ZonedDateTime" class="headerlink" title="4. ZonedDateTime"></a>4. ZonedDateTime</h2><p><code>LocalDateTime</code>总是表示本地日期和时间，要表示一个带时区的日期和时间，我们就需要<code>ZonedDateTime</code>。</p>
-<p><code>ZonedDateTime</code>理解成<code>LocalDateTime</code>加<code>ZoneId</code>。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ZonedDateTime zbj = ZonedDateTime.now(); <span class="comment">// 默认时区</span></span><br><span class="line">        ZonedDateTime zny = ZonedDateTime.now(ZoneId.of(<span class="string">&quot;America/New_York&quot;</span>)); <span class="comment">// 用指定时区获取当前时间</span></span><br><span class="line">        System.out.println(zbj);</span><br><span class="line">        System.out.println(zny);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2021-04-22T13:21:21.244909512Z[Etc/UTC]</span></span><br><span class="line"><span class="comment">2021-04-22T09:21:21.246806905-04:00[America/New_York]</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-<p>通过给一个<code>LocalDateTime</code>附加一个<code>ZoneId</code>，就可以变成<code>ZonedDateTime</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        LocalDateTime ldt = LocalDateTime.of(<span class="number">2019</span>, <span class="number">9</span>, <span class="number">15</span>, <span class="number">15</span>, <span class="number">16</span>, <span class="number">17</span>);</span><br><span class="line">        ZonedDateTime zbj = ldt.atZone(ZoneId.systemDefault());</span><br><span class="line">        ZonedDateTime zny = ldt.atZone(ZoneId.of(<span class="string">&quot;America/New_York&quot;</span>));</span><br><span class="line">        System.out.println(zbj);</span><br><span class="line">        System.out.println(zny);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2019-09-15T15:16:17Z[Etc/UTC]</span></span><br><span class="line"><span class="comment">2019-09-15T15:16:17-04:00[America/New_York]</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>时区转换</strong></p>
-<p>要转换时区，首先我们需要有一个<code>ZonedDateTime</code>对象，然后，通过<code>withZoneSameInstant()</code>将关联时区转换到另一个时区，转换后日期和时间都会相应调整。</p>
-<p>将北京时间转换为纽约时间：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 以中国时区获取当前时间:</span></span><br><span class="line">        ZonedDateTime zbj = ZonedDateTime.now(ZoneId.of(<span class="string">&quot;Asia/Shanghai&quot;</span>));</span><br><span class="line">        <span class="comment">// 转换为纽约时间:</span></span><br><span class="line">        ZonedDateTime zny = zbj.withZoneSameInstant(ZoneId.of(<span class="string">&quot;America/New_York&quot;</span>));</span><br><span class="line">        System.out.println(zbj);</span><br><span class="line">        System.out.println(zny);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2021-04-22T21:34:20.051086886+08:00[Asia/Shanghai]</span></span><br><span class="line"><span class="comment">2021-04-22T09:34:20.051086886-04:00[America/New_York]</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="5-DateTimeFormatter"><a href="#5-DateTimeFormatter" class="headerlink" title="5. DateTimeFormatter"></a>5. DateTimeFormatter</h2><p>使用旧的<code>Date</code>对象时，我们用<code>SimpleDateFormat</code>进行格式化显示。使用新的<code>LocalDateTime</code>或<code>ZonedLocalDateTime</code>时，我们要进行格式化显示，就要使用<code>DateTimeFormatter</code>。</p>
-<p>创建<code>DateTimeFormatter</code>时，我们仍然通过传入格式化字符串实现：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">DateTimeFormatter formatter = DateTimeFormatter.ofPattern(<span class="string">&quot;yyyy-MM-dd HH:mm&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<p>使用方式与<code>SimpleDateFormat</code>完全一致。</p>
-<p>另一种创建<code>DateTimeFormatter</code>的方法是，传入格式化字符串时，同时指定<code>Locale</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">DateTimeFormatter formatter = DateTimeFormatter.ofPattern(<span class="string">&quot;E, yyyy-MMMM-dd HH:mm&quot;</span>, Locale.US);</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ZonedDateTime zdt = ZonedDateTime.now();</span><br><span class="line">        <span class="keyword">var</span> formatter = DateTimeFormatter.ofPattern(<span class="string">&quot;yyyy-MM-dd&#x27;T&#x27;HH:mm ZZZZ&quot;</span>);</span><br><span class="line">        System.out.println(formatter.format(zdt));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> zhFormatter = DateTimeFormatter.ofPattern(<span class="string">&quot;yyyy MMM dd EE HH:mm&quot;</span>, Locale.CHINA);</span><br><span class="line">        System.out.println(zhFormatter.format(zdt));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> usFormatter = DateTimeFormatter.ofPattern(<span class="string">&quot;E, MMMM/dd/yyyy HH:mm&quot;</span>, Locale.US);</span><br><span class="line">        System.out.println(usFormatter.format(zdt));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2021-04-22T13:37 GMT</span></span><br><span class="line"><span class="comment">2021 4月 22 周四 13:37</span></span><br><span class="line"><span class="comment">Thu, April/22/2021 13:37</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-<p>我们可以通过<code>DateTimeFormatter</code>预定义的几个静态变量来引用：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> ldt = LocalDateTime.now();</span><br><span class="line">System.out.println(DateTimeFormatter.ISO_DATE.format(ldt));</span><br><span class="line">System.out.println(DateTimeFormatter.ISO_DATE_TIME.format(ldt));</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2019-09-15</span></span><br><span class="line"><span class="comment">2019-09-15T23:16:51.56217</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="6-Instant"><a href="#6-Instant" class="headerlink" title="6. Instant"></a>6. Instant</h2><p><code>Instant.now()</code>获取当前时间戳。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Instant now = Instant.now();</span><br><span class="line">        System.out.println(now.getEpochSecond()); <span class="comment">// 秒</span></span><br><span class="line">        System.out.println(now.toEpochMilli()); <span class="comment">// 毫秒</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">1619098921</span></span><br><span class="line"><span class="comment">1619098921281</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-<p><code>Instant</code>就是时间戳，那么，给它附加上一个时区，就可以创建出<code>ZonedDateTime</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 以指定时间戳创建Instant:</span></span><br><span class="line">Instant ins = Instant.ofEpochSecond(<span class="number">1568568760</span>);</span><br><span class="line">ZonedDateTime zdt = ins.atZone(ZoneId.systemDefault());</span><br><span class="line">System.out.println(zdt); <span class="comment">// 2019-09-16T01:32:40+08:00[Asia/Shanghai]</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210422214742768.png" alt="image-20210422214742768"></p>
-<h2 id="7-转化"><a href="#7-转化" class="headerlink" title="7. 转化"></a>7. 转化</h2><p>如果要把旧式的<code>Date</code>或<code>Calendar</code>转换为新API对象，可以通过<code>toInstant()</code>方法转换为<code>Instant</code>对象，再继续转换为<code>ZonedDateTime</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Date -&gt; Instant:</span></span><br><span class="line">Instant ins1 = <span class="keyword">new</span> Date().toInstant();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Calendar -&gt; Instant -&gt; ZonedDateTime:</span></span><br><span class="line">Calendar calendar = Calendar.getInstance();</span><br><span class="line">Instant ins2 = calendar.toInstant();</span><br><span class="line">ZonedDateTime zdt = ins2.atZone(calendar.getTimeZone().toZoneId());</span><br></pre></td></tr></table></figure>
-
-<p><strong>数据库的Date</strong></p>
-<p>在使用Java程序操作数据库时，我们需要把数据库类型与Java类型映射起来。</p>
-<table>
-<thead>
-<tr>
-<th align="left">数据库</th>
-<th align="left">对应Java类（旧）</th>
-<th align="left">对应Java类（新）</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">DATETIME</td>
-<td align="left"><code>java.util.Date</code></td>
-<td align="left"><code>LocalDateTime</code></td>
-</tr>
-<tr>
-<td align="left">DATE</td>
-<td align="left"><code>java.sql.Date</code></td>
-<td align="left"><code>LocalDate</code></td>
-</tr>
-<tr>
-<td align="left">TIME</td>
-<td align="left"><code>java.sql.Time</code></td>
-<td align="left"><code>LocalTime</code></td>
-</tr>
-<tr>
-<td align="left">TIMESTAMP</td>
-<td align="left"><code>java.sql.Timestamp</code></td>
-<td align="left"><code>LocalDateTime</code></td>
-</tr>
-</tbody></table>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> ts = <span class="number">1574208900000L</span>;</span><br><span class="line">        System.out.println(timestampToString(ts, Locale.CHINA, <span class="string">&quot;Asia/Shanghai&quot;</span>));</span><br><span class="line">        System.out.println(timestampToString(ts, Locale.US, <span class="string">&quot;America/New_York&quot;</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> String <span class="title">timestampToString</span><span class="params">(<span class="keyword">long</span> epochMilli, Locale lo, String zoneId)</span> </span>&#123;</span><br><span class="line">        Instant ins = Instant.ofEpochMilli(epochMilli);</span><br><span class="line">        DateTimeFormatter f = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT);</span><br><span class="line">        <span class="keyword">return</span> f.withLocale(lo).format(ZonedDateTime.ofInstant(ins, ZoneId.of(zoneId)));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2019年11月20日 上午8:15</span></span><br><span class="line"><span class="comment">Nov 19, 2019, 7:15 PM</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>JAVA</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>JAVA-核心类</title>
     <url>/2021/04/02/JAVA%E6%A0%B8%E5%BF%83%E7%B1%BB/</url>
     <content><![CDATA[<h1 id="JAVA核心类"><a href="#JAVA核心类" class="headerlink" title="JAVA核心类"></a>JAVA核心类</h1><p>感谢廖雪峰老师的教程！</p>
@@ -1794,6 +1591,209 @@
 <p><strong>SecureRandom</strong></p>
 <p><code>SecureRandom</code>就是用来创建安全的随机数的：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">SecureRandom sr = <span class="keyword">new</span> SecureRandom();</span><br><span class="line">System.out.println(sr.nextInt(<span class="number">100</span>));</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>JAVA</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JAVA - 时间和日期</title>
+    <url>/2021/04/22/JAVA%E6%97%B6%E9%97%B4%E5%92%8C%E6%97%A5%E6%9C%9F/</url>
+    <content><![CDATA[<h1 id="时间和日期"><a href="#时间和日期" class="headerlink" title="时间和日期"></a>时间和日期</h1><h2 id="1-概念"><a href="#1-概念" class="headerlink" title="1. 概念"></a>1. 概念</h2><p><strong>时区</strong>：</p>
+<ul>
+<li>以<code>GMT</code>或者<code>UTC</code>加时区偏移表示，例如：<code>GMT+08:00</code>或者<code>UTC+08:00</code>表示东八区。</li>
+<li>缩写，例如，<code>CST</code>表示<code>China Standard Time</code>，也就是中国标准时间。但是<code>CST</code>也可以表示美国中部时间<code>Central Standard Time USA</code>，因此，缩写容易产生混淆，我们尽量不要使用缩写。</li>
+<li>洲／城市表示，例如，<code>Asia/Shanghai</code>，表示上海所在地的时区。</li>
+</ul>
+<p><strong>夏令时</strong>：</p>
+<p>所谓夏令时，就是夏天开始的时候，把时间往后拨1小时，夏天结束的时候，再把时间往前拨1小时。美国仍在用。</p>
+<p> <strong>计算夏令时请使用标准库提供的相关类，不要试图自己计算夏令时。</strong></p>
+<p><strong>本地化</strong></p>
+<p>在计算机中，通常使用<code>Locale</code>表示一个国家或地区的日期、时间、数字、货币等格式。<code>Locale</code>由<code>语言_国家</code>的字母缩写构成，例如，**<code>zh_CN</code><strong>表示中文+中国，</strong><code>en_US</code>**表示英文+美国。语言使用小写，国家使用大写。</p>
+<h2 id="2-Date-和-Calendar"><a href="#2-Date-和-Calendar" class="headerlink" title="2. Date 和 Calendar"></a>2. Date 和 Calendar</h2><p>Java标准库提供的API。Java标准库有两套处理日期和时间的API：</p>
+<ul>
+<li>一套定义在<code>java.util</code>这个包里面，主要包括<code>Date</code>、<code>Calendar</code>和<code>TimeZone</code>这几个类；</li>
+<li>一套新的API是在Java 8引入的，定义在<code>java.time</code>这个包里面，主要包括<code>LocalDateTime</code>、<code>ZonedDateTime</code>、<code>ZoneId</code>等。</li>
+</ul>
+<p>很多源代码仍在使用旧的API，故仍要学习旧的API</p>
+<p><strong>Date</strong></p>
+<p><code>java.util.Date</code>是用于表示一个日期和时间的对象</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 获取当前时间:</span></span><br><span class="line">        Date date = <span class="keyword">new</span> Date();</span><br><span class="line">        System.out.println(date.getYear() + <span class="number">1900</span>); <span class="comment">// 必须加上1900</span></span><br><span class="line">        System.out.println(date.getMonth() + <span class="number">1</span>); <span class="comment">// 0~11，必须加上1</span></span><br><span class="line">        System.out.println(date.getDate()); <span class="comment">// 1~31，不能加1</span></span><br><span class="line">        <span class="comment">// 转换为String:</span></span><br><span class="line">        System.out.println(date.toString());</span><br><span class="line">        <span class="comment">// 转换为GMT时区:</span></span><br><span class="line">        System.out.println(date.toGMTString());</span><br><span class="line">        <span class="comment">// 转换为本地时区:</span></span><br><span class="line">        System.out.println(date.toLocaleString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>SimpleDateFormat</code></p>
+<ul>
+<li>yyyy：年</li>
+<li>MM：月</li>
+<li>dd: 日</li>
+<li>HH: 小时</li>
+<li>mm: 分钟</li>
+<li>ss: 秒</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 获取当前时间:</span></span><br><span class="line">        Date date = <span class="keyword">new</span> Date();</span><br><span class="line">        <span class="keyword">var</span> sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line">        System.out.println(sdf.format(date));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 2021-04-21 14:49:09</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 获取当前时间:</span></span><br><span class="line">        Date date = <span class="keyword">new</span> Date();</span><br><span class="line">        <span class="keyword">var</span> sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">&quot;E MMM dd, yyyy&quot;</span>);</span><br><span class="line">        System.out.println(sdf.format(date));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Wed Apr 21, 2021</span></span><br></pre></td></tr></table></figure>
+
+<p>一般来说，字母越长，输出越长。以<code>M</code>为例，假设当前月份是9月：</p>
+<ul>
+<li><code>M</code>：输出<code>9</code></li>
+<li><code>MM</code>：输出<code>09</code></li>
+<li><code>MMM</code>：输出<code>Sep</code></li>
+<li><code>MMMM</code>：输出<code>September</code></li>
+</ul>
+<p><strong>Calendar</strong></p>
+<p><code>Calendar</code>可以用于获取并设置年、月、日、时、分、秒，它和<code>Date</code>比，主要多了一个可以做简单的日期和时间运算的功能。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 获取当前时间:</span></span><br><span class="line">        Calendar c = Calendar.getInstance();</span><br><span class="line">        <span class="keyword">int</span> y = c.get(Calendar.YEAR);</span><br><span class="line">        <span class="keyword">int</span> m = <span class="number">1</span> + c.get(Calendar.MONTH);</span><br><span class="line">        <span class="keyword">int</span> d = c.get(Calendar.DAY_OF_MONTH);</span><br><span class="line">        <span class="keyword">int</span> w = c.get(Calendar.DAY_OF_WEEK);</span><br><span class="line">        <span class="keyword">int</span> hh = c.get(Calendar.HOUR_OF_DAY);</span><br><span class="line">        <span class="keyword">int</span> mm = c.get(Calendar.MINUTE);</span><br><span class="line">        <span class="keyword">int</span> ss = c.get(Calendar.SECOND);</span><br><span class="line">        <span class="keyword">int</span> ms = c.get(Calendar.MILLISECOND);</span><br><span class="line">        System.out.println(y + <span class="string">&quot;-&quot;</span> + m + <span class="string">&quot;-&quot;</span> + d + <span class="string">&quot; &quot;</span> + w + <span class="string">&quot; &quot;</span> + hh + <span class="string">&quot;:&quot;</span> + mm + <span class="string">&quot;:&quot;</span> + ss + <span class="string">&quot;.&quot;</span> + ms);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 2021-4-21 4 14:50:29.350</span></span><br></pre></td></tr></table></figure>
+
+<p>返回的年份不必转换，返回的月份仍然要加1，返回的星期要特别注意，<code>1</code>~`7`分别表示周日，周一，……，周六。</p>
+<p><code>Calendar</code>只有一种方式获取，即<code>Calendar.getInstance()</code>，而且一获取到就是当前时间。</p>
+<p>设置时间：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 当前时间:</span></span><br><span class="line">        Calendar c = Calendar.getInstance();</span><br><span class="line">        <span class="comment">// 清除所有:</span></span><br><span class="line">        c.clear();    <span class="comment">//一开始获取到当前时间，调用clear()删除掉</span></span><br><span class="line">        <span class="comment">// 设置2019年:</span></span><br><span class="line">        c.set(Calendar.YEAR, <span class="number">2019</span>);</span><br><span class="line">        <span class="comment">// 设置9月:注意8表示9月:</span></span><br><span class="line">        c.set(Calendar.MONTH, <span class="number">8</span>);</span><br><span class="line">        <span class="comment">// 设置2日:</span></span><br><span class="line">        c.set(Calendar.DATE, <span class="number">2</span>);</span><br><span class="line">        <span class="comment">// 设置时间:</span></span><br><span class="line">        c.set(Calendar.HOUR_OF_DAY, <span class="number">21</span>);</span><br><span class="line">        c.set(Calendar.MINUTE, <span class="number">22</span>);</span><br><span class="line">        c.set(Calendar.SECOND, <span class="number">23</span>);</span><br><span class="line">        System.out.println(<span class="keyword">new</span> SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>).format(c.getTime()));</span><br><span class="line">        <span class="comment">// 2019-09-02 21:22:23</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>TimeZone</strong></p>
+<p><code>Calendar</code>和<code>Date</code>相比，它提供了时区转换的功能。时区用<code>TimeZone</code>对象表示：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        TimeZone tzDefault = TimeZone.getDefault(); <span class="comment">// 当前时区</span></span><br><span class="line">        TimeZone tzGMT9 = TimeZone.getTimeZone(<span class="string">&quot;GMT+09:00&quot;</span>); <span class="comment">// GMT+9:00时区</span></span><br><span class="line">        TimeZone tzNY = TimeZone.getTimeZone(<span class="string">&quot;America/New_York&quot;</span>); <span class="comment">// 纽约时区</span></span><br><span class="line">        System.out.println(tzDefault.getID()); <span class="comment">// Asia/Shanghai</span></span><br><span class="line">        System.out.println(tzGMT9.getID()); <span class="comment">// GMT+09:00</span></span><br><span class="line">        System.out.println(tzNY.getID()); <span class="comment">// America/New_York</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Etc/UTC</span></span><br><span class="line"><span class="comment">GMT+09:00</span></span><br><span class="line"><span class="comment">America/New_York</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>时区的唯一标识是以字符串表示的ID，我们获取指定<code>TimeZone</code>对象也是以这个ID为参数获取。</p>
+<p>有了时区，我们就可以对指定时间进行转换。例如，下面的例子演示了如何将北京时间<code>2019-11-20 8:15:00</code>转换为纽约时间：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 当前时间:</span></span><br><span class="line">        Calendar c = Calendar.getInstance();</span><br><span class="line">        <span class="comment">// 清除所有:</span></span><br><span class="line">        c.clear();</span><br><span class="line">        <span class="comment">// 设置为北京时区:</span></span><br><span class="line">        c.setTimeZone(TimeZone.getTimeZone(<span class="string">&quot;Asia/Shanghai&quot;</span>));</span><br><span class="line">        <span class="comment">// 设置年月日时分秒:</span></span><br><span class="line">        c.set(<span class="number">2019</span>, <span class="number">10</span> <span class="comment">/* 11月 */</span>, <span class="number">20</span>, <span class="number">8</span>, <span class="number">15</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="comment">// 显示时间:</span></span><br><span class="line">        <span class="keyword">var</span> sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line">        sdf.setTimeZone(TimeZone.getTimeZone(<span class="string">&quot;America/New_York&quot;</span>));</span><br><span class="line">        System.out.println(sdf.format(c.getTime()));</span><br><span class="line">        <span class="comment">// 2019-11-19 19:15:00</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>利用<code>Calendar</code>进行时区转换的步骤是：</p>
+<ol>
+<li>清除所有字段；</li>
+<li>设定指定时区；</li>
+<li>设定日期和时间；</li>
+<li>创建<code>SimpleDateFormat</code>并设定目标时区；</li>
+<li>格式化获取的<code>Date</code>对象（注意<code>Date</code>对象无时区信息，时区信息存储在<code>SimpleDateFormat</code>中）。</li>
+</ol>
+<p><code>Calendar</code>也可以对日期和时间进行简单的加减：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 当前时间:</span></span><br><span class="line">        Calendar c = Calendar.getInstance();</span><br><span class="line">        <span class="comment">// 清除所有:</span></span><br><span class="line">        c.clear();</span><br><span class="line">        <span class="comment">// 设置年月日时分秒:</span></span><br><span class="line">        c.set(<span class="number">2019</span>, <span class="number">10</span> <span class="comment">/* 11月 */</span>, <span class="number">20</span>, <span class="number">8</span>, <span class="number">15</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="comment">// 加5天并减去2小时:</span></span><br><span class="line">        c.add(Calendar.DAY_OF_MONTH, <span class="number">5</span>);</span><br><span class="line">        c.add(Calendar.HOUR_OF_DAY, -<span class="number">2</span>);</span><br><span class="line">        <span class="comment">// 显示时间:</span></span><br><span class="line">        <span class="keyword">var</span> sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line">        Date d = c.getTime();</span><br><span class="line">        System.out.println(sdf.format(d));</span><br><span class="line">        <span class="comment">// 2019-11-25 6:15:00</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-LocalDateTime"><a href="#3-LocalDateTime" class="headerlink" title="3. LocalDateTime"></a>3. LocalDateTime</h2><p><code>java.time</code>包提供了新的日期和时间API，主要涉及的类型有：</p>
+<ul>
+<li>本地日期和时间：<code>LocalDateTime</code>，<code>LocalDate</code>，<code>LocalTime</code>；</li>
+<li>带时区的日期和时间：<code>ZonedDateTime</code>；</li>
+<li>时刻：<code>Instant</code>；</li>
+<li>时区：<code>ZoneId</code>，<code>ZoneOffset</code>；</li>
+<li>时间间隔：<code>Duration</code>。</li>
+</ul>
+<p>以及一套新的用于取代<code>SimpleDateFormat</code>的格式化类型<code>DateTimeFormatter</code>。</p>
+<p>新API的类型几乎全部是不变类型（和String类似），可以放心使用不必担心被修改。</p>
+<p><strong>LocalDateTime</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">/* </span></span><br><span class="line"><span class="comment">        LocalDate d = LocalDate.now(); // 当前日期</span></span><br><span class="line"><span class="comment">        LocalTime t = LocalTime.now(); // 当前时间</span></span><br><span class="line"><span class="comment">        LocalDateTime dt = LocalDateTime.now(); // 当前日期和时间</span></span><br><span class="line"><span class="comment">        为了避免程序执行时间的不一样，导致时间不准确，采用下面的方法*/</span></span><br><span class="line">        LocalDateTime dt = LocalDateTime.now(); <span class="comment">// 当前日期和时</span></span><br><span class="line">        LocalDate d = dt.toLocalDate(); <span class="comment">// 转换到当前日期</span></span><br><span class="line">        LocalTime t = dt.toLocalTime(); <span class="comment">// 转换到当前时间</span></span><br><span class="line">        System.out.println(d); <span class="comment">// 严格按照ISO 8601格式打印</span></span><br><span class="line">        System.out.println(t); <span class="comment">// 严格按照ISO 8601格式打印</span></span><br><span class="line">        System.out.println(dt); <span class="comment">// 严格按照ISO 8601格式打印</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2021-04-22</span></span><br><span class="line"><span class="comment">11:36:59.238843262</span></span><br><span class="line"><span class="comment">2021-04-22T11:36:59.238871627</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>指定的日期和时间创建<code>LocalDateTime</code>可以通过<code>of()</code>方法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 指定日期和时间:</span></span><br><span class="line">LocalDate d2 = LocalDate.of(<span class="number">2019</span>, <span class="number">11</span>, <span class="number">30</span>); <span class="comment">// 2019-11-30, 注意11=11月</span></span><br><span class="line">LocalTime t2 = LocalTime.of(<span class="number">15</span>, <span class="number">16</span>, <span class="number">17</span>); <span class="comment">// 15:16:17</span></span><br><span class="line">LocalDateTime dt2 = LocalDateTime.of(<span class="number">2019</span>, <span class="number">11</span>, <span class="number">30</span>, <span class="number">15</span>, <span class="number">16</span>, <span class="number">17</span>);</span><br><span class="line">LocalDateTime dt3 = LocalDateTime.of(d2, t2);</span><br></pre></td></tr></table></figure>
+
+<p>将字符串转换为<code>LocalDateTime</code>就可以传入标准格式：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">LocalDateTime dt = LocalDateTime.parse(<span class="string">&quot;2019-11-19T15:16:17&quot;</span>);</span><br><span class="line">LocalDate d = LocalDate.parse(<span class="string">&quot;2019-11-19&quot;</span>);</span><br><span class="line">LocalTime t = LocalTime.parse(<span class="string">&quot;15:16:17&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>注意ISO 8601规定的日期和时间分隔符是<code>T</code>。标准格式如下：</p>
+<ul>
+<li>日期：<code>yyyy-MM-dd</code></li>
+<li>时间：<code>HH:mm:ss</code></li>
+<li>带毫秒的时间：<code>HH:mm:ss.SSS</code></li>
+<li>日期和时间：<code>yyyy-MM-dd&#39;T&#39;HH:mm:ss</code></li>
+<li>带毫秒的日期和时间：<code>yyyy-MM-dd&#39;T&#39;HH:mm:ss.SSS</code></li>
+</ul>
+<p><strong>DateTimeFormatter</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 自定义格式化:</span></span><br><span class="line">        DateTimeFormatter dtf = DateTimeFormatter.ofPattern(<span class="string">&quot;yyyy/MM/dd HH:mm:ss&quot;</span>);</span><br><span class="line">        System.out.println(dtf.format(LocalDateTime.now()));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 用自定义格式解析:</span></span><br><span class="line">        LocalDateTime dt2 = LocalDateTime.parse(<span class="string">&quot;2019/11/30 15:16:17&quot;</span>, dtf);</span><br><span class="line">        System.out.println(dt2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2021/04/22 11:46:18</span></span><br><span class="line"><span class="comment">2019-11-30T15:16:17</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p><code>LocalDateTime</code>提供了对日期和时间进行加减的非常简单的链式调用：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        LocalDateTime dt = LocalDateTime.of(<span class="number">2019</span>, <span class="number">10</span>, <span class="number">26</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">59</span>);</span><br><span class="line">        System.out.println(dt);</span><br><span class="line">        <span class="comment">// 加5天减3小时:</span></span><br><span class="line">        LocalDateTime dt2 = dt.plusDays(<span class="number">5</span>).minusHours(<span class="number">3</span>);</span><br><span class="line">        System.out.println(dt2); <span class="comment">// 2019-10-31T17:30:59</span></span><br><span class="line">        <span class="comment">// 减1月:</span></span><br><span class="line">        LocalDateTime dt3 = dt2.minusMonths(<span class="number">1</span>);</span><br><span class="line">        System.out.println(dt3); <span class="comment">// 2019-09-30T17:30:59</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2019-10-26T20:30:59</span></span><br><span class="line"><span class="comment">2019-10-31T17:30:59</span></span><br><span class="line"><span class="comment">2019-09-30T17:30:59</span></span><br><span class="line"><span class="comment">月份加减会自动调整日期，例如从2019-10-31减去1个月得到的结果是2019-09-30，因为9月没有31日。</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>对日期和时间进行调整则使用<code>withXxx()</code>方法</p>
+<ul>
+<li>调整年：<code>withYear()</code></li>
+<li>调整月：<code>withMonth()</code></li>
+<li>调整日：<code>withDayOfMonth()</code></li>
+<li>调整时：<code>withHour()</code></li>
+<li>调整分：<code>withMinute()</code></li>
+<li>调整秒：<code>withSecond()</code></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        LocalDateTime dt = LocalDateTime.of(<span class="number">2019</span>, <span class="number">10</span>, <span class="number">26</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">59</span>);</span><br><span class="line">        System.out.println(dt);</span><br><span class="line">        <span class="comment">// 日期变为31日:</span></span><br><span class="line">        LocalDateTime dt2 = dt.withDayOfMonth(<span class="number">31</span>);</span><br><span class="line">        System.out.println(dt2); <span class="comment">// 2019-10-31T20:30:59</span></span><br><span class="line">        <span class="comment">// 月份变为9:</span></span><br><span class="line">        LocalDateTime dt3 = dt2.withMonth(<span class="number">9</span>);</span><br><span class="line">        System.out.println(dt3); <span class="comment">// 2019-09-30T20:30:59</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>LocalDateTime</code>还有一个通用的<code>with()</code>方法:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 本月第一天0:00时刻:</span></span><br><span class="line">        LocalDateTime firstDay = LocalDate.now().withDayOfMonth(<span class="number">1</span>).atStartOfDay();</span><br><span class="line">        System.out.println(firstDay);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 本月最后1天:</span></span><br><span class="line">        LocalDate lastDay = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());</span><br><span class="line">        System.out.println(lastDay);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 下月第1天:</span></span><br><span class="line">        LocalDate nextMonthFirstDay = LocalDate.now().with(TemporalAdjusters.firstDayOfNextMonth());</span><br><span class="line">        System.out.println(nextMonthFirstDay);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 本月第1个周一:</span></span><br><span class="line">        LocalDate firstWeekday = LocalDate.now().with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY));</span><br><span class="line">        System.out.println(firstWeekday);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>要判断两个<code>LocalDateTime</code>的先后，可以使用<code>isBefore()</code>、<code>isAfter()</code>方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">LocalDateTime now = LocalDateTime.now();</span><br><span class="line">LocalDateTime target = LocalDateTime.of(<span class="number">2019</span>, <span class="number">11</span>, <span class="number">19</span>, <span class="number">8</span>, <span class="number">15</span>, <span class="number">0</span>);</span><br><span class="line">System.out.println(now.isBefore(target));</span><br><span class="line">System.out.println(LocalDate.now().isBefore(LocalDate.of(<span class="number">2019</span>, <span class="number">11</span>, <span class="number">19</span>)));</span><br><span class="line">System.out.println(LocalTime.now().isAfter(LocalTime.parse(<span class="string">&quot;08:15:00&quot;</span>)));</span><br></pre></td></tr></table></figure>
+
+<p><strong>Duration和Period</strong></p>
+<p><code>Duration</code>表示两个时刻之间的时间间隔。另一个类似的<code>Period</code>表示两个日期之间的天数：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        LocalDateTime start = LocalDateTime.of(<span class="number">2019</span>, <span class="number">11</span>, <span class="number">19</span>, <span class="number">8</span>, <span class="number">15</span>, <span class="number">0</span>);</span><br><span class="line">        LocalDateTime end = LocalDateTime.of(<span class="number">2020</span>, <span class="number">1</span>, <span class="number">9</span>, <span class="number">19</span>, <span class="number">25</span>, <span class="number">30</span>);</span><br><span class="line">        Duration d = Duration.between(start, end);</span><br><span class="line">        System.out.println(d); <span class="comment">// PT1235H10M30S</span></span><br><span class="line"></span><br><span class="line">        Period p = LocalDate.of(<span class="number">2019</span>, <span class="number">11</span>, <span class="number">19</span>).until(LocalDate.of(<span class="number">2020</span>, <span class="number">1</span>, <span class="number">9</span>));</span><br><span class="line">        System.out.println(p); <span class="comment">// P1M21D</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Duration</code>和<code>Period</code>的表示方法,以<code>P...T...</code>的形式表示，<code>P...T</code>之间表示日期间隔，<code>T</code>后面表示时间间隔。如果是<code>PT...</code>的格式表示仅有时间间隔。</p>
+<p>利用<code>ofXxx()</code>或者<code>parse()</code>方法也可以直接创建<code>Duration</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Duration d1 = Duration.ofHours(<span class="number">10</span>); <span class="comment">// 10 hours</span></span><br><span class="line">Duration d2 = Duration.parse(<span class="string">&quot;P1DT2H3M&quot;</span>); <span class="comment">// 1 day, 2 hours, 3 minutes</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="4-ZonedDateTime"><a href="#4-ZonedDateTime" class="headerlink" title="4. ZonedDateTime"></a>4. ZonedDateTime</h2><p><code>LocalDateTime</code>总是表示本地日期和时间，要表示一个带时区的日期和时间，我们就需要<code>ZonedDateTime</code>。</p>
+<p><code>ZonedDateTime</code>理解成<code>LocalDateTime</code>加<code>ZoneId</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ZonedDateTime zbj = ZonedDateTime.now(); <span class="comment">// 默认时区</span></span><br><span class="line">        ZonedDateTime zny = ZonedDateTime.now(ZoneId.of(<span class="string">&quot;America/New_York&quot;</span>)); <span class="comment">// 用指定时区获取当前时间</span></span><br><span class="line">        System.out.println(zbj);</span><br><span class="line">        System.out.println(zny);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2021-04-22T13:21:21.244909512Z[Etc/UTC]</span></span><br><span class="line"><span class="comment">2021-04-22T09:21:21.246806905-04:00[America/New_York]</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>通过给一个<code>LocalDateTime</code>附加一个<code>ZoneId</code>，就可以变成<code>ZonedDateTime</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        LocalDateTime ldt = LocalDateTime.of(<span class="number">2019</span>, <span class="number">9</span>, <span class="number">15</span>, <span class="number">15</span>, <span class="number">16</span>, <span class="number">17</span>);</span><br><span class="line">        ZonedDateTime zbj = ldt.atZone(ZoneId.systemDefault());</span><br><span class="line">        ZonedDateTime zny = ldt.atZone(ZoneId.of(<span class="string">&quot;America/New_York&quot;</span>));</span><br><span class="line">        System.out.println(zbj);</span><br><span class="line">        System.out.println(zny);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2019-09-15T15:16:17Z[Etc/UTC]</span></span><br><span class="line"><span class="comment">2019-09-15T15:16:17-04:00[America/New_York]</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>时区转换</strong></p>
+<p>要转换时区，首先我们需要有一个<code>ZonedDateTime</code>对象，然后，通过<code>withZoneSameInstant()</code>将关联时区转换到另一个时区，转换后日期和时间都会相应调整。</p>
+<p>将北京时间转换为纽约时间：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 以中国时区获取当前时间:</span></span><br><span class="line">        ZonedDateTime zbj = ZonedDateTime.now(ZoneId.of(<span class="string">&quot;Asia/Shanghai&quot;</span>));</span><br><span class="line">        <span class="comment">// 转换为纽约时间:</span></span><br><span class="line">        ZonedDateTime zny = zbj.withZoneSameInstant(ZoneId.of(<span class="string">&quot;America/New_York&quot;</span>));</span><br><span class="line">        System.out.println(zbj);</span><br><span class="line">        System.out.println(zny);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2021-04-22T21:34:20.051086886+08:00[Asia/Shanghai]</span></span><br><span class="line"><span class="comment">2021-04-22T09:34:20.051086886-04:00[America/New_York]</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="5-DateTimeFormatter"><a href="#5-DateTimeFormatter" class="headerlink" title="5. DateTimeFormatter"></a>5. DateTimeFormatter</h2><p>使用旧的<code>Date</code>对象时，我们用<code>SimpleDateFormat</code>进行格式化显示。使用新的<code>LocalDateTime</code>或<code>ZonedLocalDateTime</code>时，我们要进行格式化显示，就要使用<code>DateTimeFormatter</code>。</p>
+<p>创建<code>DateTimeFormatter</code>时，我们仍然通过传入格式化字符串实现：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">DateTimeFormatter formatter = DateTimeFormatter.ofPattern(<span class="string">&quot;yyyy-MM-dd HH:mm&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>使用方式与<code>SimpleDateFormat</code>完全一致。</p>
+<p>另一种创建<code>DateTimeFormatter</code>的方法是，传入格式化字符串时，同时指定<code>Locale</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">DateTimeFormatter formatter = DateTimeFormatter.ofPattern(<span class="string">&quot;E, yyyy-MMMM-dd HH:mm&quot;</span>, Locale.US);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ZonedDateTime zdt = ZonedDateTime.now();</span><br><span class="line">        <span class="keyword">var</span> formatter = DateTimeFormatter.ofPattern(<span class="string">&quot;yyyy-MM-dd&#x27;T&#x27;HH:mm ZZZZ&quot;</span>);</span><br><span class="line">        System.out.println(formatter.format(zdt));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> zhFormatter = DateTimeFormatter.ofPattern(<span class="string">&quot;yyyy MMM dd EE HH:mm&quot;</span>, Locale.CHINA);</span><br><span class="line">        System.out.println(zhFormatter.format(zdt));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> usFormatter = DateTimeFormatter.ofPattern(<span class="string">&quot;E, MMMM/dd/yyyy HH:mm&quot;</span>, Locale.US);</span><br><span class="line">        System.out.println(usFormatter.format(zdt));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2021-04-22T13:37 GMT</span></span><br><span class="line"><span class="comment">2021 4月 22 周四 13:37</span></span><br><span class="line"><span class="comment">Thu, April/22/2021 13:37</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>我们可以通过<code>DateTimeFormatter</code>预定义的几个静态变量来引用：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> ldt = LocalDateTime.now();</span><br><span class="line">System.out.println(DateTimeFormatter.ISO_DATE.format(ldt));</span><br><span class="line">System.out.println(DateTimeFormatter.ISO_DATE_TIME.format(ldt));</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2019-09-15</span></span><br><span class="line"><span class="comment">2019-09-15T23:16:51.56217</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="6-Instant"><a href="#6-Instant" class="headerlink" title="6. Instant"></a>6. Instant</h2><p><code>Instant.now()</code>获取当前时间戳。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Instant now = Instant.now();</span><br><span class="line">        System.out.println(now.getEpochSecond()); <span class="comment">// 秒</span></span><br><span class="line">        System.out.println(now.toEpochMilli()); <span class="comment">// 毫秒</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">1619098921</span></span><br><span class="line"><span class="comment">1619098921281</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p><code>Instant</code>就是时间戳，那么，给它附加上一个时区，就可以创建出<code>ZonedDateTime</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 以指定时间戳创建Instant:</span></span><br><span class="line">Instant ins = Instant.ofEpochSecond(<span class="number">1568568760</span>);</span><br><span class="line">ZonedDateTime zdt = ins.atZone(ZoneId.systemDefault());</span><br><span class="line">System.out.println(zdt); <span class="comment">// 2019-09-16T01:32:40+08:00[Asia/Shanghai]</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210422214742768.png" alt="image-20210422214742768"></p>
+<h2 id="7-转化"><a href="#7-转化" class="headerlink" title="7. 转化"></a>7. 转化</h2><p>如果要把旧式的<code>Date</code>或<code>Calendar</code>转换为新API对象，可以通过<code>toInstant()</code>方法转换为<code>Instant</code>对象，再继续转换为<code>ZonedDateTime</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Date -&gt; Instant:</span></span><br><span class="line">Instant ins1 = <span class="keyword">new</span> Date().toInstant();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Calendar -&gt; Instant -&gt; ZonedDateTime:</span></span><br><span class="line">Calendar calendar = Calendar.getInstance();</span><br><span class="line">Instant ins2 = calendar.toInstant();</span><br><span class="line">ZonedDateTime zdt = ins2.atZone(calendar.getTimeZone().toZoneId());</span><br></pre></td></tr></table></figure>
+
+<p><strong>数据库的Date</strong></p>
+<p>在使用Java程序操作数据库时，我们需要把数据库类型与Java类型映射起来。</p>
+<table>
+<thead>
+<tr>
+<th align="left">数据库</th>
+<th align="left">对应Java类（旧）</th>
+<th align="left">对应Java类（新）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">DATETIME</td>
+<td align="left"><code>java.util.Date</code></td>
+<td align="left"><code>LocalDateTime</code></td>
+</tr>
+<tr>
+<td align="left">DATE</td>
+<td align="left"><code>java.sql.Date</code></td>
+<td align="left"><code>LocalDate</code></td>
+</tr>
+<tr>
+<td align="left">TIME</td>
+<td align="left"><code>java.sql.Time</code></td>
+<td align="left"><code>LocalTime</code></td>
+</tr>
+<tr>
+<td align="left">TIMESTAMP</td>
+<td align="left"><code>java.sql.Timestamp</code></td>
+<td align="left"><code>LocalDateTime</code></td>
+</tr>
+</tbody></table>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> ts = <span class="number">1574208900000L</span>;</span><br><span class="line">        System.out.println(timestampToString(ts, Locale.CHINA, <span class="string">&quot;Asia/Shanghai&quot;</span>));</span><br><span class="line">        System.out.println(timestampToString(ts, Locale.US, <span class="string">&quot;America/New_York&quot;</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> String <span class="title">timestampToString</span><span class="params">(<span class="keyword">long</span> epochMilli, Locale lo, String zoneId)</span> </span>&#123;</span><br><span class="line">        Instant ins = Instant.ofEpochMilli(epochMilli);</span><br><span class="line">        DateTimeFormatter f = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT);</span><br><span class="line">        <span class="keyword">return</span> f.withLocale(lo).format(ZonedDateTime.ofInstant(ins, ZoneId.of(zoneId)));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2019年11月20日 上午8:15</span></span><br><span class="line"><span class="comment">Nov 19, 2019, 7:15 PM</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
 
 ]]></content>
       <tags>
