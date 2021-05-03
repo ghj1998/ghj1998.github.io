@@ -1,7 +1,10 @@
 ---
 title: ANTLR安装和初次尝试
 date: 2021-04-26 10:56:33
-tags: JAVA,语法分析,ANTLR
+tags: 
+- JAVA
+- 语法分析
+- ANTLR
 ---
 
 > 本文是antlr4权威指南的阅读笔记。
