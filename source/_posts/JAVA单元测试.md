@@ -56,6 +56,17 @@ tags:
 
 ![image-20210506095651944](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210506095651944.png)
 
+**注意**：Maven需要在pom.xml中添加依赖。
+
+```xml
+<dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>4.12</version>
+    <scope>test</scope>
+</dependency>
+```
+
 ### 1.3 常用断言
 
 `assertEquals(expected, actual)`是最常用的测试方法。
