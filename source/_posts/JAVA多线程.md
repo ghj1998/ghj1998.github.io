@@ -1,7 +1,9 @@
 ---
 title: JAVA-多线程
 date: 2021-04-24 19:44:25
-tags: JAVA
+tags: 
+- JAVA
+- 多线程
 ---
 
 # 多线程
