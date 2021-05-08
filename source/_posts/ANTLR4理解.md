@@ -1,9 +1,10 @@
 ---
 title: ANTLR4理解
-date: 2021-04-26 18:55:47
+date: 2021-05-8 16:04:47
 tags: 
 - ANTLR
 - 语法分析
+
 ---
 
 # ANTLR背后在干什么？
@@ -39,3 +40,107 @@ ANTLR工具依赖于类似于assign的语法规则，产生递归下降的语法
 **什么是递归下降？**
 
 从根节点开始，向叶节点解析。
+
+举例：
+
+例如如下的语法规则
+
+```apl
+assin : ID '=' expr ';';
+```
+
+语法分析器实现的细节：
+
+```java
+void assign(){
+    match(ID);
+    match('=');
+    expr();
+    match(";");
+}
+```
+
+`stat()`是根节点。
+
+`assign()`和`expr()`都是调用路线，`match()`对应了语法规则的叶子节点。
+
+`stat`规则能对应多个`assign`级别的分支。
+
+例如：
+
+```api
+stat: assign   //第一备选分支
+    | ifstat   //第二备选分支
+    | whilestat
+    ...
+    ;
+```
+
+解析的话类似于`switch`语句：
+
+```java
+void stat(){
+    switch(<< 当前输入的词法符号 >>){
+            CASE ID ：assign();break;
+            CASE IF : ifstat();break;
+            CASE WHILE ：whilestat();break;
+            ...
+            default : <<抛出无可选方案的异常>>
+    }
+}
+```
+
+`stat()`通过检查下一个词法符号来做出决策。例如，如果遇到了WHILE关键字，则选择第三个分支备选。同时`stat()`调用`whilestat()`方法。
+
+下一个词法符号又称为**前瞻词法符号（lookahead token）**
+
+但是，选择分支往往很多，就导致语法分析器往往需要多个前瞻词法符号才能指导去哪个分支。
+
+**ANTLR能够根据情况调整前瞻数量。**
+
+所以：我们不用考虑了哈哈哈哈。
+
+**合法语句**：能够顺利从开始走到语句结尾，就是合法语句。
+也就是说，如果在中途没办法做出选择，表示，语句本身出了问题。
+
+## 3. 避免歧义性语句
+
+歧义性举例：
+
+```api
+stat: expr ';'
+     | ID '(' ')' ';'
+     ;
+expr: ID '(' ')'
+	| INT
+	;
+```
+
+上述规则如果匹配 "`f();`"
+
+![image-20210508160604632](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210508160604632.png)
+
+就会出现如上两种情况。左边是匹配了expr规则，右边是匹配了stat规则的第二个备选分支。
+
+ANTLR会选择左边的语法分析树对`f()`进行解释。
+
+## 4. 利用语法分析树构建语言类应用程序
+
+### 4.1 ANTLR使用的数据结构和类名
+
+ANTLR类：`CharStream`，`Lexer`，`Token`，`Parser`，`ParseTree`。
+
+连接词法分析器和语法分析器的管道是`TokenStream`。
+
+整体交互如图所示：
+
+<img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210508162752717.png" alt="image-20210508162752717" style="zoom:50%;" />
+
+`TokenStream`只记录了`CharStream`中字符序列的开始位置和结束位置。目的是：共享数据结构来节约内存。
+
+`ParseTree`的子类`RuleNode`和`TerminalNode`，分别是子树的根节点和叶子节点。`RuleNode`规则不是一成不变，实际上是`StatContext`、`AssignContext`以及`ExprContext`。
+
+<img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210508163241574.png" alt="image-20210508163241574" style="zoom:75%;" />
+
+
+
