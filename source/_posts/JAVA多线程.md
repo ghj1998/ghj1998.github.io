@@ -1,6 +1,6 @@
 ---
 title: JAVA-多线程
-date: 2021-04-24 19:44:25
+date: 2021-05-09 21:13:25
 tags: 
 - JAVA
 - 多线程
@@ -735,3 +735,652 @@ public class Point {
 }
 ```
 
+## 13. 使用Concurrent集合
+
+`BlockingQueue`：当一个线程调用这个`TaskQueue`的`getTask()`方法时，该方法内部可能会让线程变成等待状态，直到队列条件满足不为空，线程被唤醒后，`getTask()`方法才会返回。
+
+Java标准库的`java.util.concurrent`包提供线程安全的集合：
+
+| interface | non-thread-safe           | thread-safe                                |
+| :-------- | :------------------------ | :----------------------------------------- |
+| List      | `ArrayList`               | `CopyOnWriteArrayList`                     |
+| Map       | `HashMap`                 | `ConcurrentHashMap`                        |
+| Set       | `HashSet / TreeSet`       | `CopyOnWriteArraySet`                      |
+| Queue     | `ArrayDeque / LinkedList` | `ArrayBlockingQueue / LinkedBlockingQueue` |
+| Deque     | `ArrayDeque / LinkedList` | `LinkedBlockingDeque`                      |
+
+使用方法完全相同。
+
+`java.util.Collections`工具类还提供了一个旧的线程安全集合转换器，可以这么用：
+
+```java
+Map unsafeMap = new HashMap();
+Map threadSafeMap = Collections.synchronizedMap(unsafeMap);
+```
+
+**但是不推荐，因为效率低**
+
+## 14. Atomic
+
+Java的`java.util.concurrent`包除了提供底层锁、并发集合外，还提供了一组原子操作的封装类，它们位于`java.util.concurrent.atomic`包。
+
+我们以`AtomicInteger`为例，它提供的主要操作有：
+
+- 增加值并返回新值：`int addAndGet(int delta)`
+- 加1后返回新值：`int incrementAndGet()`
+- 获取当前值：`int get()`
+- 用CAS方式设置：`int compareAndSet(int expect, int update)`
+
+CAS ：Compare and Set。
+
+实现方法如下：
+
+```java
+public int incrementAndGet(AtomicInteger var) {
+    int prev, next;
+    do {
+        prev = var.get();
+        next = prev + 1;
+    } while ( ! var.compareAndSet(prev, next));
+    return next;
+}
+```
+
+CAS是指，在这个操作中，如果`AtomicInteger`的当前值是`prev`，那么就更新为`next`，返回`true`。如果`AtomicInteger`的当前值不是`prev`，就什么也不干，返回`false`。通过CAS操作并配合`do ... while`循环，即使其他线程修改了`AtomicInteger`的值，最终的结果也是正确的。
+
+我们并不需要直接用`do ... while`循环调用`compareAndSet`实现复杂的并发操作，而是用`incrementAndGet()`这样的封装好的方法，因此，使用起来非常简单。
+
+在高度竞争的情况下，还可以使用Java 8提供的`LongAdder`和`LongAccumulator`。
+
+## 15. 线程池
+
+### 15.1 普通线程池
+
+程池内部维护了若干个线程，没有任务的时候，这些线程都处于等待状态。如果有新任务，就分配一个空闲线程执行。如果所有线程都处于忙碌状态，新任务要么放入队列等待，要么增加一个新线程进行处理。
+
+Java标准库提供了`ExecutorService`接口表示线程池，它的典型用法如下：
+
+```java
+// 创建固定大小的线程池:
+ExecutorService executor = Executors.newFixedThreadPool(3);
+// 提交任务:
+executor.submit(task1);
+executor.submit(task2);
+executor.submit(task3);
+executor.submit(task4);
+executor.submit(task5);
+```
+
+因为`ExecutorService`只是接口，Java标准库提供的几个常用实现类有：
+
+- `FixedThreadPool`：线程数固定的线程池；
+- `CachedThreadPool`：线程数根据任务动态调整的线程池；
+- `SingleThreadExecutor`：仅单线程执行的线程池。
+
+执行逻辑：
+
+```java
+import java.util.concurrent.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // 创建一个固定大小的线程池:
+        ExecutorService es = Executors.newFixedThreadPool(4);
+        for (int i = 0; i < 6; i++) {
+            es.submit(new Task("" + i));
+        }
+        // 关闭线程池:
+        es.shutdown();
+    }
+}
+
+class Task implements Runnable {
+    private final String name;
+
+    public Task(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void run() {
+        System.out.println("start task " + name);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
+        System.out.println("end task " + name);
+    }
+}
+/*
+start task 0
+start task 1
+start task 2
+start task 3
+end task 0
+start task 4
+end task 1
+start task 5
+end task 2
+end task 3
+end task 4
+end task 5
+*/
+```
+
+使用`shutdown()`方法关闭线程池的时候，它会等待正在执行的任务先完成，然后再关闭。`shutdownNow()`会立刻停止正在执行的任务，`awaitTermination()`则会等待指定的时间让线程池关闭。
+
+动态范围的线程池：
+
+```java
+int min = 4;
+int max = 10;
+ExecutorService es = new ThreadPoolExecutor(min, max,
+        60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
+```
+
+### 15.2 反复执行线程池ScheduledThreadPool
+
+创建一个`ScheduledThreadPool`仍然是通过`Executors`类：
+
+```java
+ScheduledExecutorService ses = Executors.newScheduledThreadPool(4);
+```
+
+我们可以提交一次性任务，它会在指定延迟后只执行一次：
+
+```java
+// 1秒后执行一次性任务:
+ses.schedule(new Task("one-time"), 1, TimeUnit.SECONDS);
+```
+
+如果任务以固定的每3秒执行，我们可以这样写：
+
+```java
+// 2秒后开始执行定时任务，每3秒执行:
+ses.scheduleAtFixedRate(new Task("fixed-rate"), 2, 3, TimeUnit.SECONDS);
+```
+
+如果任务以固定的3秒为间隔执行，我们可以这样写：
+
+```java
+// 2秒后开始执行定时任务，以3秒为间隔执行:
+ses.scheduleWithFixedDelay(new Task("fixed-delay"), 2, 3, TimeUnit.SECONDS);
+```
+
+`FixedRate`是指任务总是以固定时间间隔触发，不管任务执行多长时间：
+
+![image-20210509224407824](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210509224407824.png)
+
+`FixedDelay`是指，上一次任务执行完毕后，等待固定的时间间隔，再执行下一次任务：
+
+![image-20210509224432989](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210509224432989.png)
+
+## 16. Future
+
+```
+class Task implements Runnable {
+    public String result;
+
+    public void run() {
+        this.result = longTimeCalculation(); 
+    }
+}
+```
+
+`Runnable`接口有个问题，它的方法没有返回值。
+
+Java标准库还提供了一个`Callable`接口，和`Runnable`接口比，它多了一个返回值：
+
+```java
+class Task implements Callable<String> {
+    public String call() throws Exception {
+        return longTimeCalculation(); 
+    }
+}
+```
+
+`Callable`接口是一个泛型接口，可以返回指定类型的结果。
+
+`ExecutorService.submit()`方法返回一个`Future`类型的实例，代表一个未来能获取结果的对象：
+
+```java
+ExecutorService executor = Executors.newFixedThreadPool(4); 
+// 定义任务:
+Callable<String> task = new Task();
+// 提交任务并获得Future:
+Future<String> future = executor.submit(task);
+// 从Future获取异步执行返回的结果:
+String result = future.get(); // 可能阻塞
+```
+
+一个`Future<V>`接口表示一个未来可能会返回的结果，它定义的方法有：
+
+- `get()`：获取结果（可能会等待）
+- `get(long timeout, TimeUnit unit)`：获取结果，但只等待指定的时间；
+- `cancel(boolean mayInterruptIfRunning)`：取消当前任务；
+- `isDone()`：判断任务是否已完成。
+
+## 17. CompletableFuture
+
+Java 8开始引入了`CompletableFuture`，它针对`Future`做了改进，可以传入回调对象，当异步任务完成或者发生异常时，自动调用回调对象的回调方法。
+
+举例：
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // 创建异步执行任务:
+        CompletableFuture<Double> cf = CompletableFuture.supplyAsync(Main::fetchPrice);
+        // 如果执行成功:
+        cf.thenAccept((result) -> {
+            System.out.println("price: " + result);
+        });
+        // 如果执行异常:
+        cf.exceptionally((e) -> {
+            e.printStackTrace();
+            return null;
+        });
+        // 主线程不要立刻结束，否则CompletableFuture默认使用的线程池会立刻关闭:
+        Thread.sleep(200);
+    }
+
+    static Double fetchPrice() {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+        }
+        if (Math.random() < 0.3) {
+            throw new RuntimeException("fetch price failed!");
+        }
+        return 5 + Math.random() * 20;
+    }
+}
+```
+
+创建一个`CompletableFuture`是通过`CompletableFuture.supplyAsync()`实现的，它需要一个实现了`Supplier`接口的对象：
+
+```java
+public interface Supplier<T> {
+    T get();
+}
+```
+
+用lambda语法简化了一下，直接传入`Main::fetchPrice`,`Main.fetchPrice()`静态方法的签名符合`Supplier`接口的定义。
+
+紧接着，`CompletableFuture`已经被提交给默认的线程池执行了，我们需要定义的是`CompletableFuture`完成时和异常时需要回调的实例。完成时，`CompletableFuture`会调用`Consumer`对象：
+
+```java
+public interface Consumer<T> {
+    void accept(T t);
+}
+```
+
+异常时，`CompletableFuture`会调用`Function`对象：
+
+```java
+public interface Function<T, R> {
+    R apply(T t);
+}
+```
+
+`CompletableFuture`的优点是：
+
+- 异步任务结束时，会自动回调某个对象的方法；
+- 异步任务出错时，会自动回调某个对象的方法；
+- 主线程设置好回调后，不再关心异步任务的执行。
+
+直接看例子：
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // 第一个任务:
+        CompletableFuture<String> cfQuery = CompletableFuture.supplyAsync(() -> {
+            return queryCode("中国石油");
+        });
+        // cfQuery成功后继续执行下一个任务:
+        CompletableFuture<Double> cfFetch = cfQuery.thenApplyAsync((code) -> {
+            return fetchPrice(code);
+        });
+        // cfFetch成功后打印结果:
+        cfFetch.thenAccept((result) -> {
+            System.out.println("price: " + result);
+        });
+        // 主线程不要立刻结束，否则CompletableFuture默认使用的线程池会立刻关闭:
+        Thread.sleep(2000);
+    }
+
+    static String queryCode(String name) {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+        }
+        return "601857";
+    }
+
+    static Double fetchPrice(String code) {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+        }
+        return 5 + Math.random() * 20;
+    }
+}
+/*
+price: 18.552424162240882
+*/
+```
+
+除了串行执行外，多个`CompletableFuture`还可以并行执行。例如，我们考虑这样的场景：
+
+同时从新浪和网易查询证券代码，只要任意一个返回结果，就进行下一步查询价格，查询价格也同时从新浪和网易查询，只要任意一个返回结果，就完成操作：
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // 两个CompletableFuture执行异步查询:
+        CompletableFuture<String> cfQueryFromSina = CompletableFuture.supplyAsync(() -> {
+            return queryCode("中国石油", "https://finance.sina.com.cn/code/");
+        });
+        CompletableFuture<String> cfQueryFrom163 = CompletableFuture.supplyAsync(() -> {
+            return queryCode("中国石油", "https://money.163.com/code/");
+        });
+
+        // 用anyOf合并为一个新的CompletableFuture:
+        CompletableFuture<Object> cfQuery = CompletableFuture.anyOf(cfQueryFromSina, cfQueryFrom163);
+
+        // 两个CompletableFuture执行异步查询:
+        CompletableFuture<Double> cfFetchFromSina = cfQuery.thenApplyAsync((code) -> {
+            return fetchPrice((String) code, "https://finance.sina.com.cn/price/");
+        });
+        CompletableFuture<Double> cfFetchFrom163 = cfQuery.thenApplyAsync((code) -> {
+            return fetchPrice((String) code, "https://money.163.com/price/");
+        });
+
+        // 用anyOf合并为一个新的CompletableFuture:
+        CompletableFuture<Object> cfFetch = CompletableFuture.anyOf(cfFetchFromSina, cfFetchFrom163);
+
+        // 最终结果:
+        cfFetch.thenAccept((result) -> {
+            System.out.println("price: " + result);
+        });
+        // 主线程不要立刻结束，否则CompletableFuture默认使用的线程池会立刻关闭:
+        Thread.sleep(200);
+    }
+
+    static String queryCode(String name, String url) {
+        System.out.println("query code from " + url + "...");
+        try {
+            Thread.sleep((long) (Math.random() * 100));
+        } catch (InterruptedException e) {
+        }
+        return "601857";
+    }
+
+    static Double fetchPrice(String code, String url) {
+        System.out.println("query price from " + url + "...");
+        try {
+            Thread.sleep((long) (Math.random() * 100));
+        } catch (InterruptedException e) {
+        }
+        return 5 + Math.random() * 20;
+    }
+}
+/*
+query code from https://finance.sina.com.cn/code/...
+query code from https://money.163.com/code/...
+query price from https://finance.sina.com.cn/price/...
+query price from https://money.163.com/price/...
+price: 16.397253746873602
+*/
+```
+
+![image-20210509230825458](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210509230825458.png)
+
+除了`anyOf()`可以实现“任意个`CompletableFuture`只要一个成功”，`allOf()`可以实现“所有`CompletableFuture`都必须成功”，这些组合操作可以实现非常复杂的异步流程控制。
+
+最后我们注意`CompletableFuture`的命名规则：
+
+- `xxx()`：表示该方法将继续在已有的线程中执行；
+- `xxxAsync()`：表示将异步在线程池中执行。
+
+## 18. ForkJoin
+
+Fork/Join任务的原理：判断一个任务是否足够小，如果是，直接计算，否则，就分拆成几个小任务分别计算。这个过程可以反复“裂变”成一系列小任务。
+
+使用Fork/Join对大数据进行并行求和：
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // 创建2000个随机数组成的数组:
+        long[] array = new long[2000];
+        long expectedSum = 0;
+        for (int i = 0; i < array.length; i++) {
+            array[i] = random();
+            expectedSum += array[i];
+        }
+        System.out.println("Expected sum: " + expectedSum);
+        // fork/join:
+        ForkJoinTask<Long> task = new SumTask(array, 0, array.length);
+        long startTime = System.currentTimeMillis();
+        Long result = ForkJoinPool.commonPool().invoke(task);
+        long endTime = System.currentTimeMillis();
+        System.out.println("Fork/join sum: " + result + " in " + (endTime - startTime) + " ms.");
+    }
+
+    static Random random = new Random(0);
+
+    static long random() {
+        return random.nextInt(10000);
+    }
+}
+
+class SumTask extends RecursiveTask<Long> {
+    static final int THRESHOLD = 500;
+    long[] array;
+    int start;
+    int end;
+
+    SumTask(long[] array, int start, int end) {
+        this.array = array;
+        this.start = start;
+        this.end = end;
+    }
+
+    @Override
+    protected Long compute() {
+        if (end - start <= THRESHOLD) {
+            // 如果任务足够小,直接计算:
+            long sum = 0;
+            for (int i = start; i < end; i++) {
+                sum += this.array[i];
+                // 故意放慢计算速度:
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                }
+            }
+            return sum;
+        }
+        // 任务太大,一分为二:
+        int middle = (end + start) / 2;
+        System.out.println(String.format("split %d~%d ==> %d~%d, %d~%d", start, end, start, middle, middle, end));
+        SumTask subtask1 = new SumTask(this.array, start, middle);
+        SumTask subtask2 = new SumTask(this.array, middle, end);
+        invokeAll(subtask1, subtask2);
+        Long subresult1 = subtask1.join();
+        Long subresult2 = subtask2.join();
+        Long result = subresult1 + subresult2;
+        System.out.println("result = " + subresult1 + " + " + subresult2 + " ==> " + result);
+        return result;
+    }
+}
+/*
+Expected sum: 9788366
+split 0~2000 ==> 0~1000, 1000~2000
+split 1000~2000 ==> 1000~1500, 1500~2000
+split 0~1000 ==> 0~500, 500~1000
+result = 2485485 + 2491717 ==> 4977202
+result = 2391591 + 2419573 ==> 4811164
+result = 4811164 + 4977202 ==> 9788366
+Fork/join sum: 9788366 in 1084 ms.
+*/
+```
+
+关键式分裂，代码结构如下：
+
+```java
+class SumTask extends RecursiveTask<Long> {
+    protected Long compute() {
+        // “分裂”子任务:
+        SumTask subtask1 = new SumTask(...);
+        SumTask subtask2 = new SumTask(...);
+        // invokeAll会并行运行两个子任务:
+        invokeAll(subtask1, subtask2);
+        // 获得子任务的结果:
+        Long subresult1 = subtask1.join();
+        Long subresult2 = subtask2.join();
+        // 汇总结果:
+        return subresult1 + subresult2;
+    }
+}
+```
+
+Java标准库提供的`java.util.Arrays.parallelSort(array)`可以进行并行排序，它的原理就是内部通过Fork/Join对大数组分拆进行并行排序，在多核CPU上就可以大大提高排序的速度。
+
+## 19. ThreadLocal
+
+`Thread`对象代表一个线程，我们可以在代码中调用`Thread.currentThread()`获取当前线程。例如，打印日志时，可以同时打印出当前线程的名字：
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        log("start main...");
+        new Thread(() -> {
+            log("run task...");
+        }).start();
+        new Thread(() -> {
+            log("print...");
+        }).start();
+        log("end main.");
+    }
+
+    static void log(String s) {
+        System.out.println(Thread.currentThread().getName() + ": " + s);
+    }
+}
+/*
+main: start main...
+Thread-0: run task...
+main: end main.
+Thread-1: print...
+*/
+```
+
+对于多任务，Java标准库提供的线程池可以方便地执行这些任务，同时复用线程。Web应用程序就是典型的多任务应用，每个用户请求页面时，我们都会创建一个任务，类似：
+
+```java
+public void process(User user) {
+    checkPermission();
+    doWork();
+    saveStatus();
+    sendResponse();
+}
+```
+
+然后，通过线程池去执行这些任务。
+
+Java标准库提供了一个特殊的`ThreadLocal`，它可以在一个线程中传递同一个对象。
+
+`ThreadLocal`实例通常总是以静态字段初始化如下：
+
+```java
+static ThreadLocal<User> threadLocalUser = new ThreadLocal<>();
+```
+
+使用方式如下：
+
+```java
+void processUser(user) {
+    try {
+        threadLocalUser.set(user);
+        step1();
+        step2();
+    } finally {
+        threadLocalUser.remove();
+    }
+}
+```
+
+通过设置一个`User`实例关联到`ThreadLocal`中，在移除之前，所有方法都可以随时获取到该`User`实例：
+
+```java
+void step1() {
+    User u = threadLocalUser.get();
+    log();
+    printUser();
+}
+
+void log() {
+    User u = threadLocalUser.get();
+    println(u.name);
+}
+
+void step2() {
+    User u = threadLocalUser.get();
+    checkUser(u.id);
+}
+```
+
+可以把`ThreadLocal`看成一个全局`Map<Thread, Object>`：每个线程获取`ThreadLocal`变量时，总是使用`Thread`自身作为key：
+
+```java
+Object threadLocalValue = threadLocalMap.get(Thread.currentThread());
+```
+
+因此，`ThreadLocal`相当于给每个线程都开辟了一个独立的存储空间，各个线程的`ThreadLocal`关联的实例互不干扰。
+
+最后，特别注意`ThreadLocal`一定要在`finally`中清除：
+
+```java
+try {
+    threadLocalUser.set(user);
+    ...
+} finally {
+    threadLocalUser.remove();
+}
+```
+
+为了保证能释放`ThreadLocal`关联的实例，我们可以通过`AutoCloseable`接口配合`try (resource) {...}`结构，让编译器自动为我们关闭。例如，一个保存了当前用户名的`ThreadLocal`可以封装为一个`UserContext`对象：
+
+```java
+public class UserContext implements AutoCloseable {
+
+    static final ThreadLocal<String> ctx = new ThreadLocal<>();
+
+    public UserContext(String user) {
+        ctx.set(user);
+    }
+
+    public static String currentUser() {
+        return ctx.get();
+    }
+
+    @Override
+    public void close() {
+        ctx.remove();
+    }
+}
+```
+
+使用的时候，我们借助`try (resource) {...}`结构，可以这么写：
+
+```java
+try (var ctx = new UserContext("Bob")) {
+    // 可任意调用UserContext.currentUser():
+    String currentUser = UserContext.currentUser();
+} // 在此自动调用UserContext.close()方法释放ThreadLocal关联对象
+```
+
+这样就在`UserContext`中完全封装了`ThreadLocal`，外部代码在`try (resource) {...}`内部可以随时调用`UserContext.currentUser()`获取当前线程绑定的用户名。
