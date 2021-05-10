@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ghj1998.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="哈希算法1. Hash算法特点哈希算法最重要的特点就是：  相同的输入一定得到相同的输出； 不同的输入大概率得到不同的输出。  2. Hash碰撞">
+<meta property="og:type" content="article">
+<meta property="og:title" content="哈希算法">
+<meta property="og:url" content="https://ghj1998.github.io/2021/05/06/%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:site_name" content="小高同学の技术博客">
+<meta property="og:description" content="哈希算法1. Hash算法特点哈希算法最重要的特点就是：  相同的输入一定得到相同的输出； 不同的输入大概率得到不同的输出。  2. Hash碰撞">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.liaoxuefeng.com/files/attachments/1305351978745921/l">
+<meta property="article:published_time" content="2021-05-06T09:28:20.000Z">
+<meta property="article:modified_time" content="2021-05-08T00:49:20.531Z">
+<meta property="article:author" content="高虎军">
+<meta property="article:tag" content="Hash">
+<meta property="article:tag" content="JAVA">
+<meta property="article:tag" content="加密">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.liaoxuefeng.com/files/attachments/1305351978745921/l">
+
+<link rel="canonical" href="https://ghj1998.github.io/2021/05/06/%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>哈希算法 | 小高同学の技术博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">小高同学の技术博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生即是一段艰难曲折的旅程,人生无坦途。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ghj1998.github.io/2021/05/06/%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="高虎军">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小高同学の技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          哈希算法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-06 17:28:20" itemprop="dateCreated datePublished" datetime="2021-05-06T17:28:20+08:00">2021-05-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-08 08:49:20" itemprop="dateModified" datetime="2021-05-08T08:49:20+08:00">2021-05-08</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="哈希算法"><a href="#哈希算法" class="headerlink" title="哈希算法"></a>哈希算法</h1><h2 id="1-Hash算法特点"><a href="#1-Hash算法特点" class="headerlink" title="1. Hash算法特点"></a>1. Hash算法特点</h2><p>哈希算法最重要的特点就是：</p>
+<ul>
+<li>相同的输入一定得到相同的输出；</li>
+<li>不同的输入大概率得到不同的输出。</li>
+</ul>
+<h2 id="2-Hash碰撞"><a href="#2-Hash碰撞" class="headerlink" title="2. Hash碰撞"></a>2. Hash碰撞</h2><p>哈希碰撞是指，两个不同的输入得到了相同的输出：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;AaAaAa&quot;</span>.hashCode(); <span class="comment">// 0x7460e8c0</span></span><br><span class="line"><span class="string">&quot;BBAaBB&quot;</span>.hashCode(); <span class="comment">// 0x7460e8c0</span></span><br></pre></td></tr></table></figure>
+
+<p>一个安全的哈希算法必须满足：</p>
+<ul>
+<li>碰撞概率低；</li>
+<li>不能猜测输出：不能根据hashCode的输出反推回输入。</li>
+</ul>
+<h2 id="3-常见hash算法"><a href="#3-常见hash算法" class="headerlink" title="3. 常见hash算法"></a>3. 常见hash算法</h2><p>常用的哈希算法有：</p>
+<table>
+<thead>
+<tr>
+<th align="left">算法</th>
+<th align="left">输出长度（位）</th>
+<th align="left">输出长度（字节）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">MD5</td>
+<td align="left">128 bits</td>
+<td align="left">16 bytes</td>
+</tr>
+<tr>
+<td align="left">SHA-1</td>
+<td align="left">160 bits</td>
+<td align="left">20 bytes</td>
+</tr>
+<tr>
+<td align="left">RipeMD-160</td>
+<td align="left">160 bits</td>
+<td align="left">20 bytes</td>
+</tr>
+<tr>
+<td align="left">SHA-256</td>
+<td align="left">256 bits</td>
+<td align="left">32 bytes</td>
+</tr>
+<tr>
+<td align="left">SHA-512</td>
+<td align="left">512 bits</td>
+<td align="left">64 bytes</td>
+</tr>
+</tbody></table>
+<p>根据碰撞概率，哈希算法的输出长度越长，就越难产生碰撞，也就越安全。</p>
+<p>Java标准库提供了常用的哈希算法，并且有一套统一的接口。MessageDigest是专门用来生成散列码的类，只能通过getInstance进行实例化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 创建一个MessageDigest实例:</span></span><br><span class="line">        MessageDigest md = MessageDigest.getInstance(<span class="string">&quot;MD5&quot;</span>);</span><br><span class="line">        <span class="comment">// 反复调用update输入数据:</span></span><br><span class="line">        md.update(<span class="string">&quot;Hello&quot;</span>.getBytes(<span class="string">&quot;UTF-8&quot;</span>));</span><br><span class="line">        md.update(<span class="string">&quot;World&quot;</span>.getBytes(<span class="string">&quot;UTF-8&quot;</span>));</span><br><span class="line">        <span class="keyword">byte</span>[] result = md.digest(); <span class="comment">// 16 bytes: 68e109f0f40ca72a15e05cc22786f8e6</span></span><br><span class="line">        System.out.println(<span class="keyword">new</span> BigInteger(<span class="number">1</span>, result).toString(<span class="number">16</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>MessageDigest</code>时，我们首先根据哈希算法获取一个<code>MessageDigest</code>实例，然后，反复调用<code>update(byte[])</code>输入数据。当输入结束后，调用<code>digest()</code>方法获得byte[]数组表示的摘要，最后，把它转换为十六进制的字符串。</p>
+<p>运行上述代码，可以得到输入<code>HelloWorld</code>的MD5是<code>68e109f0f40ca72a15e05cc22786f8e6</code>。</p>
+<h2 id="4-hash算法用途"><a href="#4-hash算法用途" class="headerlink" title="4. hash算法用途"></a>4. hash算法用途</h2><ul>
+<li><p>下载文件</p>
+<p><img src="https://www.liaoxuefeng.com/files/attachments/1305351978745921/l" alt="file-md5"></p>
+<p>下载完文件可以计算本地文件的MD5哈希值，就可以知道文件有没有被修改。</p>
+</li>
+<li><p>存储用户口令</p>
+<p>不存储用户的原始口令，方法是存储用户口令的哈希，例如，MD5。</p>
+<p>在用户输入原始口令后，系统计算用户输入的原始口令的MD5并与数据库存储的MD5对比，如果一致，说明口令正确，否则，口令错误。</p>
+<p>数据库的存储应当如下所示：</p>
+<table>
+<thead>
+<tr>
+<th align="left">username</th>
+<th align="left">password</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">bob</td>
+<td align="left">f30aa7a662c728b7407c54ae6bfd27d1</td>
+</tr>
+<tr>
+<td align="left">alice</td>
+<td align="left">25d55ad283aa400af464c76d713c07ad</td>
+</tr>
+<tr>
+<td align="left">tim</td>
+<td align="left">bed128365216c019988915ed3add75fb</td>
+</tr>
+</tbody></table>
+<p>使用哈希口令时，还要注意防止彩虹表攻击。</p>
+<p>彩虹表是一个预先计算好的常用口令和它们的MD5的对照表。</p>
+<p>例如：</p>
+<table>
+<thead>
+<tr>
+<th align="left">常用口令</th>
+<th align="left">MD5</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">hello123</td>
+<td align="left">f30aa7a662c728b7407c54ae6bfd27d1</td>
+</tr>
+<tr>
+<td align="left">12345678</td>
+<td align="left">25d55ad283aa400af464c76d713c07ad</td>
+</tr>
+<tr>
+<td align="left">passw0rd</td>
+<td align="left">bed128365216c019988915ed3add75fb</td>
+</tr>
+<tr>
+<td align="left">19700101</td>
+<td align="left">570da6d5277a646f6552b8832012f5dc</td>
+</tr>
+<tr>
+<td align="left">…</td>
+<td align="left">…</td>
+</tr>
+<tr>
+<td align="left">20201231</td>
+<td align="left">6879c0ae9117b50074ce0a0d4c843060</td>
+</tr>
+</tbody></table>
+<p>所以说，尽量不要使用过于简单的密码。</p>
+</li>
+</ul>
+<h2 id="5-使用不在Java标准库中的哈希算法"><a href="#5-使用不在Java标准库中的哈希算法" class="headerlink" title="5. 使用不在Java标准库中的哈希算法"></a>5. 使用不在Java标准库中的哈希算法</h2><p><a target="_blank" rel="noopener" href="https://www.bouncycastle.org/">BouncyCastle</a>就是一个提供了很多哈希算法和加密算法的第三方库。它提供了Java标准库没有的一些算法，例如，RipeMD160哈希算法。</p>
+<p>如何使用BouncyCastle这个第三方提供的算法？</p>
+<p>首先，我们必须把BouncyCastle提供的jar包放到classpath中。这个jar包就是<code>bcprov-jdk15on-xxx.jar</code>，可以从<a target="_blank" rel="noopener" href="https://www.bouncycastle.org/latest_releases.html">官方网站</a>下载。</p>
+<p>Java标准库的<code>java.security</code>包提供了一种标准机制，允许第三方提供商无缝接入。我们要使用BouncyCastle提供的RipeMD160算法，需要先把BouncyCastle注册一下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 注册BouncyCastle:</span></span><br><span class="line">        Security.addProvider(<span class="keyword">new</span> BouncyCastleProvider());</span><br><span class="line">        <span class="comment">// 按名称正常调用:</span></span><br><span class="line">        MessageDigest md = MessageDigest.getInstance(<span class="string">&quot;RipeMD160&quot;</span>);</span><br><span class="line">        md.update(<span class="string">&quot;HelloWorld&quot;</span>.getBytes(<span class="string">&quot;UTF-8&quot;</span>));</span><br><span class="line">        <span class="keyword">byte</span>[] result = md.digest();</span><br><span class="line">        System.out.println(<span class="keyword">new</span> BigInteger(<span class="number">1</span>, result).toString(<span class="number">16</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中，注册BouncyCastle是通过下面的语句实现的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Security.addProvider(<span class="keyword">new</span> BouncyCastleProvider());</span><br></pre></td></tr></table></figure>
+
+<p>注册只需要在启动时进行一次，后续就可以使用BouncyCastle提供的所有哈希算法和加密算法。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Hash/" rel="tag"># Hash</a>
+              <a href="/tags/JAVA/" rel="tag"># JAVA</a>
+              <a href="/tags/%E5%8A%A0%E5%AF%86/" rel="tag"># 加密</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/05/06/%E7%BC%96%E7%A0%81%E6%80%BB%E7%BB%93/" rel="prev" title="编码">
+      <i class="fa fa-chevron-left"></i> 编码
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/05/06/Hmac%E7%AE%97%E6%B3%95/" rel="next" title="Hmac算法">
+      Hmac算法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95"><span class="nav-text">哈希算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Hash%E7%AE%97%E6%B3%95%E7%89%B9%E7%82%B9"><span class="nav-text">1. Hash算法特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Hash%E7%A2%B0%E6%92%9E"><span class="nav-text">2. Hash碰撞</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%B8%B8%E8%A7%81hash%E7%AE%97%E6%B3%95"><span class="nav-text">3. 常见hash算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-hash%E7%AE%97%E6%B3%95%E7%94%A8%E9%80%94"><span class="nav-text">4. hash算法用途</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E4%BD%BF%E7%94%A8%E4%B8%8D%E5%9C%A8Java%E6%A0%87%E5%87%86%E5%BA%93%E4%B8%AD%E7%9A%84%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95"><span class="nav-text">5. 使用不在Java标准库中的哈希算法</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="高虎军"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">高虎军</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ghj1998" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ghj1998" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/gao-hu-jun-77" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;gao-hu-jun-77" rel="noopener" target="_blank"><i class="fa fa-bolt fa-fw"></i>知乎</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:im.gaohj@foxmail.com" title="E-Mail → mailto:im.gaohj@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">高虎军</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false});</script></body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
