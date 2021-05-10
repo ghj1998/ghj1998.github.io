@@ -274,6 +274,72 @@
       </tags>
   </entry>
   <entry>
+    <title>Hmac算法</title>
+    <url>/2021/05/06/Hmac%E7%AE%97%E6%B3%95/</url>
+    <content><![CDATA[<h1 id="Hmac算法"><a href="#Hmac算法" class="headerlink" title="Hmac算法"></a>Hmac算法</h1><p>存储用户的哈希口令时，要加盐存储，目的就在于抵御彩虹表攻击。</p>
+<p>哈希算法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">digest = hash(input)</span><br></pre></td></tr></table></figure>
+
+<p>正是因为相同的输入会产生相同的输出，我们加盐的目的就在于，使得输入有所变化：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">digest = hash(salt + input)</span><br></pre></td></tr></table></figure>
+
+<p>salt可以看作是一个额外的“认证码”，同样的输入，不同的认证码，会产生不同的输出。因此，要验证输出的哈希，必须同时提供“认证码”。</p>
+<p>Hmac算法就是一种基于密钥的消息认证码算法，它的全称是Hash-based Message Authentication Code，是一种更安全的消息摘要算法。</p>
+<p>Hmac算法总是和某种哈希算法配合起来用的。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">HmacMD5 ≈ md5(secure_random_key, input)</span><br></pre></td></tr></table></figure>
+
+<p>HmacMD5可以看作带有一个安全的key的MD5。使用HmacMD5而不是用MD5加salt，有如下好处：</p>
+<ul>
+<li>HmacMD5使用的key长度是64字节，更安全；</li>
+<li>Hmac是标准算法，同样适用于SHA-1等其他哈希算法；</li>
+<li>Hmac输出和原有的哈希算法长度一致。</li>
+</ul>
+<p>为了保证安全，我们不会自己指定key，而是通过Java标准库的KeyGenerator生成一个安全的随机的key。下面是使用HmacMD5的代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        KeyGenerator keyGen = KeyGenerator.getInstance(<span class="string">&quot;HmacMD5&quot;</span>);</span><br><span class="line">        SecretKey key = keyGen.generateKey();</span><br><span class="line">        <span class="comment">// 打印随机生成的key:</span></span><br><span class="line">        <span class="keyword">byte</span>[] skey = key.getEncoded();</span><br><span class="line">        System.out.println(<span class="keyword">new</span> BigInteger(<span class="number">1</span>, skey).toString(<span class="number">16</span>));</span><br><span class="line">        Mac mac = Mac.getInstance(<span class="string">&quot;HmacMD5&quot;</span>);</span><br><span class="line">        mac.init(key);</span><br><span class="line">        mac.update(<span class="string">&quot;HelloWorld&quot;</span>.getBytes(<span class="string">&quot;UTF-8&quot;</span>));</span><br><span class="line">        <span class="keyword">byte</span>[] result = mac.doFinal();</span><br><span class="line">        System.out.println(<span class="keyword">new</span> BigInteger(<span class="number">1</span>, result).toString(<span class="number">16</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>和MD5相比，使用HmacMD5的步骤是：</p>
+<ol>
+<li>通过名称<code>HmacMD5</code>获取<code>KeyGenerator</code>实例；</li>
+<li>通过<code>KeyGenerator</code>创建一个<code>SecretKey</code>实例；</li>
+<li>通过名称<code>HmacMD5</code>获取<code>Mac</code>实例；</li>
+<li>用<code>SecretKey</code>初始化<code>Mac</code>实例；</li>
+<li>对<code>Mac</code>实例反复调用<code>update(byte[])</code>输入数据；</li>
+<li>调用<code>Mac</code>实例的<code>doFinal()</code>获取最终的哈希值。</li>
+</ol>
+<p>数据库中的存储表变成了：</p>
+<table>
+<thead>
+<tr>
+<th align="left">username</th>
+<th align="left">secret_key (64 bytes)</th>
+<th align="left">password</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">bob</td>
+<td align="left">a8c06e05f92e…5e16</td>
+<td align="left">7e0387872a57c85ef6dddbaa12f376de</td>
+</tr>
+<tr>
+<td align="left">alice</td>
+<td align="left">e6a343693985…f4be</td>
+<td align="left">c1f929ac2552642b302e739bc0cdbaac</td>
+</tr>
+<tr>
+<td align="left">tim</td>
+<td align="left">f27a973dfdc0…6003</td>
+<td align="left">af57651c3a8a73303515804d4af43790</td>
+</tr>
+</tbody></table>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">byte</span>[] hkey = <span class="keyword">new</span> <span class="keyword">byte</span>[] &#123; <span class="number">106</span>, <span class="number">70</span>, -<span class="number">110</span>, <span class="number">125</span>, <span class="number">39</span>, -<span class="number">20</span>, <span class="number">52</span>, <span class="number">56</span>, <span class="number">85</span>, <span class="number">9</span>, -<span class="number">19</span>, -<span class="number">72</span>, <span class="number">52</span>, -<span class="number">53</span>, <span class="number">52</span>, -<span class="number">45</span>, -<span class="number">6</span>, <span class="number">119</span>, -<span class="number">63</span>,</span><br><span class="line">                <span class="number">30</span>, <span class="number">20</span>, -<span class="number">83</span>, -<span class="number">28</span>, <span class="number">77</span>, <span class="number">98</span>, <span class="number">109</span>, -<span class="number">32</span>, -<span class="number">76</span>, <span class="number">121</span>, -<span class="number">106</span>, <span class="number">0</span>, -<span class="number">74</span>, -<span class="number">107</span>, -<span class="number">114</span>, -<span class="number">45</span>, <span class="number">104</span>, -<span class="number">104</span>, -<span class="number">8</span>, <span class="number">2</span>, <span class="number">121</span>, <span class="number">6</span>,</span><br><span class="line">                <span class="number">97</span>, -<span class="number">18</span>, -<span class="number">13</span>, -<span class="number">63</span>, -<span class="number">30</span>, -<span class="number">125</span>, -<span class="number">103</span>, -<span class="number">80</span>, -<span class="number">46</span>, <span class="number">113</span>, -<span class="number">14</span>, <span class="number">68</span>, <span class="number">32</span>, -<span class="number">46</span>, <span class="number">101</span>, -<span class="number">116</span>, -<span class="number">104</span>, -<span class="number">81</span>, -<span class="number">108</span>, <span class="number">122</span>,</span><br><span class="line">                <span class="number">89</span>, -<span class="number">106</span>, -<span class="number">109</span> &#125;;</span><br><span class="line"></span><br><span class="line">        SecretKey key = <span class="keyword">new</span> SecretKeySpec(hkey, <span class="string">&quot;HmacMD5&quot;</span>);</span><br><span class="line">        Mac mac = Mac.getInstance(<span class="string">&quot;HmacMD5&quot;</span>);</span><br><span class="line">        mac.init(key);</span><br><span class="line">        mac.update(<span class="string">&quot;HelloWorld&quot;</span>.getBytes(<span class="string">&quot;UTF-8&quot;</span>));</span><br><span class="line">        <span class="keyword">byte</span>[] result = mac.doFinal();</span><br><span class="line">        System.out.println(Arrays.toString(result));</span><br><span class="line">        <span class="comment">// [126, 59, 37, 63, 73, 90, 111, -96, -77, 15, 82, -74, 122, -55, -67, 54]</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>Hash</tag>
+        <tag>Hmac</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>JAVA - 单元测试</title>
     <url>/2021/05/06/JAVA%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/</url>
     <content><![CDATA[<h1 id="单元测试"><a href="#单元测试" class="headerlink" title="单元测试"></a>单元测试</h1><h2 id="1-JUnit测试"><a href="#1-JUnit测试" class="headerlink" title="1. JUnit测试"></a>1. JUnit测试</h2><h3 id="1-1-TDD"><a href="#1-1-TDD" class="headerlink" title="1.1 TDD"></a>1.1 TDD</h3><p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210422222709239.png" alt="image-20210422222709239"></p>
@@ -544,69 +610,178 @@
       </tags>
   </entry>
   <entry>
-    <title>Hmac算法</title>
-    <url>/2021/05/06/Hmac%E7%AE%97%E6%B3%95/</url>
-    <content><![CDATA[<h1 id="Hmac算法"><a href="#Hmac算法" class="headerlink" title="Hmac算法"></a>Hmac算法</h1><p>存储用户的哈希口令时，要加盐存储，目的就在于抵御彩虹表攻击。</p>
-<p>哈希算法：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">digest = hash(input)</span><br></pre></td></tr></table></figure>
+    <title>JAVA处理json</title>
+    <url>/2021/05/10/JAVA%E5%A4%84%E7%90%86json/</url>
+    <content><![CDATA[<h1 id="Json"><a href="#Json" class="headerlink" title="Json"></a>Json</h1><p>在Web上使用XML现在越来越少，取而代之的是JSON这种数据结构。</p>
+<p>JSON是JavaScript Object Notation的缩写，它去除了所有JavaScript执行代码，只保留JavaScript的对象格式。一个典型的JSON如下：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;id&quot;</span>: <span class="number">1</span>,</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;Java核心技术&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;author&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;firstName&quot;</span>: <span class="string">&quot;Abc&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;lastName&quot;</span>: <span class="string">&quot;Xyz&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">&quot;isbn&quot;</span>: <span class="string">&quot;1234567&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;tags&quot;</span>: [<span class="string">&quot;Java&quot;</span>, <span class="string">&quot;Network&quot;</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>正是因为相同的输入会产生相同的输出，我们加盐的目的就在于，使得输入有所变化：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">digest = hash(salt + input)</span><br></pre></td></tr></table></figure>
-
-<p>salt可以看作是一个额外的“认证码”，同样的输入，不同的认证码，会产生不同的输出。因此，要验证输出的哈希，必须同时提供“认证码”。</p>
-<p>Hmac算法就是一种基于密钥的消息认证码算法，它的全称是Hash-based Message Authentication Code，是一种更安全的消息摘要算法。</p>
-<p>Hmac算法总是和某种哈希算法配合起来用的。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">HmacMD5 ≈ md5(secure_random_key, input)</span><br></pre></td></tr></table></figure>
-
-<p>HmacMD5可以看作带有一个安全的key的MD5。使用HmacMD5而不是用MD5加salt，有如下好处：</p>
+<p>JSON作为数据传输的格式，有几个显著的优点：</p>
 <ul>
-<li>HmacMD5使用的key长度是64字节，更安全；</li>
-<li>Hmac是标准算法，同样适用于SHA-1等其他哈希算法；</li>
-<li>Hmac输出和原有的哈希算法长度一致。</li>
+<li>JSON只允许使用UTF-8编码，不存在编码问题；</li>
+<li>JSON只允许使用双引号作为key，特殊字符用<code>\</code>转义，格式简单；</li>
+<li>浏览器内置JSON支持，如果把数据用JSON发送给浏览器，可以用JavaScript直接处理。</li>
 </ul>
-<p>为了保证安全，我们不会自己指定key，而是通过Java标准库的KeyGenerator生成一个安全的随机的key。下面是使用HmacMD5的代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        KeyGenerator keyGen = KeyGenerator.getInstance(<span class="string">&quot;HmacMD5&quot;</span>);</span><br><span class="line">        SecretKey key = keyGen.generateKey();</span><br><span class="line">        <span class="comment">// 打印随机生成的key:</span></span><br><span class="line">        <span class="keyword">byte</span>[] skey = key.getEncoded();</span><br><span class="line">        System.out.println(<span class="keyword">new</span> BigInteger(<span class="number">1</span>, skey).toString(<span class="number">16</span>));</span><br><span class="line">        Mac mac = Mac.getInstance(<span class="string">&quot;HmacMD5&quot;</span>);</span><br><span class="line">        mac.init(key);</span><br><span class="line">        mac.update(<span class="string">&quot;HelloWorld&quot;</span>.getBytes(<span class="string">&quot;UTF-8&quot;</span>));</span><br><span class="line">        <span class="keyword">byte</span>[] result = mac.doFinal();</span><br><span class="line">        System.out.println(<span class="keyword">new</span> BigInteger(<span class="number">1</span>, result).toString(<span class="number">16</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>JSON适合表示层次结构，因为它格式简单，仅支持以下几种数据类型：</p>
+<ul>
+<li>键值对：<code>&#123;&quot;key&quot;: value&#125;</code></li>
+<li>数组：<code>[1, 2, 3]</code></li>
+<li>字符串：<code>&quot;abc&quot;</code></li>
+<li>数值（整数和浮点数）：<code>12.34</code></li>
+<li>布尔值：<code>true</code>或<code>false</code></li>
+<li>空值：<code>null</code></li>
+</ul>
+<p>常用的用于解析JSON的第三方库有：</p>
+<ul>
+<li>Jackson</li>
+<li>Gson</li>
+<li>Fastjson</li>
+<li>…</li>
+</ul>
+<p>Jackson也可以解析JSON，因此我们只需要引入以下Maven依赖：</p>
+<ul>
+<li>com.fasterxml.jackson.core:jackson-databind:2.10.0</li>
+</ul>
+<p>代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">InputStream input = Main.class.getResourceAsStream(<span class="string">&quot;/book.json&quot;</span>);</span><br><span class="line">ObjectMapper mapper = <span class="keyword">new</span> ObjectMapper();</span><br><span class="line"><span class="comment">// 反序列化时忽略不存在的JavaBean属性:</span></span><br><span class="line">mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, <span class="keyword">false</span>);</span><br><span class="line">Book book = mapper.readValue(input, Book.class);</span><br></pre></td></tr></table></figure>
 
-<p>和MD5相比，使用HmacMD5的步骤是：</p>
-<ol>
-<li>通过名称<code>HmacMD5</code>获取<code>KeyGenerator</code>实例；</li>
-<li>通过<code>KeyGenerator</code>创建一个<code>SecretKey</code>实例；</li>
-<li>通过名称<code>HmacMD5</code>获取<code>Mac</code>实例；</li>
-<li>用<code>SecretKey</code>初始化<code>Mac</code>实例；</li>
-<li>对<code>Mac</code>实例反复调用<code>update(byte[])</code>输入数据；</li>
-<li>调用<code>Mac</code>实例的<code>doFinal()</code>获取最终的哈希值。</li>
-</ol>
-<p>数据库中的存储表变成了：</p>
+<p>核心代码是创建一个<code>ObjectMapper</code>对象。关闭<code>DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES</code>功能使得解析时如果JavaBean不存在该属性时解析不会报错。</p>
+<p>把JSON解析为JavaBean的过程称为反序列化。如果把JavaBean变为JSON，那就是序列化。要实现JavaBean到JSON的序列化，只需要一行代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String json = mapper.writeValueAsString(book);</span><br></pre></td></tr></table></figure>
+
+<p>要把JSON的某些值解析为特定的Java对象，例如<code>LocalDate</code>，也是完全可以的。</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;Java核心技术&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;pubDate&quot;</span>: <span class="string">&quot;2016-09-01&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>要解析为：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line">    <span class="keyword">public</span> LocalDate pubDate;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>只需要引入标准的JSR 310关于JavaTime的数据格式定义至Maven：</p>
+<ul>
+<li>com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.0</li>
+</ul>
+<p>在创建<code>ObjectMapper</code>时，注册一个新的<code>JavaTimeModule</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ObjectMapper mapper = <span class="keyword">new</span> ObjectMapper().registerModule(<span class="keyword">new</span> JavaTimeModule());</span><br></pre></td></tr></table></figure>
+
+<p>内置的解析规则和扩展的解析规则如果都不满足我们的需求，还可以自定义解析。</p>
+<p>举个例子，假设<code>Book</code>类的<code>isbn</code>是一个<code>BigInteger</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span> </span>&#123;</span><br><span class="line">	<span class="keyword">public</span> String name;</span><br><span class="line">	<span class="keyword">public</span> BigInteger isbn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但JSON数据并不是标准的整形格式：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;Java核心技术&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;isbn&quot;</span>: <span class="string">&quot;978-7-111-54742-6&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>直接解析，肯定报错。这时，我们需要自定义一个<code>IsbnDeserializer</code>，用于解析含有非数字的字符串：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">IsbnDeserializer</span> <span class="keyword">extends</span> <span class="title">JsonDeserializer</span>&lt;<span class="title">BigInteger</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> BigInteger <span class="title">deserialize</span><span class="params">(JsonParser p, DeserializationContext ctxt)</span> <span class="keyword">throws</span> IOException, JsonProcessingException </span>&#123;</span><br><span class="line">        <span class="comment">// 读取原始的JSON字符串内容:</span></span><br><span class="line">        String s = p.getValueAsString();</span><br><span class="line">        <span class="keyword">if</span> (s != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> BigInteger(s.replace(<span class="string">&quot;-&quot;</span>, <span class="string">&quot;&quot;</span>));</span><br><span class="line">            &#125; <span class="keyword">catch</span> (NumberFormatException e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> JsonParseException(p, s, e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后，在<code>Book</code>类中使用注解标注：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line">    <span class="comment">// 表示反序列化isbn时使用自定义的IsbnDeserializer:</span></span><br><span class="line">    <span class="meta">@JsonDeserialize(using = IsbnDeserializer.class)</span></span><br><span class="line">    <span class="keyword">public</span> BigInteger isbn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>类似的，自定义序列化时我们需要自定义一个<code>IsbnSerializer</code>，然后在<code>Book</code>类中标注<code>@JsonSerialize(using = ...)</code>即可。</p>
+]]></content>
+      <tags>
+        <tag>JAVA</tag>
+        <tag>json</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JAVA处理xml</title>
+    <url>/2021/05/10/JAVA%E5%A4%84%E7%90%86xml/</url>
+    <content><![CDATA[<h1 id="XML"><a href="#XML" class="headerlink" title="XML"></a>XML</h1><h2 id="1-XML结构"><a href="#1-XML结构" class="headerlink" title="1. XML结构"></a>1. XML结构</h2><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">note</span> <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;book.dtd&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">book</span> <span class="attr">id</span>=<span class="string">&quot;1&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>Java核心技术<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">author</span>&gt;</span>Cay S. Horstmann<span class="tag">&lt;/<span class="name">author</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">isbn</span> <span class="attr">lang</span>=<span class="string">&quot;CN&quot;</span>&gt;</span>1234567<span class="tag">&lt;/<span class="name">isbn</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">tags</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tag</span>&gt;</span>Java<span class="tag">&lt;/<span class="name">tag</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tag</span>&gt;</span>Network<span class="tag">&lt;/<span class="name">tag</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">tags</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">pubDate</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">book</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>首行必定是<code>&lt;?xml version=&quot;1.0&quot;?&gt;</code>，可以加上可选的编码。</p>
+<p><code>&lt;!DOCTYPE note SYSTEM &quot;book.dtd&quot;&gt;</code>声明的是文档定义类型（DTD：Document Type Definition），DTD是可选的。</p>
+<p>一个XML文档有且仅有一个根元素，根元素可以包含任意个子元素，元素可以包含属性，例如，<code>&lt;isbn lang=&quot;CN&quot;&gt;1234567&lt;/isbn&gt;</code>包含一个属性<code>lang=&quot;CN&quot;</code>。</p>
+<p>由于使用了<code>&lt;</code>、<code>&gt;</code>以及引号等标识符，如果内容出现了特殊符号，需要使用<code>&amp;???;</code>表示转义。</p>
 <table>
 <thead>
 <tr>
-<th align="left">username</th>
-<th align="left">secret_key (64 bytes)</th>
-<th align="left">password</th>
+<th align="left">字符</th>
+<th align="left">表示</th>
 </tr>
 </thead>
 <tbody><tr>
-<td align="left">bob</td>
-<td align="left">a8c06e05f92e…5e16</td>
-<td align="left">7e0387872a57c85ef6dddbaa12f376de</td>
+<td align="left">&lt;</td>
+<td align="left"><code>&amp;lt; </code></td>
 </tr>
 <tr>
-<td align="left">alice</td>
-<td align="left">e6a343693985…f4be</td>
-<td align="left">c1f929ac2552642b302e739bc0cdbaac</td>
+<td align="left">&gt;</td>
+<td align="left"><code>&amp;gt;</code></td>
 </tr>
 <tr>
-<td align="left">tim</td>
-<td align="left">f27a973dfdc0…6003</td>
-<td align="left">af57651c3a8a73303515804d4af43790</td>
+<td align="left">&amp;</td>
+<td align="left"><code>&amp;amp; </code></td>
+</tr>
+<tr>
+<td align="left">“</td>
+<td align="left"><code>&amp;quot;</code></td>
+</tr>
+<tr>
+<td align="left">‘</td>
+<td align="left"><code>&amp;apos;</code></td>
 </tr>
 </tbody></table>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">byte</span>[] hkey = <span class="keyword">new</span> <span class="keyword">byte</span>[] &#123; <span class="number">106</span>, <span class="number">70</span>, -<span class="number">110</span>, <span class="number">125</span>, <span class="number">39</span>, -<span class="number">20</span>, <span class="number">52</span>, <span class="number">56</span>, <span class="number">85</span>, <span class="number">9</span>, -<span class="number">19</span>, -<span class="number">72</span>, <span class="number">52</span>, -<span class="number">53</span>, <span class="number">52</span>, -<span class="number">45</span>, -<span class="number">6</span>, <span class="number">119</span>, -<span class="number">63</span>,</span><br><span class="line">                <span class="number">30</span>, <span class="number">20</span>, -<span class="number">83</span>, -<span class="number">28</span>, <span class="number">77</span>, <span class="number">98</span>, <span class="number">109</span>, -<span class="number">32</span>, -<span class="number">76</span>, <span class="number">121</span>, -<span class="number">106</span>, <span class="number">0</span>, -<span class="number">74</span>, -<span class="number">107</span>, -<span class="number">114</span>, -<span class="number">45</span>, <span class="number">104</span>, -<span class="number">104</span>, -<span class="number">8</span>, <span class="number">2</span>, <span class="number">121</span>, <span class="number">6</span>,</span><br><span class="line">                <span class="number">97</span>, -<span class="number">18</span>, -<span class="number">13</span>, -<span class="number">63</span>, -<span class="number">30</span>, -<span class="number">125</span>, -<span class="number">103</span>, -<span class="number">80</span>, -<span class="number">46</span>, <span class="number">113</span>, -<span class="number">14</span>, <span class="number">68</span>, <span class="number">32</span>, -<span class="number">46</span>, <span class="number">101</span>, -<span class="number">116</span>, -<span class="number">104</span>, -<span class="number">81</span>, -<span class="number">108</span>, <span class="number">122</span>,</span><br><span class="line">                <span class="number">89</span>, -<span class="number">106</span>, -<span class="number">109</span> &#125;;</span><br><span class="line"></span><br><span class="line">        SecretKey key = <span class="keyword">new</span> SecretKeySpec(hkey, <span class="string">&quot;HmacMD5&quot;</span>);</span><br><span class="line">        Mac mac = Mac.getInstance(<span class="string">&quot;HmacMD5&quot;</span>);</span><br><span class="line">        mac.init(key);</span><br><span class="line">        mac.update(<span class="string">&quot;HelloWorld&quot;</span>.getBytes(<span class="string">&quot;UTF-8&quot;</span>));</span><br><span class="line">        <span class="keyword">byte</span>[] result = mac.doFinal();</span><br><span class="line">        System.out.println(Arrays.toString(result));</span><br><span class="line">        <span class="comment">// [126, 59, 37, 63, 73, 90, 111, -96, -77, 15, 82, -74, 122, -55, -67, 54]</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>DTD文档可以指定一系列规则，例如：</p>
+<ul>
+<li>根元素必须是<code>book</code></li>
+<li><code>book</code>元素必须包含<code>name</code>，<code>author</code>等指定元素</li>
+<li><code>isbn</code>元素必须包含属性<code>lang</code></li>
+<li>…</li>
+</ul>
+<p>如何验证XML文件的正确性呢？最简单的方式是通过浏览器验证。可以直接把XML文件拖拽到浏览器窗口，如果格式错误，浏览器会报错。</p>
+<h2 id="2-DOM"><a href="#2-DOM" class="headerlink" title="2. DOM"></a>2. DOM</h2><p>因为XML是一种树形结构的文档，它有两种标准的解析API：</p>
+<ul>
+<li>DOM：一次性读取XML，并在内存中表示为树形结构；</li>
+<li>SAX：以流的形式读取XML，使用事件回调。</li>
+</ul>
+<p>如果解析为DOM结构，它大概长这样：</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210510215159229.png" alt="image-20210510215159229"></p>
+<p>Java提供了DOM API来解析XML，它使用下面的对象来表示XML的内容：</p>
+<ul>
+<li>Document：代表整个XML文档；</li>
+<li>Element：代表一个XML元素；</li>
+<li>Attribute：代表一个元素的某个属性。</li>
+</ul>
+<p>使用DOM API解析一个XML文档的代码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">InputStream input = Main.class.getResourceAsStream(<span class="string">&quot;/book.xml&quot;</span>);</span><br><span class="line">DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();</span><br><span class="line">DocumentBuilder db = dbf.newDocumentBuilder();</span><br><span class="line">Document doc = db.parse(input);</span><br></pre></td></tr></table></figure>
 
+<p><code>DocumentBuilder.parse()</code>用于解析一个XML，它可以接收InputStream，File或者URL，如果解析无误，我们将获得一个Document对象，这个对象代表了整个XML文档的树形结构，需要遍历以便读取指定元素的值：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">printNode</span><span class="params">(Node n, <span class="keyword">int</span> indent)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; indent; i++) &#123;</span><br><span class="line">        System.out.print(<span class="string">&#x27; &#x27;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">switch</span> (n.getNodeType()) &#123;</span><br><span class="line">    <span class="keyword">case</span> Node.DOCUMENT_NODE: <span class="comment">// Document节点</span></span><br><span class="line">        System.out.println(<span class="string">&quot;Document: &quot;</span> + n.getNodeName());</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> Node.ELEMENT_NODE: <span class="comment">// 元素节点</span></span><br><span class="line">        System.out.println(<span class="string">&quot;Element: &quot;</span> + n.getNodeName());</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> Node.TEXT_NODE: <span class="comment">// 文本</span></span><br><span class="line">        System.out.println(<span class="string">&quot;Text: &quot;</span> + n.getNodeName() + <span class="string">&quot; = &quot;</span> + n.getNodeValue());</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> Node.ATTRIBUTE_NODE: <span class="comment">// 属性</span></span><br><span class="line">        System.out.println(<span class="string">&quot;Attr: &quot;</span> + n.getNodeName() + <span class="string">&quot; = &quot;</span> + n.getNodeValue());</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>: <span class="comment">// 其他</span></span><br><span class="line">        System.out.println(<span class="string">&quot;NodeType: &quot;</span> + n.getNodeType() + <span class="string">&quot;, NodeName: &quot;</span> + n.getNodeName());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (Node child = n.getFirstChild(); child != <span class="keyword">null</span>; child = child.getNextSibling()) &#123;</span><br><span class="line">        printNode(child, indent + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Document: #document</span></span><br><span class="line"><span class="comment"> Element: book</span></span><br><span class="line"><span class="comment">  Text: #text = </span></span><br><span class="line"><span class="comment">    </span></span><br><span class="line"><span class="comment">  Element: name</span></span><br><span class="line"><span class="comment">   Text: #text = Java核心技术</span></span><br><span class="line"><span class="comment">  Text: #text = </span></span><br><span class="line"><span class="comment">    </span></span><br><span class="line"><span class="comment">  Element: author</span></span><br><span class="line"><span class="comment">   Text: #text = Cay S. Horstmann</span></span><br><span class="line"><span class="comment">  Text: #text = </span></span><br><span class="line"><span class="comment">  ...</span></span><br><span class="line"><span class="comment">  */</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-SAX"><a href="#3-SAX" class="headerlink" title="3. SAX"></a>3. SAX</h2><p>SAX解析会触发一系列事件：</p>
+<ul>
+<li>startDocument：开始读取XML文档；</li>
+<li>startElement：读取到了一个元素，例如<code>&lt;book&gt;</code>；</li>
+<li>characters：读取到了字符；</li>
+<li>endElement：读取到了一个结束的元素，例如<code>&lt;/book&gt;</code>；</li>
+<li>endDocument：读取XML文档结束。</li>
+</ul>
+<p>如果我们用SAX API解析XML，Java代码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">InputStream input = Main.class.getResourceAsStream(<span class="string">&quot;/book.xml&quot;</span>);</span><br><span class="line">SAXParserFactory spf = SAXParserFactory.newInstance();</span><br><span class="line">SAXParser saxParser = spf.newSAXParser();</span><br><span class="line">saxParser.parse(input, <span class="keyword">new</span> MyHandler());</span><br></pre></td></tr></table></figure>
+
+<p>关键代码<code>SAXParser.parse()</code>除了需要传入一个<code>InputStream</code>外，还需要传入一个回调对象，这个对象要继承自<code>DefaultHandler</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyHandler</span> <span class="keyword">extends</span> <span class="title">DefaultHandler</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">startDocument</span><span class="params">()</span> <span class="keyword">throws</span> SAXException </span>&#123;</span><br><span class="line">        print(<span class="string">&quot;start document&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">endDocument</span><span class="params">()</span> <span class="keyword">throws</span> SAXException </span>&#123;</span><br><span class="line">        print(<span class="string">&quot;end document&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">startElement</span><span class="params">(String uri, String localName, String qName, Attributes attributes)</span> <span class="keyword">throws</span> SAXException </span>&#123;</span><br><span class="line">        print(<span class="string">&quot;start element:&quot;</span>, localName, qName);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">endElement</span><span class="params">(String uri, String localName, String qName)</span> <span class="keyword">throws</span> SAXException </span>&#123;</span><br><span class="line">        print(<span class="string">&quot;end element:&quot;</span>, localName, qName);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">characters</span><span class="params">(<span class="keyword">char</span>[] ch, <span class="keyword">int</span> start, <span class="keyword">int</span> length)</span> <span class="keyword">throws</span> SAXException </span>&#123;</span><br><span class="line">        print(<span class="string">&quot;characters:&quot;</span>, <span class="keyword">new</span> String(ch, start, length));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">error</span><span class="params">(SAXParseException e)</span> <span class="keyword">throws</span> SAXException </span>&#123;</span><br><span class="line">        print(<span class="string">&quot;error:&quot;</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(Object... objs)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (Object obj : objs) &#123;</span><br><span class="line">            System.out.print(obj);</span><br><span class="line">            System.out.print(<span class="string">&quot; &quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行SAX解析代码，可以打印出下面的结果：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">start document</span><br><span class="line">start element:  book</span><br><span class="line">characters:</span><br><span class="line">     </span><br><span class="line">start element:  name</span><br><span class="line">characters: Java核心技术</span><br><span class="line">end element:  name</span><br><span class="line">characters:</span><br><span class="line">     </span><br><span class="line">start element:  author</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>如果要读取<code>&lt;name&gt;</code>节点的文本，我们就必须在解析过程中根据<code>startElement()</code>和<code>endElement()</code>定位当前正在读取的节点，可以使用栈结构保存，每遇到一个<code>startElement()</code>入栈，每遇到一个<code>endElement()</code>出栈，这样，读到<code>characters()</code>时我们才知道当前读取的文本是哪个节点的。可见，使用SAX API仍然比较麻烦。</p>
+<h2 id="4-Jackson"><a href="#4-Jackson" class="headerlink" title="4. Jackson"></a>4. Jackson</h2><p>一个名叫Jackson的开源的第三方库可以轻松做到XML到JavaBean的转换。我们要使用Jackson，先添加两个Maven的依赖：</p>
+<ul>
+<li>com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.10.1</li>
+<li>org.codehaus.woodstox:woodstox-core-asl:4.4.1</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">book</span> <span class="attr">id</span>=<span class="string">&quot;1&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>Java核心技术<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">author</span>&gt;</span>Cay S. Horstmann<span class="tag">&lt;/<span class="name">author</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">isbn</span> <span class="attr">lang</span>=<span class="string">&quot;CN&quot;</span>&gt;</span>1234567<span class="tag">&lt;/<span class="name">isbn</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">tags</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tag</span>&gt;</span>Java<span class="tag">&lt;/<span class="name">tag</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tag</span>&gt;</span>Network<span class="tag">&lt;/<span class="name">tag</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">tags</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">pubDate</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">book</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>定义好JavaBean</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">long</span> id;</span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line">    <span class="keyword">public</span> String author;</span><br><span class="line">    <span class="keyword">public</span> String isbn;</span><br><span class="line">    <span class="keyword">public</span> List&lt;String&gt; tags;</span><br><span class="line">    <span class="keyword">public</span> String pubDate;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>解析：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">InputStream input = Main.class.getResourceAsStream(<span class="string">&quot;/book.xml&quot;</span>);</span><br><span class="line">JacksonXmlModule <span class="keyword">module</span> = <span class="keyword">new</span> JacksonXmlModule();</span><br><span class="line">XmlMapper mapper = <span class="keyword">new</span> XmlMapper(<span class="keyword">module</span>);</span><br><span class="line">Book book = mapper.readValue(input, Book.class);</span><br><span class="line">System.out.println(book.id);</span><br><span class="line">System.out.println(book.name);</span><br><span class="line">System.out.println(book.author);</span><br><span class="line">System.out.println(book.isbn);</span><br><span class="line">System.out.println(book.tags);</span><br><span class="line">System.out.println(book.pubDate);</span><br></pre></td></tr></table></figure>
+
+<p>注意到<code>XmlMapper</code>就是我们需要创建的核心对象，可以用<code>readValue(InputStream, Class)</code>直接读取XML并返回一个JavaBean。</p>
 ]]></content>
       <tags>
-        <tag>Hash</tag>
-        <tag>Hmac</tag>
+        <tag>JAVA</tag>
+        <tag>xml</tag>
       </tags>
   </entry>
   <entry>
@@ -2128,6 +2303,11 @@
         <tag>JAVA</tag>
         <tag>编码</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>设计模式</title>
+    <url>/2021/05/10/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[]]></content>
   </entry>
   <entry>
     <title>JAVA-IO</title>
