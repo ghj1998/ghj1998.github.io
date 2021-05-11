@@ -176,6 +176,99 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ghj1998.github.io/2021/05/11/ANTLR%E6%8C%87%E5%8D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="高虎军">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小高同学の技术博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/05/11/ANTLR%E6%8C%87%E5%8D%97/" class="post-title-link" itemprop="url">ANTLR指南</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-05-11 14:56:45 / 修改时间：20:44:04" itemprop="dateCreated datePublished" datetime="2021-05-11T14:56:45+08:00">2021-05-11</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="四个案例展示ANTLR的不同特性"><a href="#四个案例展示ANTLR的不同特性" class="headerlink" title="四个案例展示ANTLR的不同特性"></a>四个案例展示ANTLR的不同特性</h1><h2 id="1-简介"><a href="#1-简介" class="headerlink" title="1. 简介"></a>1. 简介</h2><ol>
+<li>分析一个简单的算术表达式语言的语法，<ul>
+<li>深入学习语法分析器的启动过程。</li>
+<li>如何使用语法导入将语法文件切分为容易管理的小块。</li>
+<li>语法分析器处理非法输入。</li>
+</ul>
+</li>
+<li>使用访问者模式构建计算器<ul>
+<li>遍历算术表达式的语法分析树并获得计算结果</li>
+<li>自动生成访问器接口和空的实现类。</li>
+</ul>
+</li>
+<li>构建一个翻译器<ul>
+<li>读取JAVA类定义将其翻译成一个仅有方法声明的接口</li>
+<li>ANTLR生成的监听器机制</li>
+</ul>
+</li>
+<li>如何将代码嵌入语法文件<ul>
+<li>实现极端的灵活性</li>
+</ul>
+</li>
+<li>ANTLR如何处理包含不止一种语言的输入文件<ul>
+<li><code>TokenStreamRewriter</code></li>
+<li>修改词法符号流不影响原来的输入流</li>
+</ul>
+</li>
+</ol>
+<h2 id="2-环境搭建"><a href="#2-环境搭建" class="headerlink" title="2. 环境搭建"></a>2. 环境搭建</h2><p>使用maven搭建环境，在配置文件<code>pom.xml</code>中增加依赖：</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/05/11/ANTLR%E6%8C%87%E5%8D%97/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://ghj1998.github.io/2021/05/11/ANTLR4%E9%A1%B9%E7%9B%AE%E5%85%A5%E9%97%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -799,84 +892,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://ghj1998.github.io/2021/05/06/%E5%A4%9A%E7%A7%8D%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="高虎军">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="小高同学の技术博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/05/06/%E5%A4%9A%E7%A7%8D%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95/" class="post-title-link" itemprop="url">多种加密算法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-05-06 19:34:19" itemprop="dateCreated datePublished" datetime="2021-05-06T19:34:19+08:00">2021-05-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-08 08:49:20" itemprop="dateModified" datetime="2021-05-08T08:49:20+08:00">2021-05-08</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="多种加密算法"><a href="#多种加密算法" class="headerlink" title="多种加密算法"></a>多种加密算法</h1><h2 id="1-对称加密算法"><a href="#1-对称加密算法" class="headerlink" title="1. 对称加密算法"></a>1. 对称加密算法</h2><p>对称加密算法就是传统的用一个密码进行加密和解密。例如，我们常用的WinZIP和WinRAR对压缩包的加密和解密，就是使用对称加密算法：</p>
-<p>加密其实就是一个函数，输入密码和明文，得到密文。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">secret = encrypt(key, message);</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/05/06/%E5%A4%9A%E7%A7%8D%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -944,7 +963,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-count">31</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
