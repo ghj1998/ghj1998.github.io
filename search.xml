@@ -335,6 +335,9 @@
 
 <p>*在执行第一部的时候抛出了<code>IndexOutOfBoundsException</code>*，是<code>antlr4.0</code>的问题，去官网下载最新版解决了这个问题。</p>
 <p>注意修改时要同步修改<code>pom.xml</code> 中的版本号。</p>
+<p>运行结果如下😁：</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511204440048.png" alt="image-20210511204440048"></p>
+<p>最终，我们需要把ANTLR为我们自动生成的语法分析器集成到程序中。</p>
 ]]></content>
       <tags>
         <tag>JAVA</tag>
@@ -548,79 +551,6 @@
       </tags>
   </entry>
   <entry>
-    <title>JAVA处理json</title>
-    <url>/2021/05/10/JAVA%E5%A4%84%E7%90%86json/</url>
-    <content><![CDATA[<h1 id="Json"><a href="#Json" class="headerlink" title="Json"></a>Json</h1><p>在Web上使用XML现在越来越少，取而代之的是JSON这种数据结构。</p>
-<p>JSON是JavaScript Object Notation的缩写，它去除了所有JavaScript执行代码，只保留JavaScript的对象格式。一个典型的JSON如下：</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;id&quot;</span>: <span class="number">1</span>,</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;Java核心技术&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;author&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;firstName&quot;</span>: <span class="string">&quot;Abc&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;lastName&quot;</span>: <span class="string">&quot;Xyz&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">&quot;isbn&quot;</span>: <span class="string">&quot;1234567&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;tags&quot;</span>: [<span class="string">&quot;Java&quot;</span>, <span class="string">&quot;Network&quot;</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>JSON作为数据传输的格式，有几个显著的优点：</p>
-<ul>
-<li>JSON只允许使用UTF-8编码，不存在编码问题；</li>
-<li>JSON只允许使用双引号作为key，特殊字符用<code>\</code>转义，格式简单；</li>
-<li>浏览器内置JSON支持，如果把数据用JSON发送给浏览器，可以用JavaScript直接处理。</li>
-</ul>
-<p>JSON适合表示层次结构，因为它格式简单，仅支持以下几种数据类型：</p>
-<ul>
-<li>键值对：<code>&#123;&quot;key&quot;: value&#125;</code></li>
-<li>数组：<code>[1, 2, 3]</code></li>
-<li>字符串：<code>&quot;abc&quot;</code></li>
-<li>数值（整数和浮点数）：<code>12.34</code></li>
-<li>布尔值：<code>true</code>或<code>false</code></li>
-<li>空值：<code>null</code></li>
-</ul>
-<p>常用的用于解析JSON的第三方库有：</p>
-<ul>
-<li>Jackson</li>
-<li>Gson</li>
-<li>Fastjson</li>
-<li>…</li>
-</ul>
-<p>Jackson也可以解析JSON，因此我们只需要引入以下Maven依赖：</p>
-<ul>
-<li>com.fasterxml.jackson.core:jackson-databind:2.10.0</li>
-</ul>
-<p>代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">InputStream input = Main.class.getResourceAsStream(<span class="string">&quot;/book.json&quot;</span>);</span><br><span class="line">ObjectMapper mapper = <span class="keyword">new</span> ObjectMapper();</span><br><span class="line"><span class="comment">// 反序列化时忽略不存在的JavaBean属性:</span></span><br><span class="line">mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, <span class="keyword">false</span>);</span><br><span class="line">Book book = mapper.readValue(input, Book.class);</span><br></pre></td></tr></table></figure>
-
-<p>核心代码是创建一个<code>ObjectMapper</code>对象。关闭<code>DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES</code>功能使得解析时如果JavaBean不存在该属性时解析不会报错。</p>
-<p>把JSON解析为JavaBean的过程称为反序列化。如果把JavaBean变为JSON，那就是序列化。要实现JavaBean到JSON的序列化，只需要一行代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String json = mapper.writeValueAsString(book);</span><br></pre></td></tr></table></figure>
-
-<p>要把JSON的某些值解析为特定的Java对象，例如<code>LocalDate</code>，也是完全可以的。</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;Java核心技术&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;pubDate&quot;</span>: <span class="string">&quot;2016-09-01&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>要解析为：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line">    <span class="keyword">public</span> LocalDate pubDate;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>只需要引入标准的JSR 310关于JavaTime的数据格式定义至Maven：</p>
-<ul>
-<li>com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.0</li>
-</ul>
-<p>在创建<code>ObjectMapper</code>时，注册一个新的<code>JavaTimeModule</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ObjectMapper mapper = <span class="keyword">new</span> ObjectMapper().registerModule(<span class="keyword">new</span> JavaTimeModule());</span><br></pre></td></tr></table></figure>
-
-<p>内置的解析规则和扩展的解析规则如果都不满足我们的需求，还可以自定义解析。</p>
-<p>举个例子，假设<code>Book</code>类的<code>isbn</code>是一个<code>BigInteger</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span> </span>&#123;</span><br><span class="line">	<span class="keyword">public</span> String name;</span><br><span class="line">	<span class="keyword">public</span> BigInteger isbn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>但JSON数据并不是标准的整形格式：</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;Java核心技术&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;isbn&quot;</span>: <span class="string">&quot;978-7-111-54742-6&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>直接解析，肯定报错。这时，我们需要自定义一个<code>IsbnDeserializer</code>，用于解析含有非数字的字符串：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">IsbnDeserializer</span> <span class="keyword">extends</span> <span class="title">JsonDeserializer</span>&lt;<span class="title">BigInteger</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> BigInteger <span class="title">deserialize</span><span class="params">(JsonParser p, DeserializationContext ctxt)</span> <span class="keyword">throws</span> IOException, JsonProcessingException </span>&#123;</span><br><span class="line">        <span class="comment">// 读取原始的JSON字符串内容:</span></span><br><span class="line">        String s = p.getValueAsString();</span><br><span class="line">        <span class="keyword">if</span> (s != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> BigInteger(s.replace(<span class="string">&quot;-&quot;</span>, <span class="string">&quot;&quot;</span>));</span><br><span class="line">            &#125; <span class="keyword">catch</span> (NumberFormatException e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> JsonParseException(p, s, e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后，在<code>Book</code>类中使用注解标注：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line">    <span class="comment">// 表示反序列化isbn时使用自定义的IsbnDeserializer:</span></span><br><span class="line">    <span class="meta">@JsonDeserialize(using = IsbnDeserializer.class)</span></span><br><span class="line">    <span class="keyword">public</span> BigInteger isbn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>类似的，自定义序列化时我们需要自定义一个<code>IsbnSerializer</code>，然后在<code>Book</code>类中标注<code>@JsonSerialize(using = ...)</code>即可。</p>
-]]></content>
-      <tags>
-        <tag>JAVA</tag>
-        <tag>json</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>JAVA-反射</title>
     <url>/2021/04/19/JAVA%E5%8F%8D%E5%B0%84/</url>
     <content><![CDATA[<h1 id="JAVA反射"><a href="#JAVA反射" class="headerlink" title="JAVA反射"></a>JAVA反射</h1><h2 id="1-Class类"><a href="#1-Class类" class="headerlink" title="1. Class类"></a>1. Class类</h2><p><code>class</code>是由JVM在执行过程中动态加载的。JVM在第一次读取到一种<code>class</code>类型时，将其加载进内存。</p>
@@ -748,6 +678,79 @@
 ]]></content>
       <tags>
         <tag>JAVA</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JAVA处理json</title>
+    <url>/2021/05/10/JAVA%E5%A4%84%E7%90%86json/</url>
+    <content><![CDATA[<h1 id="Json"><a href="#Json" class="headerlink" title="Json"></a>Json</h1><p>在Web上使用XML现在越来越少，取而代之的是JSON这种数据结构。</p>
+<p>JSON是JavaScript Object Notation的缩写，它去除了所有JavaScript执行代码，只保留JavaScript的对象格式。一个典型的JSON如下：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;id&quot;</span>: <span class="number">1</span>,</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;Java核心技术&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;author&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;firstName&quot;</span>: <span class="string">&quot;Abc&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;lastName&quot;</span>: <span class="string">&quot;Xyz&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">&quot;isbn&quot;</span>: <span class="string">&quot;1234567&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;tags&quot;</span>: [<span class="string">&quot;Java&quot;</span>, <span class="string">&quot;Network&quot;</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>JSON作为数据传输的格式，有几个显著的优点：</p>
+<ul>
+<li>JSON只允许使用UTF-8编码，不存在编码问题；</li>
+<li>JSON只允许使用双引号作为key，特殊字符用<code>\</code>转义，格式简单；</li>
+<li>浏览器内置JSON支持，如果把数据用JSON发送给浏览器，可以用JavaScript直接处理。</li>
+</ul>
+<p>JSON适合表示层次结构，因为它格式简单，仅支持以下几种数据类型：</p>
+<ul>
+<li>键值对：<code>&#123;&quot;key&quot;: value&#125;</code></li>
+<li>数组：<code>[1, 2, 3]</code></li>
+<li>字符串：<code>&quot;abc&quot;</code></li>
+<li>数值（整数和浮点数）：<code>12.34</code></li>
+<li>布尔值：<code>true</code>或<code>false</code></li>
+<li>空值：<code>null</code></li>
+</ul>
+<p>常用的用于解析JSON的第三方库有：</p>
+<ul>
+<li>Jackson</li>
+<li>Gson</li>
+<li>Fastjson</li>
+<li>…</li>
+</ul>
+<p>Jackson也可以解析JSON，因此我们只需要引入以下Maven依赖：</p>
+<ul>
+<li>com.fasterxml.jackson.core:jackson-databind:2.10.0</li>
+</ul>
+<p>代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">InputStream input = Main.class.getResourceAsStream(<span class="string">&quot;/book.json&quot;</span>);</span><br><span class="line">ObjectMapper mapper = <span class="keyword">new</span> ObjectMapper();</span><br><span class="line"><span class="comment">// 反序列化时忽略不存在的JavaBean属性:</span></span><br><span class="line">mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, <span class="keyword">false</span>);</span><br><span class="line">Book book = mapper.readValue(input, Book.class);</span><br></pre></td></tr></table></figure>
+
+<p>核心代码是创建一个<code>ObjectMapper</code>对象。关闭<code>DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES</code>功能使得解析时如果JavaBean不存在该属性时解析不会报错。</p>
+<p>把JSON解析为JavaBean的过程称为反序列化。如果把JavaBean变为JSON，那就是序列化。要实现JavaBean到JSON的序列化，只需要一行代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String json = mapper.writeValueAsString(book);</span><br></pre></td></tr></table></figure>
+
+<p>要把JSON的某些值解析为特定的Java对象，例如<code>LocalDate</code>，也是完全可以的。</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;Java核心技术&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;pubDate&quot;</span>: <span class="string">&quot;2016-09-01&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>要解析为：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line">    <span class="keyword">public</span> LocalDate pubDate;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>只需要引入标准的JSR 310关于JavaTime的数据格式定义至Maven：</p>
+<ul>
+<li>com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.0</li>
+</ul>
+<p>在创建<code>ObjectMapper</code>时，注册一个新的<code>JavaTimeModule</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ObjectMapper mapper = <span class="keyword">new</span> ObjectMapper().registerModule(<span class="keyword">new</span> JavaTimeModule());</span><br></pre></td></tr></table></figure>
+
+<p>内置的解析规则和扩展的解析规则如果都不满足我们的需求，还可以自定义解析。</p>
+<p>举个例子，假设<code>Book</code>类的<code>isbn</code>是一个<code>BigInteger</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span> </span>&#123;</span><br><span class="line">	<span class="keyword">public</span> String name;</span><br><span class="line">	<span class="keyword">public</span> BigInteger isbn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但JSON数据并不是标准的整形格式：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;Java核心技术&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;isbn&quot;</span>: <span class="string">&quot;978-7-111-54742-6&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>直接解析，肯定报错。这时，我们需要自定义一个<code>IsbnDeserializer</code>，用于解析含有非数字的字符串：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">IsbnDeserializer</span> <span class="keyword">extends</span> <span class="title">JsonDeserializer</span>&lt;<span class="title">BigInteger</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> BigInteger <span class="title">deserialize</span><span class="params">(JsonParser p, DeserializationContext ctxt)</span> <span class="keyword">throws</span> IOException, JsonProcessingException </span>&#123;</span><br><span class="line">        <span class="comment">// 读取原始的JSON字符串内容:</span></span><br><span class="line">        String s = p.getValueAsString();</span><br><span class="line">        <span class="keyword">if</span> (s != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> BigInteger(s.replace(<span class="string">&quot;-&quot;</span>, <span class="string">&quot;&quot;</span>));</span><br><span class="line">            &#125; <span class="keyword">catch</span> (NumberFormatException e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> JsonParseException(p, s, e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后，在<code>Book</code>类中使用注解标注：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line">    <span class="comment">// 表示反序列化isbn时使用自定义的IsbnDeserializer:</span></span><br><span class="line">    <span class="meta">@JsonDeserialize(using = IsbnDeserializer.class)</span></span><br><span class="line">    <span class="keyword">public</span> BigInteger isbn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>类似的，自定义序列化时我们需要自定义一个<code>IsbnSerializer</code>，然后在<code>Book</code>类中标注<code>@JsonSerialize(using = ...)</code>即可。</p>
+]]></content>
+      <tags>
+        <tag>JAVA</tag>
+        <tag>json</tag>
       </tags>
   </entry>
   <entry>
@@ -1025,138 +1028,6 @@
       </tags>
   </entry>
   <entry>
-    <title>JAVA - 注解</title>
-    <url>/2021/04/19/JAVA%E6%B3%A8%E8%A7%A3/</url>
-    <content><![CDATA[<h1 id="JAVA注解"><a href="#JAVA注解" class="headerlink" title="JAVA注解"></a>JAVA注解</h1><p>注解是放在Java源码的类、方法、字段、参数前的一种特殊“注释”。</p>
-<h2 id="1-使用注解"><a href="#1-使用注解" class="headerlink" title="1. 使用注解"></a>1. 使用注解</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// this is a component:</span></span><br><span class="line"><span class="meta">@Resource(&quot;hello&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Inject</span></span><br><span class="line">    <span class="keyword">int</span> n;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">(<span class="meta">@Param</span> String name)</span> </span>&#123;</span><br><span class="line">        System.out.println(name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Hello&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>注释会被编译器直接忽略，注解则可以被编译器打包进入class文件，因此，注解是一种用作标注的“元数据”。</p>
-<p>Java的注解可以分为三类：</p>
-<p>第一类是由编译器使用的注解，例如：</p>
-<ul>
-<li><code>@Override</code>：让编译器检查该方法是否正确地实现了覆写；</li>
-<li><code>@SuppressWarnings</code>：告诉编译器忽略此处代码产生的警告。</li>
-</ul>
-<p>这类注解不会被编译进入<code>.class</code>文件，它们在编译后就被编译器扔掉了。</p>
-<p>第二类是由工具处理<code>.class</code>文件使用的注解，比如有些工具会在加载class的时候，对class做动态修改，实现一些特殊的功能。这类注解会被编译进入<code>.class</code>文件，但加载结束后并不会存在于内存中。这类注解只被一些底层库使用，一般我们不必自己处理。</p>
-<p>第三类是在程序运行期能够读取的注解，它们在加载后一直存在于JVM中，这也是最常用的注解。例如，一个配置了<code>@PostConstruct</code>的方法会在调用构造方法后自动被调用（这是Java代码读取该注解实现的功能，JVM并不会识别该注解）。</p>
-<p>定义一个注解时，还可以定义配置参数。配置参数可以包括：</p>
-<ul>
-<li>所有基本类型；</li>
-<li>String；</li>
-<li>枚举类型；</li>
-<li>基本类型、String、Class以及枚举的数组。</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Check(min=0, max=100, value=55)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> n;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Check(value=99)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> p;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Check(99)</span> <span class="comment">// @Check(value=99)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> x;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Check</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>@Check</code>就是一个注解。第一个<code>@Check(min=0, max=100, value=55)</code>明确定义了三个参数，第二个<code>@Check(value=99)</code>只定义了一个<code>value</code>参数，它实际上和<code>@Check(99)</code>是完全一样的。最后一个<code>@Check</code>表示所有参数都使用默认值。</p>
-<h2 id="2-定义注解"><a href="#2-定义注解" class="headerlink" title="2. 定义注解"></a>2. 定义注解</h2><p>使用<code>@interface</code>语法来定义注解（<code>Annotation</code>），它的格式如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>注解的参数类似无参数方法，可以用<code>default</code>设定一个默认值（强烈推荐）。最常用的参数应当命名为<code>value</code>。</p>
-<p><strong>元注解</strong></p>
-<p>元注解：能修饰其他注解的注解。JAVA标准库提供。</p>
-<h3 id="Target"><a href="#Target" class="headerlink" title="@Target"></a>@Target</h3><p>最常用的元注解是<code>@Target</code>。使用<code>@Target</code>可以定义<code>Annotation</code>能够被应用于源码的哪些位置：</p>
-<ul>
-<li>类或接口：<code>ElementType.TYPE</code>；</li>
-<li>字段：<code>ElementType.FIELD</code>；</li>
-<li>方法：<code>ElementType.METHOD</code>；</li>
-<li>构造方法：<code>ElementType.CONSTRUCTOR</code>；</li>
-<li>方法参数：<code>ElementType.PARAMETER</code>。</li>
-</ul>
-<p>例如：<code>@Target(ElementType.METHOD)</code>指定该注解只能用在方法上。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target(ElementType.METHOD)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>如果要定义该注解只能用在方法和字段上，可以把<code>@Target</code>注解参数变为数组<code>&#123; ElementType.METHOD, ElementType.FIELD &#125;</code>。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target(&#123;</span></span><br><span class="line"><span class="meta">    ElementType.METHOD,</span></span><br><span class="line"><span class="meta">    ElementType.FIELD</span></span><br><span class="line"><span class="meta">&#125;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="Retention"><a href="#Retention" class="headerlink" title="@Retention"></a>@Retention</h3><p>另一个重要的元注解<code>@Retention</code>定义了<code>Annotation</code>的生命周期：</p>
-<ul>
-<li>仅编译期：<code>RetentionPolicy.SOURCE</code>；</li>
-<li>仅class文件：<code>RetentionPolicy.CLASS</code>；</li>
-<li>运行期：<code>RetentionPolicy.RUNTIME</code>。</li>
-</ul>
-<p>默认为CLASS，通常我们会要求是RUNTIME类型，所以要加上<code>@Retention(RetentionPolicy.RUNTIME)</code> 。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="Repeatable"><a href="#Repeatable" class="headerlink" title="@Repeatable"></a>@Repeatable</h3><p><code>@Repeatable</code>这个元注解可以定义<code>Annotation</code>是否可重复。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Repeatable(Reports.class)</span></span><br><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Reports &#123;</span><br><span class="line">    Report[] value();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>经过<code>@Repeatable</code>修饰后，在某个类型声明处，就可以添加多个<code>@Report</code>注解：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Report(type=1, level=&quot;debug&quot;)</span></span><br><span class="line"><span class="meta">@Report(type=2, level=&quot;warning&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="Inherited"><a href="#Inherited" class="headerlink" title="@Inherited"></a>@Inherited</h3><p>使用<code>@Inherited</code>定义子类是否可继承父类定义的<code>Annotation</code>。<code>@Inherited</code>仅针对<code>@Target(ElementType.TYPE)</code>类型的<code>annotation</code>有效，并且仅针对<code>class</code>的继承，对<code>interface</code>的继承无效。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Inherited</span></span><br><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在使用的时候，如果一个类用到了<code>@Report</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Report(type=1)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>则它的子类默认也定义了该注解：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Student</span> <span class="keyword">extends</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="如何定义注解总结"><a href="#如何定义注解总结" class="headerlink" title="如何定义注解总结"></a>如何定义注解总结</h3><p>第一步：用<code>@interface</code>定义注解：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>第二步，添加参数、默认值：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public @interface Report &#123;</span><br><span class="line">    int type() default 0;</span><br><span class="line">    String level() default &quot;info&quot;;</span><br><span class="line">    String value() default &quot;&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>把最常用的参数定义为<code>value()</code>，推荐所有参数都尽量设置默认值。</p>
-<p>第三步，用元注解配置注解：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@Target(ElementType.TYPE)</span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">public @interface Report &#123;</span><br><span class="line">    int type() default 0;</span><br><span class="line">    String level() default &quot;info&quot;;</span><br><span class="line">    String value() default &quot;&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>其中，必须设置<code>@Target</code>和<code>@Retention</code>，<code>@Retention</code>一般设置为<code>RUNTIME</code>，因为我们自定义的注解通常要求在运行期读取。一般情况下，不必写<code>@Inherited</code>和<code>@Repeatable</code>。</p>
-<h2 id="3-处理注解"><a href="#3-处理注解" class="headerlink" title="3. 处理注解"></a>3. 处理注解</h2><p><code>SOURCE</code>类型的注解主要由编译器使用，因此我们一般只使用，不编写。</p>
-<p><code>CLASS</code>类型的注解主要由底层工具库使用，涉及到class的加载，一般我们很少用到。</p>
-<p><code>RUNTIME</code>类型的注解不但要使用，还经常需要编写。</p>
-<p>读取注解，需要使用反射API。</p>
-<p>Java提供的使用反射API读取<code>Annotation</code>的方法包括：</p>
-<p>判断某个注解是否存在于<code>Class</code>、<code>Field</code>、<code>Method</code>或<code>Constructor</code>：</p>
-<ul>
-<li><code>Class.isAnnotationPresent(Class)</code></li>
-<li><code>Field.isAnnotationPresent(Class)</code></li>
-<li><code>Method.isAnnotationPresent(Class)</code></li>
-<li><code>Constructor.isAnnotationPresent(Class)</code></li>
-</ul>
-<p>例如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 判断@Report是否存在于Person类:</span></span><br><span class="line">Person.class.isAnnotationPresent(Report.class);</span><br></pre></td></tr></table></figure>
-
-<p>使用反射API读取Annotation：</p>
-<ul>
-<li><code>Class.getAnnotation(Class)</code></li>
-<li><code>Field.getAnnotation(Class)</code></li>
-<li><code>Method.getAnnotation(Class)</code></li>
-<li><code>Constructor.getAnnotation(Class)</code></li>
-</ul>
-<p>例如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 获取Person定义的@Report注解:</span></span><br><span class="line">Report report = Person.class.getAnnotation(Report.class);</span><br><span class="line"><span class="keyword">int</span> type = report.type();</span><br><span class="line">String level = report.level();</span><br></pre></td></tr></table></figure>
-
-<p>使用反射API读取<code>Annotation</code>有两种方法。</p>
-<p>方法一是先判断<code>Annotation</code>是否存在，如果存在，就直接读取：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Class cls = Person.class;</span><br><span class="line"><span class="keyword">if</span> (cls.isAnnotationPresent(Report.class)) &#123;</span><br><span class="line">    Report report = cls.getAnnotation(Report.class);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>第二种方法是直接读取<code>Annotation</code>，如果<code>Annotation</code>不存在，将返回<code>null</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Class cls = Person.class;</span><br><span class="line">Report report = cls.getAnnotation(Report.class);</span><br><span class="line"><span class="keyword">if</span> (report != <span class="keyword">null</span>) &#123;</span><br><span class="line">   ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>读取方法、字段和构造方法的<code>Annotation</code>和Class类似。但要读取方法参数的<code>Annotation</code>必须用一个二维数组。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">(<span class="meta">@NotNull</span> <span class="meta">@Range(max=5)</span> String name, <span class="meta">@NotNull</span> String prefix)</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 获取Method实例:</span></span><br><span class="line">Method m = ...</span><br><span class="line"><span class="comment">// 获取所有参数的Annotation:</span></span><br><span class="line">Annotation[][] annos = m.getParameterAnnotations();</span><br><span class="line"><span class="comment">// 第一个参数（索引为0）的所有Annotation:</span></span><br><span class="line">Annotation[] annosOfName = annos[<span class="number">0</span>];</span><br><span class="line"><span class="keyword">for</span> (Annotation anno : annosOfName) &#123;</span><br><span class="line">    <span class="keyword">if</span> (anno <span class="keyword">instanceof</span> Range) &#123; <span class="comment">// @Range注解</span></span><br><span class="line">        Range r = (Range) anno;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (anno <span class="keyword">instanceof</span> NotNull) &#123; <span class="comment">// @NotNull注解</span></span><br><span class="line">        NotNull n = (NotNull) anno;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>使用注解</strong></p>
-<p>注解如何使用，完全由程序自己决定。例如，JUnit是一个测试框架，它会自动运行所有标记为<code>@Test</code>的方法。</p>
-<p><code>@Range</code>注解，我们希望用它来定义一个<code>String</code>字段的规则：字段长度满足<code>@Range</code>的参数定义：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Target(ElementType.FIELD)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Range &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">min</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">max</span><span class="params">()</span> <span class="keyword">default</span> 255</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Range(min=1, max=20)</span></span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Range(max=10)</span></span><br><span class="line">    <span class="keyword">public</span> String city;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>定义了注解，本身对程序逻辑没有任何影响。我们必须自己编写代码来使用注解。</p>
-<p>例如：编写一个<code>Person</code>实例的检查方法，它可以检查<code>Person</code>实例的<code>String</code>字段长度是否满足<code>@Range</code>的定义。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">check</span><span class="params">(Person person)</span> <span class="keyword">throws</span> IllegalArgumentException, ReflectiveOperationException </span>&#123;</span><br><span class="line">    <span class="comment">// 遍历所有Field:</span></span><br><span class="line">    <span class="keyword">for</span> (Field field : person.getClass().getFields()) &#123;</span><br><span class="line">        <span class="comment">// 获取Field定义的@Range:</span></span><br><span class="line">        Range range = field.getAnnotation(Range.class);</span><br><span class="line">        <span class="comment">// 如果@Range存在:</span></span><br><span class="line">        <span class="keyword">if</span> (range != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 获取Field的值:</span></span><br><span class="line">            Object value = field.get(person);</span><br><span class="line">            <span class="comment">// 如果值是String:</span></span><br><span class="line">            <span class="keyword">if</span> (value <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">                String s = (String) value;</span><br><span class="line">                <span class="comment">// 判断值是否满足@Range的min/max:</span></span><br><span class="line">                <span class="keyword">if</span> (s.length() &lt; range.min() || s.length() &gt; range.max()) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Invalid field: &quot;</span> + field.getName());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>JAVA</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>JAVA - 泛型</title>
     <url>/2021/04/21/JAVA%E6%B3%9B%E5%9E%8B/</url>
     <content><![CDATA[<h1 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h1><h2 id="1-泛型定义"><a href="#1-泛型定义" class="headerlink" title="1. 泛型定义"></a>1. 泛型定义</h2><p>泛型就是定义一种模板，例如<code>ArrayList&lt;T&gt;</code>，然后在代码中为用到的类创建对应的<code>ArrayList&lt;类型&gt;</code>：</p>
@@ -1345,66 +1216,133 @@
       </tags>
   </entry>
   <entry>
-    <title>Lambda学习</title>
-    <url>/2021/05/03/Lambda%E5%AD%A6%E4%B9%A0/</url>
-    <content><![CDATA[<h1 id="Lambda基础"><a href="#Lambda基础" class="headerlink" title="Lambda基础"></a>Lambda基础</h1><h2 id="1-函数式编程"><a href="#1-函数式编程" class="headerlink" title="1. 函数式编程"></a>1. 函数式编程</h2><p>函数式编程把函数作为基本运算单元，函数可以作为变量，可以接受函数，可以返回函数。<em>常把支持函数式编程的风格策划归纳为Lambda表达式</em></p>
-<h2 id="2-Lambda表达式"><a href="#2-Lambda表达式" class="headerlink" title="2. Lambda表达式"></a>2. Lambda表达式</h2><p>单方法接口：一个接口只定义了一个方法：</p>
+    <title>JAVA - 注解</title>
+    <url>/2021/04/19/JAVA%E6%B3%A8%E8%A7%A3/</url>
+    <content><![CDATA[<h1 id="JAVA注解"><a href="#JAVA注解" class="headerlink" title="JAVA注解"></a>JAVA注解</h1><p>注解是放在Java源码的类、方法、字段、参数前的一种特殊“注释”。</p>
+<h2 id="1-使用注解"><a href="#1-使用注解" class="headerlink" title="1. 使用注解"></a>1. 使用注解</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// this is a component:</span></span><br><span class="line"><span class="meta">@Resource(&quot;hello&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Inject</span></span><br><span class="line">    <span class="keyword">int</span> n;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">(<span class="meta">@Param</span> String name)</span> </span>&#123;</span><br><span class="line">        System.out.println(name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Hello&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注释会被编译器直接忽略，注解则可以被编译器打包进入class文件，因此，注解是一种用作标注的“元数据”。</p>
+<p>Java的注解可以分为三类：</p>
+<p>第一类是由编译器使用的注解，例如：</p>
 <ul>
-<li>Comparator</li>
-<li>Runnable</li>
-<li>Callable</li>
+<li><code>@Override</code>：让编译器检查该方法是否正确地实现了覆写；</li>
+<li><code>@SuppressWarnings</code>：告诉编译器忽略此处代码产生的警告。</li>
 </ul>
-<p>例如，调用<code>Arrays.sort()</code>时，可以传入一个<code>Comparator</code>实例，以前的写法是使用匿名类，如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String[] array = ...</span><br><span class="line">Arrays.sort(array, <span class="keyword">new</span> Comparator&lt;String&gt;() &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(String s1, String s2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> s1.compareTo(s2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>这类注解不会被编译进入<code>.class</code>文件，它们在编译后就被编译器扔掉了。</p>
+<p>第二类是由工具处理<code>.class</code>文件使用的注解，比如有些工具会在加载class的时候，对class做动态修改，实现一些特殊的功能。这类注解会被编译进入<code>.class</code>文件，但加载结束后并不会存在于内存中。这类注解只被一些底层库使用，一般我们不必自己处理。</p>
+<p>第三类是在程序运行期能够读取的注解，它们在加载后一直存在于JVM中，这也是最常用的注解。例如，一个配置了<code>@PostConstruct</code>的方法会在调用构造方法后自动被调用（这是Java代码读取该注解实现的功能，JVM并不会识别该注解）。</p>
+<p>定义一个注解时，还可以定义配置参数。配置参数可以包括：</p>
+<ul>
+<li>所有基本类型；</li>
+<li>String；</li>
+<li>枚举类型；</li>
+<li>基本类型、String、Class以及枚举的数组。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Check(min=0, max=100, value=55)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> n;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Check(value=99)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> p;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Check(99)</span> <span class="comment">// @Check(value=99)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> x;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Check</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>较为繁琐，JAVA 8 开始引入了Lambda表达式来替换<strong>单方法接口</strong>。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String[] array = <span class="keyword">new</span> String[] &#123; <span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Orange&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Lemon&quot;</span> &#125;;</span><br><span class="line">        Arrays.sort(array, (s1, s2) -&gt; &#123;</span><br><span class="line">            <span class="keyword">return</span> s1.compareTo(s2);</span><br><span class="line">        &#125;);</span><br><span class="line">        System.out.println(String.join(<span class="string">&quot;, &quot;</span>, array));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>@Check</code>就是一个注解。第一个<code>@Check(min=0, max=100, value=55)</code>明确定义了三个参数，第二个<code>@Check(value=99)</code>只定义了一个<code>value</code>参数，它实际上和<code>@Check(99)</code>是完全一样的。最后一个<code>@Check</code>表示所有参数都使用默认值。</p>
+<h2 id="2-定义注解"><a href="#2-定义注解" class="headerlink" title="2. 定义注解"></a>2. 定义注解</h2><p>使用<code>@interface</code>语法来定义注解（<code>Annotation</code>），它的格式如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">(s1, s2) -&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> s1.compareTo(s2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注解的参数类似无参数方法，可以用<code>default</code>设定一个默认值（强烈推荐）。最常用的参数应当命名为<code>value</code>。</p>
+<p><strong>元注解</strong></p>
+<p>元注解：能修饰其他注解的注解。JAVA标准库提供。</p>
+<h3 id="Target"><a href="#Target" class="headerlink" title="@Target"></a>@Target</h3><p>最常用的元注解是<code>@Target</code>。使用<code>@Target</code>可以定义<code>Annotation</code>能够被应用于源码的哪些位置：</p>
+<ul>
+<li>类或接口：<code>ElementType.TYPE</code>；</li>
+<li>字段：<code>ElementType.FIELD</code>；</li>
+<li>方法：<code>ElementType.METHOD</code>；</li>
+<li>构造方法：<code>ElementType.CONSTRUCTOR</code>；</li>
+<li>方法参数：<code>ElementType.PARAMETER</code>。</li>
+</ul>
+<p>例如：<code>@Target(ElementType.METHOD)</code>指定该注解只能用在方法上。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target(ElementType.METHOD)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>括号内是参数，参数类型可以忽略。<code>-&gt;&#123;&#125;</code>表示方法体。</p>
-<p>如果只有一行，可以省略大括号以及<code>return</code>。</p>
+<p>如果要定义该注解只能用在方法和字段上，可以把<code>@Target</code>注解参数变为数组<code>&#123; ElementType.METHOD, ElementType.FIELD &#125;</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target(&#123;</span></span><br><span class="line"><span class="meta">    ElementType.METHOD,</span></span><br><span class="line"><span class="meta">    ElementType.FIELD</span></span><br><span class="line"><span class="meta">&#125;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Retention"><a href="#Retention" class="headerlink" title="@Retention"></a>@Retention</h3><p>另一个重要的元注解<code>@Retention</code>定义了<code>Annotation</code>的生命周期：</p>
+<ul>
+<li>仅编译期：<code>RetentionPolicy.SOURCE</code>；</li>
+<li>仅class文件：<code>RetentionPolicy.CLASS</code>；</li>
+<li>运行期：<code>RetentionPolicy.RUNTIME</code>。</li>
+</ul>
+<p>默认为CLASS，通常我们会要求是RUNTIME类型，所以要加上<code>@Retention(RetentionPolicy.RUNTIME)</code> 。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Repeatable"><a href="#Repeatable" class="headerlink" title="@Repeatable"></a>@Repeatable</h3><p><code>@Repeatable</code>这个元注解可以定义<code>Annotation</code>是否可重复。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Repeatable(Reports.class)</span></span><br><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Reports &#123;</span><br><span class="line">    Report[] value();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>经过<code>@Repeatable</code>修饰后，在某个类型声明处，就可以添加多个<code>@Report</code>注解：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Report(type=1, level=&quot;debug&quot;)</span></span><br><span class="line"><span class="meta">@Report(type=2, level=&quot;warning&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Inherited"><a href="#Inherited" class="headerlink" title="@Inherited"></a>@Inherited</h3><p>使用<code>@Inherited</code>定义子类是否可继承父类定义的<code>Annotation</code>。<code>@Inherited</code>仅针对<code>@Target(ElementType.TYPE)</code>类型的<code>annotation</code>有效，并且仅针对<code>class</code>的继承，对<code>interface</code>的继承无效。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Inherited</span></span><br><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">type</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function">String <span class="title">level</span><span class="params">()</span> <span class="keyword">default</span> &quot;info&quot;</span>;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在使用的时候，如果一个类用到了<code>@Report</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Report(type=1)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>则它的子类默认也定义了该注解：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Student</span> <span class="keyword">extends</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="如何定义注解总结"><a href="#如何定义注解总结" class="headerlink" title="如何定义注解总结"></a>如何定义注解总结</h3><p>第一步：用<code>@interface</code>定义注解：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Report &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第二步，添加参数、默认值：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public @interface Report &#123;</span><br><span class="line">    int type() default 0;</span><br><span class="line">    String level() default &quot;info&quot;;</span><br><span class="line">    String value() default &quot;&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>把最常用的参数定义为<code>value()</code>，推荐所有参数都尽量设置默认值。</p>
+<p>第三步，用元注解配置注解：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@Target(ElementType.TYPE)</span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">public @interface Report &#123;</span><br><span class="line">    int type() default 0;</span><br><span class="line">    String level() default &quot;info&quot;;</span><br><span class="line">    String value() default &quot;&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中，必须设置<code>@Target</code>和<code>@Retention</code>，<code>@Retention</code>一般设置为<code>RUNTIME</code>，因为我们自定义的注解通常要求在运行期读取。一般情况下，不必写<code>@Inherited</code>和<code>@Repeatable</code>。</p>
+<h2 id="3-处理注解"><a href="#3-处理注解" class="headerlink" title="3. 处理注解"></a>3. 处理注解</h2><p><code>SOURCE</code>类型的注解主要由编译器使用，因此我们一般只使用，不编写。</p>
+<p><code>CLASS</code>类型的注解主要由底层工具库使用，涉及到class的加载，一般我们很少用到。</p>
+<p><code>RUNTIME</code>类型的注解不但要使用，还经常需要编写。</p>
+<p>读取注解，需要使用反射API。</p>
+<p>Java提供的使用反射API读取<code>Annotation</code>的方法包括：</p>
+<p>判断某个注解是否存在于<code>Class</code>、<code>Field</code>、<code>Method</code>或<code>Constructor</code>：</p>
+<ul>
+<li><code>Class.isAnnotationPresent(Class)</code></li>
+<li><code>Field.isAnnotationPresent(Class)</code></li>
+<li><code>Method.isAnnotationPresent(Class)</code></li>
+<li><code>Constructor.isAnnotationPresent(Class)</code></li>
+</ul>
 <p>例如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Arrays.sort(array, (s1, s2) -&gt; s1.compareTo(s2));</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 判断@Report是否存在于Person类:</span></span><br><span class="line">Person.class.isAnnotationPresent(Report.class);</span><br></pre></td></tr></table></figure>
 
-<h2 id="3-FunctionalInterface"><a href="#3-FunctionalInterface" class="headerlink" title="3. FunctionalInterface"></a>3. FunctionalInterface</h2><p>只定义了单方法的接口称之为<code>FunctionalInterface</code>，用注解<code>@FunctionalInterface</code>标记。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Callable</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">V <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用反射API读取Annotation：</p>
+<ul>
+<li><code>Class.getAnnotation(Class)</code></li>
+<li><code>Field.getAnnotation(Class)</code></li>
+<li><code>Method.getAnnotation(Class)</code></li>
+<li><code>Constructor.getAnnotation(Class)</code></li>
+</ul>
+<p>例如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 获取Person定义的@Report注解:</span></span><br><span class="line">Report report = Person.class.getAnnotation(Report.class);</span><br><span class="line"><span class="keyword">int</span> type = report.type();</span><br><span class="line">String level = report.level();</span><br></pre></td></tr></table></figure>
 
-<p>接口中的<code>static</code>方法和<code>default</code>方法不被<code>FunctionalInterface</code>计算在内。</p>
-<p><code>Object</code>定义的方法也不算在接口方法内。</p>
-<p>例如<code>Comparator</code>也是<code>FunctionalInterface</code>。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Comparator</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">compare</span><span class="params">(T o1, T o2)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">default</span> Comparator&lt;T&gt; <span class="title">reversed</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Collections.reverseOrder(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">default</span> Comparator&lt;T&gt; <span class="title">thenComparing</span><span class="params">(Comparator&lt;? <span class="keyword">super</span> T&gt; other)</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用反射API读取<code>Annotation</code>有两种方法。</p>
+<p>方法一是先判断<code>Annotation</code>是否存在，如果存在，就直接读取：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Class cls = Person.class;</span><br><span class="line"><span class="keyword">if</span> (cls.isAnnotationPresent(Report.class)) &#123;</span><br><span class="line">    Report report = cls.getAnnotation(Report.class);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h2 id="4-方法引用"><a href="#4-方法引用" class="headerlink" title="4. 方法引用"></a>4. 方法引用</h2><p>方法引用：如果某个方法签名和接口恰好一致，就可以直接传入方法引用。</p>
-<p>注意：在这里，方法签名只看<strong>参数类型和返回类型</strong>，<strong>不看方法名称，也不看类的继承关系。</strong></p>
-<p><strong>引用静态方法</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String[] array = <span class="keyword">new</span> String[] &#123; <span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Orange&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Lemon&quot;</span> &#125;;</span><br><span class="line">        Arrays.sort(array, Main::cmp);</span><br><span class="line">        System.out.println(String.join(<span class="string">&quot;, &quot;</span>, array));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">cmp</span><span class="params">(String s1, String s2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> s1.compareTo(s2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第二种方法是直接读取<code>Annotation</code>，如果<code>Annotation</code>不存在，将返回<code>null</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Class cls = Person.class;</span><br><span class="line">Report report = cls.getAnnotation(Report.class);</span><br><span class="line"><span class="keyword">if</span> (report != <span class="keyword">null</span>) &#123;</span><br><span class="line">   ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><code>Arrays.sort()</code>中直接传入了静态方法<code>cmp</code>的引用，用<code>Main::cmp</code>表示。</p>
-<p>因为<code>Comparator&lt;String&gt;</code>接口定义的方法是<code>int compare(String, String)</code>，和静态方法<code>int cmp(String, String)</code>相比，除了方法名外，方法参数一致，返回类型相同，因此，我们说两者的方法签名一致，可以直接把方法名作为Lambda表达式传入。</p>
-<p><strong>引用实例方法</strong></p>
-<p>实例方法有一个隐含的<code>this</code>参数，<code>String</code>类的<code>compareTo()</code>方法在实际调用的时候，第一个隐含参数总是传入<code>this</code>，相当于静态方法：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(<span class="keyword">this</span>, String o)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>读取方法、字段和构造方法的<code>Annotation</code>和Class类似。但要读取方法参数的<code>Annotation</code>必须用一个二维数组。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">(<span class="meta">@NotNull</span> <span class="meta">@Range(max=5)</span> String name, <span class="meta">@NotNull</span> String prefix)</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>所以引用实例方法可以这么写：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String[] array = <span class="keyword">new</span> String[] &#123; <span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Orange&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Lemon&quot;</span> &#125;;</span><br><span class="line">        Arrays.sort(array, String::compareTo);</span><br><span class="line">        System.out.println(String.join(<span class="string">&quot;, &quot;</span>, array));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 获取Method实例:</span></span><br><span class="line">Method m = ...</span><br><span class="line"><span class="comment">// 获取所有参数的Annotation:</span></span><br><span class="line">Annotation[][] annos = m.getParameterAnnotations();</span><br><span class="line"><span class="comment">// 第一个参数（索引为0）的所有Annotation:</span></span><br><span class="line">Annotation[] annosOfName = annos[<span class="number">0</span>];</span><br><span class="line"><span class="keyword">for</span> (Annotation anno : annosOfName) &#123;</span><br><span class="line">    <span class="keyword">if</span> (anno <span class="keyword">instanceof</span> Range) &#123; <span class="comment">// @Range注解</span></span><br><span class="line">        Range r = (Range) anno;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (anno <span class="keyword">instanceof</span> NotNull) &#123; <span class="comment">// @NotNull注解</span></span><br><span class="line">        NotNull n = (NotNull) anno;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><strong>构造方法引用</strong></p>
-<p>如果要把一个<code>List&lt;String&gt;</code>转换为<code>List&lt;Person&gt;</code>。</p>
-<p>传统的做法是：定义一个<code>ArrayList&lt;Person&gt;</code>，然后用<code>for</code>循环填充这个<code>List</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; names = List.of(<span class="string">&quot;Bob&quot;</span>, <span class="string">&quot;Alice&quot;</span>, <span class="string">&quot;Tim&quot;</span>);</span><br><span class="line">List&lt;Person&gt; persons = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"><span class="keyword">for</span> (String name : names) &#123;</span><br><span class="line">    persons.add(<span class="keyword">new</span> Person(name));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>使用注解</strong></p>
+<p>注解如何使用，完全由程序自己决定。例如，JUnit是一个测试框架，它会自动运行所有标记为<code>@Test</code>的方法。</p>
+<p><code>@Range</code>注解，我们希望用它来定义一个<code>String</code>字段的规则：字段长度满足<code>@Range</code>的参数定义：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Target(ElementType.FIELD)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Range &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">min</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">max</span><span class="params">()</span> <span class="keyword">default</span> 255</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>使用构造方法的话，可以改写成：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; names = List.of(<span class="string">&quot;Bob&quot;</span>, <span class="string">&quot;Alice&quot;</span>, <span class="string">&quot;Tim&quot;</span>);</span><br><span class="line">        List&lt;Person&gt; persons = names.stream().map(Person::<span class="keyword">new</span>).collect(Collectors.toList());</span><br><span class="line">        System.out.println(persons);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">    String name;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Person</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Person:&quot;</span> + <span class="keyword">this</span>.name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Range(min=1, max=20)</span></span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Range(max=10)</span></span><br><span class="line">    <span class="keyword">public</span> String city;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<blockquote>
-<p>map笔记见：<a href="https://ghj1998.github.io/2021/05/03/%E4%BD%BF%E7%94%A8Stream">map学习</a></p>
-</blockquote>
-<p><code>map()</code>需要传入的FunctionalInterface的定义是：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Function</span>&lt;<span class="title">T</span>, <span class="title">R</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">R <span class="title">apply</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>把泛型对应上就是方法签名<code>Person apply(String)</code>，即传入参数<code>String</code>，返回类型<code>Person</code>。而<code>Person</code>类的构造方法恰好满足这个条件，因为构造方法的参数是<code>String</code>，而构造方法虽然没有<code>return</code>语句，但它会隐式地返回<code>this</code>实例，类型就是<code>Person</code>，因此，此处可以引用构造方法。构造方法的引用写法是<code>类名::new</code>，因此，此处传入<code>Person::new</code>。</p>
-]]></content>
+<p>定义了注解，本身对程序逻辑没有任何影响。我们必须自己编写代码来使用注解。</p>
+<p>例如：编写一个<code>Person</code>实例的检查方法，它可以检查<code>Person</code>实例的<code>String</code>字段长度是否满足<code>@Range</code>的定义。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">check</span><span class="params">(Person person)</span> <span class="keyword">throws</span> IllegalArgumentException, ReflectiveOperationException </span>&#123;</span><br><span class="line">    <span class="comment">// 遍历所有Field:</span></span><br><span class="line">    <span class="keyword">for</span> (Field field : person.getClass().getFields()) &#123;</span><br><span class="line">        <span class="comment">// 获取Field定义的@Range:</span></span><br><span class="line">        Range range = field.getAnnotation(Range.class);</span><br><span class="line">        <span class="comment">// 如果@Range存在:</span></span><br><span class="line">        <span class="keyword">if</span> (range != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 获取Field的值:</span></span><br><span class="line">            Object value = field.get(person);</span><br><span class="line">            <span class="comment">// 如果值是String:</span></span><br><span class="line">            <span class="keyword">if</span> (value <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">                String s = (String) value;</span><br><span class="line">                <span class="comment">// 判断值是否满足@Range的min/max:</span></span><br><span class="line">                <span class="keyword">if</span> (s.length() &lt; range.min() || s.length() &gt; range.max()) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Invalid field: &quot;</span> + field.getName());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
       <tags>
         <tag>JAVA</tag>
       </tags>
@@ -1610,118 +1548,265 @@
       </tags>
   </entry>
   <entry>
+    <title>Lambda学习</title>
+    <url>/2021/05/03/Lambda%E5%AD%A6%E4%B9%A0/</url>
+    <content><![CDATA[<h1 id="Lambda基础"><a href="#Lambda基础" class="headerlink" title="Lambda基础"></a>Lambda基础</h1><h2 id="1-函数式编程"><a href="#1-函数式编程" class="headerlink" title="1. 函数式编程"></a>1. 函数式编程</h2><p>函数式编程把函数作为基本运算单元，函数可以作为变量，可以接受函数，可以返回函数。<em>常把支持函数式编程的风格策划归纳为Lambda表达式</em></p>
+<h2 id="2-Lambda表达式"><a href="#2-Lambda表达式" class="headerlink" title="2. Lambda表达式"></a>2. Lambda表达式</h2><p>单方法接口：一个接口只定义了一个方法：</p>
+<ul>
+<li>Comparator</li>
+<li>Runnable</li>
+<li>Callable</li>
+</ul>
+<p>例如，调用<code>Arrays.sort()</code>时，可以传入一个<code>Comparator</code>实例，以前的写法是使用匿名类，如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String[] array = ...</span><br><span class="line">Arrays.sort(array, <span class="keyword">new</span> Comparator&lt;String&gt;() &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(String s1, String s2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> s1.compareTo(s2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>较为繁琐，JAVA 8 开始引入了Lambda表达式来替换<strong>单方法接口</strong>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String[] array = <span class="keyword">new</span> String[] &#123; <span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Orange&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Lemon&quot;</span> &#125;;</span><br><span class="line">        Arrays.sort(array, (s1, s2) -&gt; &#123;</span><br><span class="line">            <span class="keyword">return</span> s1.compareTo(s2);</span><br><span class="line">        &#125;);</span><br><span class="line">        System.out.println(String.join(<span class="string">&quot;, &quot;</span>, array));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">(s1, s2) -&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> s1.compareTo(s2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>括号内是参数，参数类型可以忽略。<code>-&gt;&#123;&#125;</code>表示方法体。</p>
+<p>如果只有一行，可以省略大括号以及<code>return</code>。</p>
+<p>例如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Arrays.sort(array, (s1, s2) -&gt; s1.compareTo(s2));</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-FunctionalInterface"><a href="#3-FunctionalInterface" class="headerlink" title="3. FunctionalInterface"></a>3. FunctionalInterface</h2><p>只定义了单方法的接口称之为<code>FunctionalInterface</code>，用注解<code>@FunctionalInterface</code>标记。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Callable</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">V <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接口中的<code>static</code>方法和<code>default</code>方法不被<code>FunctionalInterface</code>计算在内。</p>
+<p><code>Object</code>定义的方法也不算在接口方法内。</p>
+<p>例如<code>Comparator</code>也是<code>FunctionalInterface</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Comparator</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">compare</span><span class="params">(T o1, T o2)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">default</span> Comparator&lt;T&gt; <span class="title">reversed</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Collections.reverseOrder(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">default</span> Comparator&lt;T&gt; <span class="title">thenComparing</span><span class="params">(Comparator&lt;? <span class="keyword">super</span> T&gt; other)</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-方法引用"><a href="#4-方法引用" class="headerlink" title="4. 方法引用"></a>4. 方法引用</h2><p>方法引用：如果某个方法签名和接口恰好一致，就可以直接传入方法引用。</p>
+<p>注意：在这里，方法签名只看<strong>参数类型和返回类型</strong>，<strong>不看方法名称，也不看类的继承关系。</strong></p>
+<p><strong>引用静态方法</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String[] array = <span class="keyword">new</span> String[] &#123; <span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Orange&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Lemon&quot;</span> &#125;;</span><br><span class="line">        Arrays.sort(array, Main::cmp);</span><br><span class="line">        System.out.println(String.join(<span class="string">&quot;, &quot;</span>, array));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">cmp</span><span class="params">(String s1, String s2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> s1.compareTo(s2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Arrays.sort()</code>中直接传入了静态方法<code>cmp</code>的引用，用<code>Main::cmp</code>表示。</p>
+<p>因为<code>Comparator&lt;String&gt;</code>接口定义的方法是<code>int compare(String, String)</code>，和静态方法<code>int cmp(String, String)</code>相比，除了方法名外，方法参数一致，返回类型相同，因此，我们说两者的方法签名一致，可以直接把方法名作为Lambda表达式传入。</p>
+<p><strong>引用实例方法</strong></p>
+<p>实例方法有一个隐含的<code>this</code>参数，<code>String</code>类的<code>compareTo()</code>方法在实际调用的时候，第一个隐含参数总是传入<code>this</code>，相当于静态方法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(<span class="keyword">this</span>, String o)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>所以引用实例方法可以这么写：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String[] array = <span class="keyword">new</span> String[] &#123; <span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Orange&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Lemon&quot;</span> &#125;;</span><br><span class="line">        Arrays.sort(array, String::compareTo);</span><br><span class="line">        System.out.println(String.join(<span class="string">&quot;, &quot;</span>, array));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>构造方法引用</strong></p>
+<p>如果要把一个<code>List&lt;String&gt;</code>转换为<code>List&lt;Person&gt;</code>。</p>
+<p>传统的做法是：定义一个<code>ArrayList&lt;Person&gt;</code>，然后用<code>for</code>循环填充这个<code>List</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; names = List.of(<span class="string">&quot;Bob&quot;</span>, <span class="string">&quot;Alice&quot;</span>, <span class="string">&quot;Tim&quot;</span>);</span><br><span class="line">List&lt;Person&gt; persons = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"><span class="keyword">for</span> (String name : names) &#123;</span><br><span class="line">    persons.add(<span class="keyword">new</span> Person(name));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用构造方法的话，可以改写成：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; names = List.of(<span class="string">&quot;Bob&quot;</span>, <span class="string">&quot;Alice&quot;</span>, <span class="string">&quot;Tim&quot;</span>);</span><br><span class="line">        List&lt;Person&gt; persons = names.stream().map(Person::<span class="keyword">new</span>).collect(Collectors.toList());</span><br><span class="line">        System.out.println(persons);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">    String name;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Person</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Person:&quot;</span> + <span class="keyword">this</span>.name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>map笔记见：<a href="https://ghj1998.github.io/2021/05/03/%E4%BD%BF%E7%94%A8Stream">map学习</a></p>
+</blockquote>
+<p><code>map()</code>需要传入的FunctionalInterface的定义是：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Function</span>&lt;<span class="title">T</span>, <span class="title">R</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">R <span class="title">apply</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>把泛型对应上就是方法签名<code>Person apply(String)</code>，即传入参数<code>String</code>，返回类型<code>Person</code>。而<code>Person</code>类的构造方法恰好满足这个条件，因为构造方法的参数是<code>String</code>，而构造方法虽然没有<code>return</code>语句，但它会隐式地返回<code>this</code>实例，类型就是<code>Person</code>，因此，此处可以引用构造方法。构造方法的引用写法是<code>类名::new</code>，因此，此处传入<code>Person::new</code>。</p>
+]]></content>
+      <tags>
+        <tag>JAVA</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Mybatis框架</title>
     <url>/2021/05/04/Mybatis%E6%A1%86%E6%9E%B6/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
-    <title>git安装和配置</title>
-    <url>/2021/03/29/git%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/</url>
-    <content><![CDATA[<h1 id="git安装和配置"><a href="#git安装和配置" class="headerlink" title="git安装和配置"></a>git安装和配置</h1><h2 id="1-版本控制工具"><a href="#1-版本控制工具" class="headerlink" title="1. 版本控制工具"></a>1. 版本控制工具</h2><p><strong>SVN</strong>：集中式版本控制工具</p>
-<p>集中式版本控制工具，几乎所有的动作<strong>都需要服务器参与</strong>，并且<strong>数据安全性与服务器关系很大</strong>。</p>
-<p><strong>git</strong>：分布式版本控制工具</p>
-<p><strong>Git 是分布式版本控制工具</strong>，除了与服务器之前进行按需同步之外，<strong>所有的提交操作都不需要服务器</strong>。</p>
-<p><strong>SVN</strong>不适用的领域：</p>
+    <title>Spring框架</title>
+    <url>/2021/05/04/Spring%E6%A1%86%E6%9E%B6/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>使用Stream</title>
+    <url>/2021/05/03/%E4%BD%BF%E7%94%A8Stream/</url>
+    <content><![CDATA[<h1 id="Stream"><a href="#Stream" class="headerlink" title="Stream"></a>Stream</h1><h2 id="1-Stream简介"><a href="#1-Stream简介" class="headerlink" title="1. Stream简介"></a>1. Stream简介</h2><p>Stream代表的是任意Java对象的序列。<code>Stream</code>实现的是惰性计算.</p>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">java.io</th>
+<th>java.util.stream</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">存储</td>
+<td align="left">顺序读写的<code>byte</code>或<code>char</code></td>
+<td>顺序输出的任意Java对象实例</td>
+</tr>
+<tr>
+<td align="left">用途</td>
+<td align="left">序列化至文件或网络</td>
+<td>内存计算／业务逻辑</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">java.util.List</th>
+<th>java.util.stream</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">元素</td>
+<td align="left">已分配并存储在内存</td>
+<td>可能未分配，实时计算</td>
+</tr>
+<tr>
+<td align="left">用途</td>
+<td align="left">操作一组已存在的Java对象</td>
+<td>惰性计算</td>
+</tr>
+</tbody></table>
+<p>l例如：我们无法用List表示全部自然数，但是用Stream可以。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;BigInteger&gt; naturals = createNaturalStream(); <span class="comment">// 全体自然数</span></span><br></pre></td></tr></table></figure>
+
+<p>我们可以对每个自然数做一个平方，这样我们就把这个<code>Stream</code>转换成了另一个<code>Stream</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;BigInteger&gt; naturals = createNaturalStream(); <span class="comment">// 全体自然数</span></span><br><span class="line">Stream&lt;BigInteger&gt; streamNxN = naturals.map(n -&gt; n.multiply(n)); <span class="comment">// 全体自然数的平方</span></span><br></pre></td></tr></table></figure>
+
+<p>可以用<code>limit()</code> 截取数据，同时可以使用<code>forEach()</code>来处理每个元素。</p>
+<p><code>Stream</code>的另一个特点是，一个<code>Stream</code>可以轻易地转换为另一个<code>Stream</code>，而不是修改原<code>Stream</code>本身。真正的计算通常发生在最后结果的获取，也就是惰性计算。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;BigInteger&gt; naturals = createNaturalStream(); <span class="comment">// 不计算</span></span><br><span class="line">Stream&lt;BigInteger&gt; s2 = naturals.map(BigInteger::multiply); <span class="comment">// 不计算</span></span><br><span class="line">Stream&lt;BigInteger&gt; s3 = s2.limit(<span class="number">100</span>); <span class="comment">// 不计算</span></span><br><span class="line">s3.forEach(System.out::println); <span class="comment">// 计算</span></span><br></pre></td></tr></table></figure>
+
+<p>Stream API的基本用法就是：创建一个<code>Stream</code>，然后做若干次转换，最后调用一个求值方法获取真正计算的结果：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> result = createNaturalStream() <span class="comment">// 创建Stream</span></span><br><span class="line">             .filter(n -&gt; n % <span class="number">2</span> == <span class="number">0</span>) <span class="comment">// 任意个转换</span></span><br><span class="line">             .map(n -&gt; n * n) <span class="comment">// 任意个转换</span></span><br><span class="line">             .limit(<span class="number">100</span>) <span class="comment">// 任意个转换</span></span><br><span class="line">             .sum(); <span class="comment">// 最终计算结果</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-创建Stream"><a href="#2-创建Stream" class="headerlink" title="2. 创建Stream"></a>2. 创建Stream</h2><p><strong>Stream.of()</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;String&gt; stream = Stream.of(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;C&quot;</span>, <span class="string">&quot;D&quot;</span>);</span><br><span class="line">        <span class="comment">// forEach()方法相当于内部循环调用，</span></span><br><span class="line">        <span class="comment">// 可传入符合Consumer接口的void accept(T t)的方法引用：</span></span><br><span class="line">        stream.forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>基于数组或者Collection</strong></p>
+<p>创建<code>Stream</code>的方法是基于一个数组或者<code>Collection</code>，这样该<code>Stream</code>输出的元素就是数组或者<code>Collection</code>持有的元素：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;String&gt; stream1 = Arrays.stream(<span class="keyword">new</span> String[] &#123; <span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;C&quot;</span> &#125;);</span><br><span class="line">        Stream&lt;String&gt; stream2 = List.of(<span class="string">&quot;X&quot;</span>, <span class="string">&quot;Y&quot;</span>, <span class="string">&quot;Z&quot;</span>).stream();</span><br><span class="line">        stream1.forEach(System.out::println);</span><br><span class="line">        stream2.forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>把数组变成<code>Stream</code>使用<code>Arrays.stream()</code>方法。</p>
+<p>对于<code>Collection</code>（<code>List</code>、<code>Set</code>、<code>Queue</code>等），直接调用<code>stream()</code>方法就可以获得<code>Stream</code>。</p>
+<p><strong>基于Supplier</strong></p>
+<p>创建<code>Stream</code>还可以通过<code>Stream.generate()</code>方法，它需要传入一个<code>Supplier</code>对象：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; s = Stream.generate(Supplier&lt;String&gt; sp);</span><br></pre></td></tr></table></figure>
+
+<p>基于<code>Supplier</code>创建的<code>Stream</code>会不断调用<code>Supplier.get()</code>方法来不断产生下一个元素，这种<code>Stream</code>保存的不是元素，而是算法，它可以用来表示无限序列。</p>
+<p>例如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;Integer&gt; natual = Stream.generate(<span class="keyword">new</span> NatualSupplier());</span><br><span class="line">        <span class="comment">// 注意：无限序列必须先变成有限序列再打印:</span></span><br><span class="line">        natual.limit(<span class="number">20</span>).forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NatualSupplier</span> <span class="keyword">implements</span> <span class="title">Supplier</span>&lt;<span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n = <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        n++;</span><br><span class="line">        <span class="keyword">return</span> n;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>其他方法</strong></p>
+<p>创建<code>Stream</code>的第三种方法是通过一些API提供的接口，直接获得<code>Stream</code>。</p>
+<p>例如，<code>Files</code>类的<code>lines()</code>方法可以把一个文件变成一个<code>Stream</code>，每个元素代表文件的一行内容：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> (Stream&lt;String&gt; lines = Files.lines(Paths.get(<span class="string">&quot;/path/to/file.txt&quot;</span>))) &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>正则表达式的<code>Pattern</code>对象有一个<code>splitAsStream()</code>方法，可以直接把一个长字符串分割成<code>Stream</code>序列而不是数组：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Pattern p = Pattern.compile(<span class="string">&quot;\\s+&quot;</span>);</span><br><span class="line">Stream&lt;String&gt; s = p.splitAsStream(<span class="string">&quot;The quick brown fox jumps over the lazy dog&quot;</span>);</span><br><span class="line">s.forEach(System.out::println);</span><br></pre></td></tr></table></figure>
+
+<p><strong>基本类型</strong></p>
+<p>泛型不支持基本类型。</p>
+<p>Java标准库提供了<code>IntStream</code>、<code>LongStream</code>和<code>DoubleStream</code>这三种使用基本类型的<code>Stream</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 将int[]数组变为IntStream:</span></span><br><span class="line">IntStream is = Arrays.stream(<span class="keyword">new</span> <span class="keyword">int</span>[] &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span> &#125;);</span><br><span class="line"><span class="comment">// 将Stream&lt;String&gt;转换为LongStream:</span></span><br><span class="line">LongStream ls = List.of(<span class="string">&quot;1&quot;</span>, <span class="string">&quot;2&quot;</span>, <span class="string">&quot;3&quot;</span>).stream().mapToLong(Long::parseLong);</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-map"><a href="#3-map" class="headerlink" title="3. map"></a>3. map</h2><p><code>Stream.map()</code>是<code>Stream</code>最常用的一个转换方法，它把一个<code>Stream</code>转换为另一个<code>Stream</code>。</p>
+<p>所谓<code>map</code>操作，就是把一种操作运算，映射到一个序列的每一个元素上。</p>
+<p>可见，<code>map</code>操作，把一个<code>Stream</code>的每个元素一一对应到应用了目标函数的结果上。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;Integer&gt; s = Stream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>);</span><br><span class="line">Stream&lt;Integer&gt; s2 = s.map(n -&gt; n * n);</span><br></pre></td></tr></table></figure>
+
+<p>map的例子：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List.of(<span class="string">&quot;  Apple &quot;</span>, <span class="string">&quot; pear &quot;</span>, <span class="string">&quot; ORANGE&quot;</span>, <span class="string">&quot; BaNaNa &quot;</span>)</span><br><span class="line">                .stream()</span><br><span class="line">                .map(String::trim) <span class="comment">// 去空格</span></span><br><span class="line">                .map(String::toLowerCase) <span class="comment">// 变小写</span></span><br><span class="line">                .forEach(System.out::println); <span class="comment">// 打印</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-filter"><a href="#4-filter" class="headerlink" title="4. filter"></a>4. filter</h2><p><code>Stream.filter()</code>是<code>Stream</code>的另一个常用转换方法。</p>
+<p>所谓<code>filter()</code>操作，就是对一个<code>Stream</code>的所有元素一一进行测试，不满足条件的就被“滤掉”了，剩下的满足条件的元素就构成了一个新的<code>Stream</code>。</p>
+<p>例如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        IntStream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>)</span><br><span class="line">                .filter(n -&gt; n % <span class="number">2</span> != <span class="number">0</span>)</span><br><span class="line">                .forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>filter()</code>方法接收的对象是<code>Predicate</code>接口对象，它定义了一个<code>test()</code>方法，负责判断元素是否符合条件：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Predicate</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// 判断元素t是否符合条件:</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">test</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>过滤周六周日。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream.generate(<span class="keyword">new</span> LocalDateSupplier())</span><br><span class="line">                .limit(<span class="number">31</span>)</span><br><span class="line">                .filter(ldt -&gt; ldt.getDayOfWeek() == DayOfWeek.SATURDAY || ldt.getDayOfWeek() == DayOfWeek.SUNDAY)</span><br><span class="line">                .forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LocalDateSupplier</span> <span class="keyword">implements</span> <span class="title">Supplier</span>&lt;<span class="title">LocalDate</span>&gt; </span>&#123;</span><br><span class="line">    LocalDate start = LocalDate.of(<span class="number">2020</span>, <span class="number">1</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">int</span> n = -<span class="number">1</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> LocalDate <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        n++;</span><br><span class="line">        <span class="keyword">return</span> start.plusDays(n);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-reduce"><a href="#5-reduce" class="headerlink" title="5. reduce"></a>5. reduce</h2><p><code>Stream.reduce()</code>则是<code>Stream</code>的一个聚合方法，它可以把一个<code>Stream</code>的所有元素按照聚合函数聚合成一个结果。</p>
+<p><code>reduce</code>的第一参数是初始值，<code>(acc, n) -&gt; acc + n</code>acc是上次计算的结果。</p>
+<p>递归求和（<code>reduce</code>参数是0）：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> sum = Stream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>).reduce(<span class="number">0</span>, (acc, n) -&gt; acc + n);</span><br><span class="line">        System.out.println(sum); <span class="comment">// 45</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>递归求积（<code>reduce</code>第一个参数是1）</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> s = Stream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>).reduce(<span class="number">1</span>, (acc, n) -&gt; acc * n);</span><br><span class="line">        System.out.println(s); <span class="comment">// 362880</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>复杂点的：（将配置文件聚合成Map）</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 按行读取配置文件:</span></span><br><span class="line">        List&lt;String&gt; props = List.of(<span class="string">&quot;profile=native&quot;</span>, <span class="string">&quot;debug=true&quot;</span>, <span class="string">&quot;logging=warn&quot;</span>, <span class="string">&quot;interval=500&quot;</span>);</span><br><span class="line">        Map&lt;String, String&gt; map = props.stream()</span><br><span class="line">                <span class="comment">// 把k=v转换为Map[k]=v:</span></span><br><span class="line">                .map(kv -&gt; &#123;</span><br><span class="line">                    String[] ss = kv.split(<span class="string">&quot;\\=&quot;</span>, <span class="number">2</span>);</span><br><span class="line">                    <span class="keyword">return</span> Map.of(ss[<span class="number">0</span>], ss[<span class="number">1</span>]);</span><br><span class="line">                &#125;)</span><br><span class="line">                <span class="comment">// 把所有Map聚合到一个Map:</span></span><br><span class="line">                .reduce(<span class="keyword">new</span> HashMap&lt;String, String&gt;(), (m, kv) -&gt; &#123;</span><br><span class="line">                    m.putAll(kv);</span><br><span class="line">                    <span class="keyword">return</span> m;</span><br><span class="line">                &#125;);</span><br><span class="line">        <span class="comment">// 打印结果:</span></span><br><span class="line">        map.forEach((k, v) -&gt; &#123;</span><br><span class="line">            System.out.println(k + <span class="string">&quot; = &quot;</span> + v);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-输出"><a href="#6-输出" class="headerlink" title="6. 输出"></a>6. 输出</h2><p><strong>输出到List</strong></p>
+<p>如何将一组<code>String</code>先过滤掉空字符串，然后把非空字符串保存到<code>List</code>中：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;String&gt; stream = Stream.of(<span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="keyword">null</span>, <span class="string">&quot;Pear&quot;</span>, <span class="string">&quot;  &quot;</span>, <span class="string">&quot;Orange&quot;</span>);</span><br><span class="line">        List&lt;String&gt; list = stream.filter(s -&gt; s != <span class="keyword">null</span> &amp;&amp; !s.isBlank()).collect(Collectors.toList());</span><br><span class="line">        System.out.println(list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>把<code>Stream</code>的每个元素收集到<code>List</code>的方法是调用<code>collect()</code>并传入<code>Collectors.toList()</code>对象，它实际上是一个<code>Collector</code>实例，通过类似<code>reduce()</code>的操作，把每个元素添加到一个收集器中（实际上是<code>ArrayList</code>）。</p>
+<p>类似的，<code>collect(Collectors.toSet())</code>可以把<code>Stream</code>的每个元素收集到<code>Set</code>中。</p>
+<p><strong>输出到数组</strong></p>
+<p>把Stream的元素输出为数组和输出为List类似，我们只需要调用<code>toArray()</code>方法，并传入数组的“构造方法”：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; list = List.of(<span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Orange&quot;</span>);</span><br><span class="line">String[] array = list.stream().toArray(String[]::<span class="keyword">new</span>);</span><br></pre></td></tr></table></figure>
+
+<p><code>String[]::new</code> 等价于new String[list.size()]</p>
+<p><strong>输出到Map</strong></p>
+<p>指定两个映射函数，分别把元素映射为key和value：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;String&gt; stream = Stream.of(<span class="string">&quot;APPL:Apple&quot;</span>, <span class="string">&quot;MSFT:Microsoft&quot;</span>);</span><br><span class="line">        Map&lt;String, String&gt; map = stream</span><br><span class="line">                .collect(Collectors.toMap(</span><br><span class="line">                        <span class="comment">// 把元素s映射为key:</span></span><br><span class="line">                        s -&gt; s.substring(<span class="number">0</span>, s.indexOf(<span class="string">&#x27;:&#x27;</span>)),</span><br><span class="line">                        <span class="comment">// 把元素s映射为value:</span></span><br><span class="line">                        s -&gt; s.substring(s.indexOf(<span class="string">&#x27;:&#x27;</span>) + <span class="number">1</span>)));</span><br><span class="line">        System.out.println(map);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>分组输出</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; list = List.of(<span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Blackberry&quot;</span>, <span class="string">&quot;Coconut&quot;</span>, <span class="string">&quot;Avocado&quot;</span>, <span class="string">&quot;Cherry&quot;</span>, <span class="string">&quot;Apricots&quot;</span>);</span><br><span class="line">        Map&lt;String, List&lt;String&gt;&gt; groups = list.stream()</span><br><span class="line">                .collect(Collectors.groupingBy(s -&gt; s.substring(<span class="number">0</span>, <span class="number">1</span>), Collectors.toList()));</span><br><span class="line">        System.out.println(groups);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">&#123;</span></span><br><span class="line"><span class="comment">    A=[Apple, Avocado, Apricots],</span></span><br><span class="line"><span class="comment">    B=[Banana, Blackberry],</span></span><br><span class="line"><span class="comment">    C=[Coconut, Cherry]</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>使用<code>Collectors.groupingBy()</code>，它需要提供两个函数：一个是分组的key，这里使用<code>s -&gt; s.substring(0, 1)</code>，表示只要首字母相同的<code>String</code>分到一组，第二个是分组的value，这里直接使用<code>Collectors.toList()</code>，表示输出为<code>List</code>。</p>
+<h2 id="7-其他操作（排序，去重，截取，合并，flatMap，并行，聚合）"><a href="#7-其他操作（排序，去重，截取，合并，flatMap，并行，聚合）" class="headerlink" title="7. 其他操作（排序，去重，截取，合并，flatMap，并行，聚合）"></a>7. 其他操作（排序，去重，截取，合并，flatMap，并行，聚合）</h2><p><strong>排序</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; list = List.of(<span class="string">&quot;Orange&quot;</span>, <span class="string">&quot;apple&quot;</span>, <span class="string">&quot;Banana&quot;</span>)</span><br><span class="line">            .stream()</span><br><span class="line">            .sorted()</span><br><span class="line">            .collect(Collectors.toList());</span><br><span class="line">        System.out.println(list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>要求每个元素必须实现<code>Comparable</code>接口。</p>
+<p><strong>去重</strong></p>
+<p>对一个<code>Stream</code>的元素进行去重，没必要先转换为<code>Set</code>，可以直接用<code>distinct()</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List.of(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;A&quot;</span>, <span class="string">&quot;C&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;D&quot;</span>)</span><br><span class="line">    .stream()</span><br><span class="line">    .distinct()</span><br><span class="line">    .collect(Collectors.toList()); <span class="comment">// [A, B, C, D]</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>截取</strong></p>
+<p>截取操作常用于把一个无限的<code>Stream</code>转换成有限的<code>Stream</code>，<code>skip()</code>用于跳过当前<code>Stream</code>的前N个元素，<code>limit()</code>用于截取当前<code>Stream</code>最多前N个元素：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List.of(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;C&quot;</span>, <span class="string">&quot;D&quot;</span>, <span class="string">&quot;E&quot;</span>, <span class="string">&quot;F&quot;</span>)</span><br><span class="line">    .stream()</span><br><span class="line">    .skip(<span class="number">2</span>) <span class="comment">// 跳过A, B</span></span><br><span class="line">    .limit(<span class="number">3</span>) <span class="comment">// 截取C, D, E</span></span><br><span class="line">    .collect(Collectors.toList()); <span class="comment">// [C, D, E]</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>合并</strong></p>
+<p>将两个<code>Stream</code>合并为一个<code>Stream</code>可以使用<code>Stream</code>的静态方法<code>concat()</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; s1 = List.of(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;C&quot;</span>).stream();</span><br><span class="line">Stream&lt;String&gt; s2 = List.of(<span class="string">&quot;D&quot;</span>, <span class="string">&quot;E&quot;</span>).stream();</span><br><span class="line"><span class="comment">// 合并:</span></span><br><span class="line">Stream&lt;String&gt; s = Stream.concat(s1, s2);</span><br><span class="line">System.out.println(s.collect(Collectors.toList())); <span class="comment">// [A, B, C, D, E]</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>flatMap</strong></p>
+<p>如果<code>Stream</code>的元素是集合：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;List&lt;Integer&gt;&gt; s = Stream.of(</span><br><span class="line">        Arrays.asList(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>),</span><br><span class="line">        Arrays.asList(<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>),</span><br><span class="line">        Arrays.asList(<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>));</span><br></pre></td></tr></table></figure>
+
+<p>希望把上述<code>Stream</code>转换为<code>Stream&lt;Integer&gt;</code>，就可以使用<code>flatMap()</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;Integer&gt; i = s.flatMap(list -&gt; list.stream());</span><br></pre></td></tr></table></figure>
+
+<p><code>flatMap()</code>，是指把<code>Stream</code>的每个元素（这里是<code>List</code>）映射为<code>Stream</code>，然后合并成一个新的<code>Stream</code>：</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210503220426922.png" alt="image-20210503220426922"></p>
+<p><strong>并行</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; s = ...</span><br><span class="line">String[] result = s.parallel() <span class="comment">// 变成一个可以并行处理的Stream</span></span><br><span class="line">                   .sorted() <span class="comment">// 可以进行并行排序</span></span><br><span class="line">                   .toArray(String[]::<span class="keyword">new</span>);</span><br></pre></td></tr></table></figure>
+
+<p>除了<code>reduce()</code>和<code>collect()</code>外，<code>Stream</code>还有一些常用的聚合方法：</p>
 <ul>
-<li>跨地域协同开发</li>
-<li>追修高质量代码以及代码门禁</li>
+<li><code>count()</code>：用于返回元素个数；</li>
+<li><code>max(Comparator&lt;? super T&gt; cp)</code>：找出最大元素；</li>
+<li><code>min(Comparator&lt;? super T&gt; cp)</code>：找出最小元素。</li>
 </ul>
-<p><strong>git</strong>不适合的领域：</p>
+<p>针对<code>IntStream</code>、<code>LongStream</code>和<code>DoubleStream</code>，还额外提供了以下聚合方法：</p>
 <ul>
-<li>不适合Word等二进制文档的版本控制</li>
-<li>git没有锁定/解锁模式，不能派他式修改</li>
-<li>权限不能细分（例如将不同的文件分配不同的访问权限）</li>
+<li><code>sum()</code>：对所有元素求和；</li>
+<li><code>average()</code>：对所有元素求平均数。</li>
 </ul>
-<h2 id="2-git安装和配置"><a href="#2-git安装和配置" class="headerlink" title="2. git安装和配置"></a>2. git安装和配置</h2><h3 id="2-1-Linux下安装-git"><a href="#2-1-Linux下安装-git" class="headerlink" title="2.1 Linux下安装 git"></a>2.1 Linux下安装 git</h3><p><strong>包管理器方式安装</strong></p>
-<p>Ubuntu 10.10(maverick)或更新版本，Debian(squeeze)或更新版本:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ sudo aptitude install git</span><br><span class="line">$ sudo aptitude install git-doc git-svn git-email gitk</span><br></pre></td></tr></table></figure>
-
-<p>Linux 系统:  RHEL、Fedora、CentOS 等版本:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ yum install git</span><br><span class="line">$ yum install git-svn git-email gitk</span><br></pre></td></tr></table></figure>
-
-<p>其中<code>git</code>软件包包含了大部分Git命令，是必装的软件包。</p>
-<p>软件包<code>git-svn</code>、<code>git-email</code>、<code>gitk</code>本来也是Git软件包的一部分，但是因为有着不一样的软件包依赖（如更多<code>perl</code>模组，<code>tk</code>等），所以单独作为软件包发布。</p>
-<p><strong>源码安装</strong></p>
-<p>访问<a href="http://git-scm.com/%EF%BC%8C%E4%B8%8B%E8%BD%BDGit%E6%BA%90%E7%A0%81%E5%8C%85%EF%BC%8C%E4%BE%8B%E5%A6%82%EF%BC%9Agit-2.19.0.tar.gz%E3%80%82">http://git-scm.com/，下载Git源码包，例如：git-2.19.0.tar.gz。</a></p>
-<p>第一步：展开源码包，并进入到相应的目录中。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ tar -jxvf git-2.19.0.tar.bz2</span><br><span class="line">$ <span class="built_in">cd</span> git-2.19.0</span><br></pre></td></tr></table></figure>
-
-<p>第二步：安装。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ make prefix=/usr/<span class="built_in">local</span> all</span><br><span class="line">$ sudo make prefix=/usr/<span class="built_in">local</span> install</span><br></pre></td></tr></table></figure>
-
-<p>第三步：安装git文档（可选）</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ make prefix=/usr/<span class="built_in">local</span> doc info</span><br><span class="line">$ sudo make prefix=/usr/<span class="built_in">local</span> install-doc install-html install-info</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-2-Windows-下安装-git"><a href="#2-2-Windows-下安装-git" class="headerlink" title="2.2 Windows 下安装 git"></a>2.2 <strong>Windows</strong> <strong>下安装</strong> git</h3><p><strong>下载安装包</strong></p>
-<p><a href="https://git-scm.com/download/win">https://git-scm.com/download/win </a>下载 Windows 安装包</p>
-<p><strong>安装安装包</strong></p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329144403430.png" alt="image-20210329144403430"></p>
-<p>在这一步去掉git LFS选项。</p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329144502858.png" alt="image-20210329144502858"></p>
-<p>在这一步可以选择编辑器，默认就可以。</p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329144551825.png" alt="image-20210329144551825"></p>
-<p>这一步选择git bash作为命令行。</p>
-<p><strong>TortoiseGit</strong></p>
-<p><strong>TortoiseGit</strong>是一个git的可视化图形界面。个人认为用处不大。</p>
-<h3 id="2-3-git安装完成后的配置"><a href="#2-3-git安装完成后的配置" class="headerlink" title="2.3 git安装完成后的配置"></a>2.3 git安装完成后的配置</h3><p>git的配置分为三类，系统配置（适用所有用户），用户配置（适用于该用户），仓库配置（只对当前项目有效）。</p>
-<p><strong>系统配置</strong>（对所有用户都适用）</p>
-<p>存放在git的安装目录下：<code>%Git%/etc/gitconfig</code>；若使用 <code>git config</code> 时用<code> --system</code> 选项，读写的就是这个文件：</p>
-<p><code>git config --system core.autocrlf</code></p>
-<p><strong>用户配置</strong>（只适用于该用户）</p>
-<p>存放在用户目录下。例如linux存放在：<code>~/.gitconfig</code>；若使用 <code>git config</code> 时用<code> --global</code> 选项，读写的就是这个文件：</p>
-<p><code>git config --global user.name</code></p>
-<p><strong>仓库配置</strong>（只对当前项目有效）</p>
-<p>当前仓库的配置文件（也就是工作目录中的 <code>.git/config</code> 文件）；若使用<code>git config</code> 时用 <code>--local</code> 选项，读写的就是这个文件：</p>
-<p><code>git config --local remote.origin.url</code></p>
-<p><strong>配置第一步：配置用户信息</strong></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git config --global user.name “XXXXX”</span><br><span class="line">git config --global user.email XXXXXXXXXX@huawei.com</span><br></pre></td></tr></table></figure>
-
-<p>第一行设置自己git提交时的姓名，第二行设置提交时的邮箱。</p>
-<p><strong>配置第二步：配置文本换行符</strong></p>
-<p>原因：Windows时用回车和换行两个字符来换行，Linux只使用换行。如果涉及到多平台开发，就可能造成问题。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ git config --global core.autocrlf <span class="literal">true</span></span><br></pre></td></tr></table></figure>
-
-<p>在Windows下使用这个命令就可以让git在提交时自动帮忙转化。</p>
-<p><strong>配置第三步：文本编码配置</strong></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">\<span class="comment"># 中文编码支持</span></span><br><span class="line">git config --global gui.encoding utf-8</span><br><span class="line">git config --global i18n.commitencoding utf-8</span><br><span class="line">git config --global i18n.logoutputencoding utf-8</span><br><span class="line"></span><br><span class="line">\<span class="comment"># 显示路径中的中文：</span></span><br><span class="line">git config --global core.quotepath <span class="literal">false</span></span><br></pre></td></tr></table></figure>
-
+<p>还有一些方法，用来测试<code>Stream</code>的元素是否满足以下条件：</p>
 <ul>
-<li><p><strong>i18n.commitEncoding</strong> <strong>选项：</strong>用来让git commit log存储时，采用的编码，默认UTF-8.</p>
-</li>
-<li><p><strong>i18n.logOutputEncoding</strong> <strong>选项：</strong>查看git log时，显示采用的编码，建议设置为UTF-8.</p>
-</li>
+<li><code>boolean allMatch(Predicate&lt;? super T&gt;)</code>：测试是否所有元素均满足测试条件；</li>
+<li><code>boolean anyMatch(Predicate&lt;? super T&gt;)</code>：测试是否至少有一个元素满足测试条件。</li>
 </ul>
-<p><strong>配置第四步：生成ssh认证文件</strong></p>
-<blockquote>
-<p>认证：在与远程的git服务器，例如GitHub，GitLab进行通讯时，建立起来的认证，证明自己可以在当前这个机器上对远程仓库的内容进行修改。</p>
-</blockquote>
-<p>两种认证方法：</p>
-<ol>
-<li>http/https协议认证（不推荐使用，因此不写了）</li>
-<li>ssh协议认证</li>
-</ol>
-<p>ssh协议认证</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ ssh-keygen -t rsa –C zhangsan1123@huawei.com</span><br></pre></td></tr></table></figure>
+<p>最后一个常用的方法是<code>forEach()</code>，它可以循环处理<code>Stream</code>的每个元素，我们经常传入<code>System.out::println</code>来打印<code>Stream</code>的元素：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; s = ...</span><br><span class="line">s.forEach(str -&gt; &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;Hello, &quot;</span> + str);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 
-<p>在git bash中输入这段命令，敲击几次回车，会在计算机中生成ssh认证文件。</p>
-<p>ssh认证文件存放地址：</p>
-<p>Windows ：C:\Users\Administrator\.ssh    <em>Administrator为你当前登陆的用户名</em></p>
-<p>Linux： <del>/.ssh           *</del>为当前用户的家目录*</p>
-<p>打开文件夹，找到<code>id_rsa.pub</code>文件，打开复制内部的内容。</p>
-<p>添加公钥到代码平台：</p>
-<ol>
-<li><p>登录代码平台</p>
-</li>
-<li><p>进入“Profile Settings”</p>
-</li>
-<li><p>点击左侧栏的“SSH Keys”</p>
-</li>
-<li><p>点击“Add SSH Key”,将刚生成的公钥文件的内容，复制到“Public Key”栏，保存即可。</p>
-</li>
-</ol>
 ]]></content>
       <tags>
-        <tag>git</tag>
+        <tag>JAVA</tag>
+        <tag>Stream</tag>
       </tags>
   </entry>
   <entry>
@@ -1866,9 +1951,114 @@
       </tags>
   </entry>
   <entry>
-    <title>Spring框架</title>
-    <url>/2021/05/04/Spring%E6%A1%86%E6%9E%B6/</url>
-    <content><![CDATA[]]></content>
+    <title>git安装和配置</title>
+    <url>/2021/03/29/git%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/</url>
+    <content><![CDATA[<h1 id="git安装和配置"><a href="#git安装和配置" class="headerlink" title="git安装和配置"></a>git安装和配置</h1><h2 id="1-版本控制工具"><a href="#1-版本控制工具" class="headerlink" title="1. 版本控制工具"></a>1. 版本控制工具</h2><p><strong>SVN</strong>：集中式版本控制工具</p>
+<p>集中式版本控制工具，几乎所有的动作<strong>都需要服务器参与</strong>，并且<strong>数据安全性与服务器关系很大</strong>。</p>
+<p><strong>git</strong>：分布式版本控制工具</p>
+<p><strong>Git 是分布式版本控制工具</strong>，除了与服务器之前进行按需同步之外，<strong>所有的提交操作都不需要服务器</strong>。</p>
+<p><strong>SVN</strong>不适用的领域：</p>
+<ul>
+<li>跨地域协同开发</li>
+<li>追修高质量代码以及代码门禁</li>
+</ul>
+<p><strong>git</strong>不适合的领域：</p>
+<ul>
+<li>不适合Word等二进制文档的版本控制</li>
+<li>git没有锁定/解锁模式，不能派他式修改</li>
+<li>权限不能细分（例如将不同的文件分配不同的访问权限）</li>
+</ul>
+<h2 id="2-git安装和配置"><a href="#2-git安装和配置" class="headerlink" title="2. git安装和配置"></a>2. git安装和配置</h2><h3 id="2-1-Linux下安装-git"><a href="#2-1-Linux下安装-git" class="headerlink" title="2.1 Linux下安装 git"></a>2.1 Linux下安装 git</h3><p><strong>包管理器方式安装</strong></p>
+<p>Ubuntu 10.10(maverick)或更新版本，Debian(squeeze)或更新版本:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ sudo aptitude install git</span><br><span class="line">$ sudo aptitude install git-doc git-svn git-email gitk</span><br></pre></td></tr></table></figure>
+
+<p>Linux 系统:  RHEL、Fedora、CentOS 等版本:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ yum install git</span><br><span class="line">$ yum install git-svn git-email gitk</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>git</code>软件包包含了大部分Git命令，是必装的软件包。</p>
+<p>软件包<code>git-svn</code>、<code>git-email</code>、<code>gitk</code>本来也是Git软件包的一部分，但是因为有着不一样的软件包依赖（如更多<code>perl</code>模组，<code>tk</code>等），所以单独作为软件包发布。</p>
+<p><strong>源码安装</strong></p>
+<p>访问<a href="http://git-scm.com/%EF%BC%8C%E4%B8%8B%E8%BD%BDGit%E6%BA%90%E7%A0%81%E5%8C%85%EF%BC%8C%E4%BE%8B%E5%A6%82%EF%BC%9Agit-2.19.0.tar.gz%E3%80%82">http://git-scm.com/，下载Git源码包，例如：git-2.19.0.tar.gz。</a></p>
+<p>第一步：展开源码包，并进入到相应的目录中。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ tar -jxvf git-2.19.0.tar.bz2</span><br><span class="line">$ <span class="built_in">cd</span> git-2.19.0</span><br></pre></td></tr></table></figure>
+
+<p>第二步：安装。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ make prefix=/usr/<span class="built_in">local</span> all</span><br><span class="line">$ sudo make prefix=/usr/<span class="built_in">local</span> install</span><br></pre></td></tr></table></figure>
+
+<p>第三步：安装git文档（可选）</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ make prefix=/usr/<span class="built_in">local</span> doc info</span><br><span class="line">$ sudo make prefix=/usr/<span class="built_in">local</span> install-doc install-html install-info</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-Windows-下安装-git"><a href="#2-2-Windows-下安装-git" class="headerlink" title="2.2 Windows 下安装 git"></a>2.2 <strong>Windows</strong> <strong>下安装</strong> git</h3><p><strong>下载安装包</strong></p>
+<p><a href="https://git-scm.com/download/win">https://git-scm.com/download/win </a>下载 Windows 安装包</p>
+<p><strong>安装安装包</strong></p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329144403430.png" alt="image-20210329144403430"></p>
+<p>在这一步去掉git LFS选项。</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329144502858.png" alt="image-20210329144502858"></p>
+<p>在这一步可以选择编辑器，默认就可以。</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329144551825.png" alt="image-20210329144551825"></p>
+<p>这一步选择git bash作为命令行。</p>
+<p><strong>TortoiseGit</strong></p>
+<p><strong>TortoiseGit</strong>是一个git的可视化图形界面。个人认为用处不大。</p>
+<h3 id="2-3-git安装完成后的配置"><a href="#2-3-git安装完成后的配置" class="headerlink" title="2.3 git安装完成后的配置"></a>2.3 git安装完成后的配置</h3><p>git的配置分为三类，系统配置（适用所有用户），用户配置（适用于该用户），仓库配置（只对当前项目有效）。</p>
+<p><strong>系统配置</strong>（对所有用户都适用）</p>
+<p>存放在git的安装目录下：<code>%Git%/etc/gitconfig</code>；若使用 <code>git config</code> 时用<code> --system</code> 选项，读写的就是这个文件：</p>
+<p><code>git config --system core.autocrlf</code></p>
+<p><strong>用户配置</strong>（只适用于该用户）</p>
+<p>存放在用户目录下。例如linux存放在：<code>~/.gitconfig</code>；若使用 <code>git config</code> 时用<code> --global</code> 选项，读写的就是这个文件：</p>
+<p><code>git config --global user.name</code></p>
+<p><strong>仓库配置</strong>（只对当前项目有效）</p>
+<p>当前仓库的配置文件（也就是工作目录中的 <code>.git/config</code> 文件）；若使用<code>git config</code> 时用 <code>--local</code> 选项，读写的就是这个文件：</p>
+<p><code>git config --local remote.origin.url</code></p>
+<p><strong>配置第一步：配置用户信息</strong></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git config --global user.name “XXXXX”</span><br><span class="line">git config --global user.email XXXXXXXXXX@huawei.com</span><br></pre></td></tr></table></figure>
+
+<p>第一行设置自己git提交时的姓名，第二行设置提交时的邮箱。</p>
+<p><strong>配置第二步：配置文本换行符</strong></p>
+<p>原因：Windows时用回车和换行两个字符来换行，Linux只使用换行。如果涉及到多平台开发，就可能造成问题。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ git config --global core.autocrlf <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<p>在Windows下使用这个命令就可以让git在提交时自动帮忙转化。</p>
+<p><strong>配置第三步：文本编码配置</strong></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">\<span class="comment"># 中文编码支持</span></span><br><span class="line">git config --global gui.encoding utf-8</span><br><span class="line">git config --global i18n.commitencoding utf-8</span><br><span class="line">git config --global i18n.logoutputencoding utf-8</span><br><span class="line"></span><br><span class="line">\<span class="comment"># 显示路径中的中文：</span></span><br><span class="line">git config --global core.quotepath <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>i18n.commitEncoding</strong> <strong>选项：</strong>用来让git commit log存储时，采用的编码，默认UTF-8.</p>
+</li>
+<li><p><strong>i18n.logOutputEncoding</strong> <strong>选项：</strong>查看git log时，显示采用的编码，建议设置为UTF-8.</p>
+</li>
+</ul>
+<p><strong>配置第四步：生成ssh认证文件</strong></p>
+<blockquote>
+<p>认证：在与远程的git服务器，例如GitHub，GitLab进行通讯时，建立起来的认证，证明自己可以在当前这个机器上对远程仓库的内容进行修改。</p>
+</blockquote>
+<p>两种认证方法：</p>
+<ol>
+<li>http/https协议认证（不推荐使用，因此不写了）</li>
+<li>ssh协议认证</li>
+</ol>
+<p>ssh协议认证</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ ssh-keygen -t rsa –C zhangsan1123@huawei.com</span><br></pre></td></tr></table></figure>
+
+<p>在git bash中输入这段命令，敲击几次回车，会在计算机中生成ssh认证文件。</p>
+<p>ssh认证文件存放地址：</p>
+<p>Windows ：C:\Users\Administrator\.ssh    <em>Administrator为你当前登陆的用户名</em></p>
+<p>Linux： <del>/.ssh           *</del>为当前用户的家目录*</p>
+<p>打开文件夹，找到<code>id_rsa.pub</code>文件，打开复制内部的内容。</p>
+<p>添加公钥到代码平台：</p>
+<ol>
+<li><p>登录代码平台</p>
+</li>
+<li><p>进入“Profile Settings”</p>
+</li>
+<li><p>点击左侧栏的“SSH Keys”</p>
+</li>
+<li><p>点击“Add SSH Key”,将刚生成的公钥文件的内容，复制到“Public Key”栏，保存即可。</p>
+</li>
+</ol>
+]]></content>
+      <tags>
+        <tag>git</tag>
+      </tags>
   </entry>
   <entry>
     <title>在JAVA中使用正则表达式</title>
@@ -2074,190 +2264,43 @@
       </tags>
   </entry>
   <entry>
-    <title>使用Stream</title>
-    <url>/2021/05/03/%E4%BD%BF%E7%94%A8Stream/</url>
-    <content><![CDATA[<h1 id="Stream"><a href="#Stream" class="headerlink" title="Stream"></a>Stream</h1><h2 id="1-Stream简介"><a href="#1-Stream简介" class="headerlink" title="1. Stream简介"></a>1. Stream简介</h2><p>Stream代表的是任意Java对象的序列。<code>Stream</code>实现的是惰性计算.</p>
-<table>
-<thead>
-<tr>
-<th align="left"></th>
-<th align="left">java.io</th>
-<th>java.util.stream</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">存储</td>
-<td align="left">顺序读写的<code>byte</code>或<code>char</code></td>
-<td>顺序输出的任意Java对象实例</td>
-</tr>
-<tr>
-<td align="left">用途</td>
-<td align="left">序列化至文件或网络</td>
-<td>内存计算／业务逻辑</td>
-</tr>
-</tbody></table>
-<table>
-<thead>
-<tr>
-<th align="left"></th>
-<th align="left">java.util.List</th>
-<th>java.util.stream</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">元素</td>
-<td align="left">已分配并存储在内存</td>
-<td>可能未分配，实时计算</td>
-</tr>
-<tr>
-<td align="left">用途</td>
-<td align="left">操作一组已存在的Java对象</td>
-<td>惰性计算</td>
-</tr>
-</tbody></table>
-<p>l例如：我们无法用List表示全部自然数，但是用Stream可以。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;BigInteger&gt; naturals = createNaturalStream(); <span class="comment">// 全体自然数</span></span><br></pre></td></tr></table></figure>
+    <title>给hexo搭建的github-page绑定域名</title>
+    <url>/2021/05/11/%E7%BB%99githubpage%E7%BB%91%E5%AE%9A%E5%9F%9F%E5%90%8D/</url>
+    <content><![CDATA[<h1 id="github-page绑定域名"><a href="#github-page绑定域名" class="headerlink" title="github-page绑定域名"></a>github-page绑定域名</h1><p>心血来潮，别人家的博客都有域名，我也要！</p>
+<img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fdingyue.nosdn.127.net%2FzHz6HuOqltLyAdSJvjhSrQIcU5irErphu%3Dk3pPpXDOvK41516856240100compressflag.jpg&refer=http%3A%2F%2Fdingyue.nosdn.127.net&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1623332105&t=8140b449423b67261bfb0f4be4f7153f" alt="img" style="zoom:50%;" />
 
-<p>我们可以对每个自然数做一个平方，这样我们就把这个<code>Stream</code>转换成了另一个<code>Stream</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;BigInteger&gt; naturals = createNaturalStream(); <span class="comment">// 全体自然数</span></span><br><span class="line">Stream&lt;BigInteger&gt; streamNxN = naturals.map(n -&gt; n.multiply(n)); <span class="comment">// 全体自然数的平方</span></span><br></pre></td></tr></table></figure>
+<h2 id="1-注册域名"><a href="#1-注册域名" class="headerlink" title="1. 注册域名"></a>1. 注册域名</h2><p>注册域名我选择的是阿里云的<a href="https://wanwang.aliyun.com/">万网</a>，由于是新人，选择了一元购域名专区。</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511214823347.png" alt="image-20210511214823347"></p>
+<p>一元购，冲冲冲！！</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511215212606.png" alt="image-20210511215212606"></p>
+<p>支付时需要创建信息模板才可以支付，点击创建新的信息模板创建就OK啦。</p>
+<p>创建信息模板后需要进行邮箱认证和实名认证。</p>
+<p>域名注册完毕！</p>
+<h2 id="2-给github-page添加CNAME解析。"><a href="#2-给github-page添加CNAME解析。" class="headerlink" title="2. 给github-page添加CNAME解析。"></a>2. 给github-page添加CNAME解析。</h2><p>我用的是hexo搭建的个人博客，所以以下针对hexo。</p>
+<p>在博客根目录下的<code>source</code>目录下新建个文件CNAME，文件内容填写自己注册的域名。</p>
+<p><strong>注意</strong>：不写www</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ &#x2F;blog&#x2F;CNAME</span><br><span class="line"></span><br><span class="line">ghj1998.top</span><br></pre></td></tr></table></figure>
 
-<p>可以用<code>limit()</code> 截取数据，同时可以使用<code>forEach()</code>来处理每个元素。</p>
-<p><code>Stream</code>的另一个特点是，一个<code>Stream</code>可以轻易地转换为另一个<code>Stream</code>，而不是修改原<code>Stream</code>本身。真正的计算通常发生在最后结果的获取，也就是惰性计算。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;BigInteger&gt; naturals = createNaturalStream(); <span class="comment">// 不计算</span></span><br><span class="line">Stream&lt;BigInteger&gt; s2 = naturals.map(BigInteger::multiply); <span class="comment">// 不计算</span></span><br><span class="line">Stream&lt;BigInteger&gt; s3 = s2.limit(<span class="number">100</span>); <span class="comment">// 不计算</span></span><br><span class="line">s3.forEach(System.out::println); <span class="comment">// 计算</span></span><br></pre></td></tr></table></figure>
+<p>将修改推送到github。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo clean</span><br><span class="line">$ hexo d</span><br></pre></td></tr></table></figure>
 
-<p>Stream API的基本用法就是：创建一个<code>Stream</code>，然后做若干次转换，最后调用一个求值方法获取真正计算的结果：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> result = createNaturalStream() <span class="comment">// 创建Stream</span></span><br><span class="line">             .filter(n -&gt; n % <span class="number">2</span> == <span class="number">0</span>) <span class="comment">// 任意个转换</span></span><br><span class="line">             .map(n -&gt; n * n) <span class="comment">// 任意个转换</span></span><br><span class="line">             .limit(<span class="number">100</span>) <span class="comment">// 任意个转换</span></span><br><span class="line">             .sum(); <span class="comment">// 最终计算结果</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="2-创建Stream"><a href="#2-创建Stream" class="headerlink" title="2. 创建Stream"></a>2. 创建Stream</h2><p><strong>Stream.of()</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;String&gt; stream = Stream.of(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;C&quot;</span>, <span class="string">&quot;D&quot;</span>);</span><br><span class="line">        <span class="comment">// forEach()方法相当于内部循环调用，</span></span><br><span class="line">        <span class="comment">// 可传入符合Consumer接口的void accept(T t)的方法引用：</span></span><br><span class="line">        stream.forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>基于数组或者Collection</strong></p>
-<p>创建<code>Stream</code>的方法是基于一个数组或者<code>Collection</code>，这样该<code>Stream</code>输出的元素就是数组或者<code>Collection</code>持有的元素：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;String&gt; stream1 = Arrays.stream(<span class="keyword">new</span> String[] &#123; <span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;C&quot;</span> &#125;);</span><br><span class="line">        Stream&lt;String&gt; stream2 = List.of(<span class="string">&quot;X&quot;</span>, <span class="string">&quot;Y&quot;</span>, <span class="string">&quot;Z&quot;</span>).stream();</span><br><span class="line">        stream1.forEach(System.out::println);</span><br><span class="line">        stream2.forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>把数组变成<code>Stream</code>使用<code>Arrays.stream()</code>方法。</p>
-<p>对于<code>Collection</code>（<code>List</code>、<code>Set</code>、<code>Queue</code>等），直接调用<code>stream()</code>方法就可以获得<code>Stream</code>。</p>
-<p><strong>基于Supplier</strong></p>
-<p>创建<code>Stream</code>还可以通过<code>Stream.generate()</code>方法，它需要传入一个<code>Supplier</code>对象：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; s = Stream.generate(Supplier&lt;String&gt; sp);</span><br></pre></td></tr></table></figure>
-
-<p>基于<code>Supplier</code>创建的<code>Stream</code>会不断调用<code>Supplier.get()</code>方法来不断产生下一个元素，这种<code>Stream</code>保存的不是元素，而是算法，它可以用来表示无限序列。</p>
-<p>例如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;Integer&gt; natual = Stream.generate(<span class="keyword">new</span> NatualSupplier());</span><br><span class="line">        <span class="comment">// 注意：无限序列必须先变成有限序列再打印:</span></span><br><span class="line">        natual.limit(<span class="number">20</span>).forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NatualSupplier</span> <span class="keyword">implements</span> <span class="title">Supplier</span>&lt;<span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n = <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        n++;</span><br><span class="line">        <span class="keyword">return</span> n;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>其他方法</strong></p>
-<p>创建<code>Stream</code>的第三种方法是通过一些API提供的接口，直接获得<code>Stream</code>。</p>
-<p>例如，<code>Files</code>类的<code>lines()</code>方法可以把一个文件变成一个<code>Stream</code>，每个元素代表文件的一行内容：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> (Stream&lt;String&gt; lines = Files.lines(Paths.get(<span class="string">&quot;/path/to/file.txt&quot;</span>))) &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>正则表达式的<code>Pattern</code>对象有一个<code>splitAsStream()</code>方法，可以直接把一个长字符串分割成<code>Stream</code>序列而不是数组：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Pattern p = Pattern.compile(<span class="string">&quot;\\s+&quot;</span>);</span><br><span class="line">Stream&lt;String&gt; s = p.splitAsStream(<span class="string">&quot;The quick brown fox jumps over the lazy dog&quot;</span>);</span><br><span class="line">s.forEach(System.out::println);</span><br></pre></td></tr></table></figure>
-
-<p><strong>基本类型</strong></p>
-<p>泛型不支持基本类型。</p>
-<p>Java标准库提供了<code>IntStream</code>、<code>LongStream</code>和<code>DoubleStream</code>这三种使用基本类型的<code>Stream</code>。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 将int[]数组变为IntStream:</span></span><br><span class="line">IntStream is = Arrays.stream(<span class="keyword">new</span> <span class="keyword">int</span>[] &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span> &#125;);</span><br><span class="line"><span class="comment">// 将Stream&lt;String&gt;转换为LongStream:</span></span><br><span class="line">LongStream ls = List.of(<span class="string">&quot;1&quot;</span>, <span class="string">&quot;2&quot;</span>, <span class="string">&quot;3&quot;</span>).stream().mapToLong(Long::parseLong);</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-map"><a href="#3-map" class="headerlink" title="3. map"></a>3. map</h2><p><code>Stream.map()</code>是<code>Stream</code>最常用的一个转换方法，它把一个<code>Stream</code>转换为另一个<code>Stream</code>。</p>
-<p>所谓<code>map</code>操作，就是把一种操作运算，映射到一个序列的每一个元素上。</p>
-<p>可见，<code>map</code>操作，把一个<code>Stream</code>的每个元素一一对应到应用了目标函数的结果上。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;Integer&gt; s = Stream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>);</span><br><span class="line">Stream&lt;Integer&gt; s2 = s.map(n -&gt; n * n);</span><br></pre></td></tr></table></figure>
-
-<p>map的例子：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List.of(<span class="string">&quot;  Apple &quot;</span>, <span class="string">&quot; pear &quot;</span>, <span class="string">&quot; ORANGE&quot;</span>, <span class="string">&quot; BaNaNa &quot;</span>)</span><br><span class="line">                .stream()</span><br><span class="line">                .map(String::trim) <span class="comment">// 去空格</span></span><br><span class="line">                .map(String::toLowerCase) <span class="comment">// 变小写</span></span><br><span class="line">                .forEach(System.out::println); <span class="comment">// 打印</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="4-filter"><a href="#4-filter" class="headerlink" title="4. filter"></a>4. filter</h2><p><code>Stream.filter()</code>是<code>Stream</code>的另一个常用转换方法。</p>
-<p>所谓<code>filter()</code>操作，就是对一个<code>Stream</code>的所有元素一一进行测试，不满足条件的就被“滤掉”了，剩下的满足条件的元素就构成了一个新的<code>Stream</code>。</p>
-<p>例如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        IntStream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>)</span><br><span class="line">                .filter(n -&gt; n % <span class="number">2</span> != <span class="number">0</span>)</span><br><span class="line">                .forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>filter()</code>方法接收的对象是<code>Predicate</code>接口对象，它定义了一个<code>test()</code>方法，负责判断元素是否符合条件：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Predicate</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// 判断元素t是否符合条件:</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">test</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>过滤周六周日。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream.generate(<span class="keyword">new</span> LocalDateSupplier())</span><br><span class="line">                .limit(<span class="number">31</span>)</span><br><span class="line">                .filter(ldt -&gt; ldt.getDayOfWeek() == DayOfWeek.SATURDAY || ldt.getDayOfWeek() == DayOfWeek.SUNDAY)</span><br><span class="line">                .forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LocalDateSupplier</span> <span class="keyword">implements</span> <span class="title">Supplier</span>&lt;<span class="title">LocalDate</span>&gt; </span>&#123;</span><br><span class="line">    LocalDate start = LocalDate.of(<span class="number">2020</span>, <span class="number">1</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">int</span> n = -<span class="number">1</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> LocalDate <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        n++;</span><br><span class="line">        <span class="keyword">return</span> start.plusDays(n);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="5-reduce"><a href="#5-reduce" class="headerlink" title="5. reduce"></a>5. reduce</h2><p><code>Stream.reduce()</code>则是<code>Stream</code>的一个聚合方法，它可以把一个<code>Stream</code>的所有元素按照聚合函数聚合成一个结果。</p>
-<p><code>reduce</code>的第一参数是初始值，<code>(acc, n) -&gt; acc + n</code>acc是上次计算的结果。</p>
-<p>递归求和（<code>reduce</code>参数是0）：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> sum = Stream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>).reduce(<span class="number">0</span>, (acc, n) -&gt; acc + n);</span><br><span class="line">        System.out.println(sum); <span class="comment">// 45</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>递归求积（<code>reduce</code>第一个参数是1）</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> s = Stream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>).reduce(<span class="number">1</span>, (acc, n) -&gt; acc * n);</span><br><span class="line">        System.out.println(s); <span class="comment">// 362880</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>复杂点的：（将配置文件聚合成Map）</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 按行读取配置文件:</span></span><br><span class="line">        List&lt;String&gt; props = List.of(<span class="string">&quot;profile=native&quot;</span>, <span class="string">&quot;debug=true&quot;</span>, <span class="string">&quot;logging=warn&quot;</span>, <span class="string">&quot;interval=500&quot;</span>);</span><br><span class="line">        Map&lt;String, String&gt; map = props.stream()</span><br><span class="line">                <span class="comment">// 把k=v转换为Map[k]=v:</span></span><br><span class="line">                .map(kv -&gt; &#123;</span><br><span class="line">                    String[] ss = kv.split(<span class="string">&quot;\\=&quot;</span>, <span class="number">2</span>);</span><br><span class="line">                    <span class="keyword">return</span> Map.of(ss[<span class="number">0</span>], ss[<span class="number">1</span>]);</span><br><span class="line">                &#125;)</span><br><span class="line">                <span class="comment">// 把所有Map聚合到一个Map:</span></span><br><span class="line">                .reduce(<span class="keyword">new</span> HashMap&lt;String, String&gt;(), (m, kv) -&gt; &#123;</span><br><span class="line">                    m.putAll(kv);</span><br><span class="line">                    <span class="keyword">return</span> m;</span><br><span class="line">                &#125;);</span><br><span class="line">        <span class="comment">// 打印结果:</span></span><br><span class="line">        map.forEach((k, v) -&gt; &#123;</span><br><span class="line">            System.out.println(k + <span class="string">&quot; = &quot;</span> + v);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="6-输出"><a href="#6-输出" class="headerlink" title="6. 输出"></a>6. 输出</h2><p><strong>输出到List</strong></p>
-<p>如何将一组<code>String</code>先过滤掉空字符串，然后把非空字符串保存到<code>List</code>中：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;String&gt; stream = Stream.of(<span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="keyword">null</span>, <span class="string">&quot;Pear&quot;</span>, <span class="string">&quot;  &quot;</span>, <span class="string">&quot;Orange&quot;</span>);</span><br><span class="line">        List&lt;String&gt; list = stream.filter(s -&gt; s != <span class="keyword">null</span> &amp;&amp; !s.isBlank()).collect(Collectors.toList());</span><br><span class="line">        System.out.println(list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>把<code>Stream</code>的每个元素收集到<code>List</code>的方法是调用<code>collect()</code>并传入<code>Collectors.toList()</code>对象，它实际上是一个<code>Collector</code>实例，通过类似<code>reduce()</code>的操作，把每个元素添加到一个收集器中（实际上是<code>ArrayList</code>）。</p>
-<p>类似的，<code>collect(Collectors.toSet())</code>可以把<code>Stream</code>的每个元素收集到<code>Set</code>中。</p>
-<p><strong>输出到数组</strong></p>
-<p>把Stream的元素输出为数组和输出为List类似，我们只需要调用<code>toArray()</code>方法，并传入数组的“构造方法”：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; list = List.of(<span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Orange&quot;</span>);</span><br><span class="line">String[] array = list.stream().toArray(String[]::<span class="keyword">new</span>);</span><br></pre></td></tr></table></figure>
-
-<p><code>String[]::new</code> 等价于new String[list.size()]</p>
-<p><strong>输出到Map</strong></p>
-<p>指定两个映射函数，分别把元素映射为key和value：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;String&gt; stream = Stream.of(<span class="string">&quot;APPL:Apple&quot;</span>, <span class="string">&quot;MSFT:Microsoft&quot;</span>);</span><br><span class="line">        Map&lt;String, String&gt; map = stream</span><br><span class="line">                .collect(Collectors.toMap(</span><br><span class="line">                        <span class="comment">// 把元素s映射为key:</span></span><br><span class="line">                        s -&gt; s.substring(<span class="number">0</span>, s.indexOf(<span class="string">&#x27;:&#x27;</span>)),</span><br><span class="line">                        <span class="comment">// 把元素s映射为value:</span></span><br><span class="line">                        s -&gt; s.substring(s.indexOf(<span class="string">&#x27;:&#x27;</span>) + <span class="number">1</span>)));</span><br><span class="line">        System.out.println(map);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>分组输出</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; list = List.of(<span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Blackberry&quot;</span>, <span class="string">&quot;Coconut&quot;</span>, <span class="string">&quot;Avocado&quot;</span>, <span class="string">&quot;Cherry&quot;</span>, <span class="string">&quot;Apricots&quot;</span>);</span><br><span class="line">        Map&lt;String, List&lt;String&gt;&gt; groups = list.stream()</span><br><span class="line">                .collect(Collectors.groupingBy(s -&gt; s.substring(<span class="number">0</span>, <span class="number">1</span>), Collectors.toList()));</span><br><span class="line">        System.out.println(groups);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">&#123;</span></span><br><span class="line"><span class="comment">    A=[Apple, Avocado, Apricots],</span></span><br><span class="line"><span class="comment">    B=[Banana, Blackberry],</span></span><br><span class="line"><span class="comment">    C=[Coconut, Cherry]</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-<p>使用<code>Collectors.groupingBy()</code>，它需要提供两个函数：一个是分组的key，这里使用<code>s -&gt; s.substring(0, 1)</code>，表示只要首字母相同的<code>String</code>分到一组，第二个是分组的value，这里直接使用<code>Collectors.toList()</code>，表示输出为<code>List</code>。</p>
-<h2 id="7-其他操作（排序，去重，截取，合并，flatMap，并行，聚合）"><a href="#7-其他操作（排序，去重，截取，合并，flatMap，并行，聚合）" class="headerlink" title="7. 其他操作（排序，去重，截取，合并，flatMap，并行，聚合）"></a>7. 其他操作（排序，去重，截取，合并，flatMap，并行，聚合）</h2><p><strong>排序</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; list = List.of(<span class="string">&quot;Orange&quot;</span>, <span class="string">&quot;apple&quot;</span>, <span class="string">&quot;Banana&quot;</span>)</span><br><span class="line">            .stream()</span><br><span class="line">            .sorted()</span><br><span class="line">            .collect(Collectors.toList());</span><br><span class="line">        System.out.println(list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>要求每个元素必须实现<code>Comparable</code>接口。</p>
-<p><strong>去重</strong></p>
-<p>对一个<code>Stream</code>的元素进行去重，没必要先转换为<code>Set</code>，可以直接用<code>distinct()</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List.of(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;A&quot;</span>, <span class="string">&quot;C&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;D&quot;</span>)</span><br><span class="line">    .stream()</span><br><span class="line">    .distinct()</span><br><span class="line">    .collect(Collectors.toList()); <span class="comment">// [A, B, C, D]</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>截取</strong></p>
-<p>截取操作常用于把一个无限的<code>Stream</code>转换成有限的<code>Stream</code>，<code>skip()</code>用于跳过当前<code>Stream</code>的前N个元素，<code>limit()</code>用于截取当前<code>Stream</code>最多前N个元素：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List.of(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;C&quot;</span>, <span class="string">&quot;D&quot;</span>, <span class="string">&quot;E&quot;</span>, <span class="string">&quot;F&quot;</span>)</span><br><span class="line">    .stream()</span><br><span class="line">    .skip(<span class="number">2</span>) <span class="comment">// 跳过A, B</span></span><br><span class="line">    .limit(<span class="number">3</span>) <span class="comment">// 截取C, D, E</span></span><br><span class="line">    .collect(Collectors.toList()); <span class="comment">// [C, D, E]</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>合并</strong></p>
-<p>将两个<code>Stream</code>合并为一个<code>Stream</code>可以使用<code>Stream</code>的静态方法<code>concat()</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; s1 = List.of(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;C&quot;</span>).stream();</span><br><span class="line">Stream&lt;String&gt; s2 = List.of(<span class="string">&quot;D&quot;</span>, <span class="string">&quot;E&quot;</span>).stream();</span><br><span class="line"><span class="comment">// 合并:</span></span><br><span class="line">Stream&lt;String&gt; s = Stream.concat(s1, s2);</span><br><span class="line">System.out.println(s.collect(Collectors.toList())); <span class="comment">// [A, B, C, D, E]</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>flatMap</strong></p>
-<p>如果<code>Stream</code>的元素是集合：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;List&lt;Integer&gt;&gt; s = Stream.of(</span><br><span class="line">        Arrays.asList(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>),</span><br><span class="line">        Arrays.asList(<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>),</span><br><span class="line">        Arrays.asList(<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>));</span><br></pre></td></tr></table></figure>
-
-<p>希望把上述<code>Stream</code>转换为<code>Stream&lt;Integer&gt;</code>，就可以使用<code>flatMap()</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;Integer&gt; i = s.flatMap(list -&gt; list.stream());</span><br></pre></td></tr></table></figure>
-
-<p><code>flatMap()</code>，是指把<code>Stream</code>的每个元素（这里是<code>List</code>）映射为<code>Stream</code>，然后合并成一个新的<code>Stream</code>：</p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210503220426922.png" alt="image-20210503220426922"></p>
-<p><strong>并行</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; s = ...</span><br><span class="line">String[] result = s.parallel() <span class="comment">// 变成一个可以并行处理的Stream</span></span><br><span class="line">                   .sorted() <span class="comment">// 可以进行并行排序</span></span><br><span class="line">                   .toArray(String[]::<span class="keyword">new</span>);</span><br></pre></td></tr></table></figure>
-
-<p>除了<code>reduce()</code>和<code>collect()</code>外，<code>Stream</code>还有一些常用的聚合方法：</p>
-<ul>
-<li><code>count()</code>：用于返回元素个数；</li>
-<li><code>max(Comparator&lt;? super T&gt; cp)</code>：找出最大元素；</li>
-<li><code>min(Comparator&lt;? super T&gt; cp)</code>：找出最小元素。</li>
-</ul>
-<p>针对<code>IntStream</code>、<code>LongStream</code>和<code>DoubleStream</code>，还额外提供了以下聚合方法：</p>
-<ul>
-<li><code>sum()</code>：对所有元素求和；</li>
-<li><code>average()</code>：对所有元素求平均数。</li>
-</ul>
-<p>还有一些方法，用来测试<code>Stream</code>的元素是否满足以下条件：</p>
-<ul>
-<li><code>boolean allMatch(Predicate&lt;? super T&gt;)</code>：测试是否所有元素均满足测试条件；</li>
-<li><code>boolean anyMatch(Predicate&lt;? super T&gt;)</code>：测试是否至少有一个元素满足测试条件。</li>
-</ul>
-<p>最后一个常用的方法是<code>forEach()</code>，它可以循环处理<code>Stream</code>的每个元素，我们经常传入<code>System.out::println</code>来打印<code>Stream</code>的元素：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; s = ...</span><br><span class="line">s.forEach(str -&gt; &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;Hello, &quot;</span> + str);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
+<h2 id="3-添加域名解析"><a href="#3-添加域名解析" class="headerlink" title="3. 添加域名解析"></a>3. 添加域名解析</h2><p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511220015320.png" alt="image-20210511220015320"></p>
+<p>在域名管理页面点击解析</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511220117898.png" alt="image-20210511220117898"></p>
+<p>添加两条记录，主机记录一个填写@，一个填写www。</p>
+<p>这样无论有没有www，都可以访问到你的域名。</p>
+<p>记录类型选择CNAME。</p>
+<p>记录值输入github-page的地址，即 <code>用户名.github.io</code></p>
+<p>OK，域名解析完毕。</p>
+<p><strong>等待几分钟，就可以用域名访问你的github-page了。</strong></p>
+<p>欢迎访问我的域名 ：<a href="http://www.ghj1998.top/">www.ghj1998.top</a></p>
+<hr>
+<p><strong>自己遇到的问题</strong></p>
+<p>解析完域名，发现DNS仍然有问题，然后发现是自己没有实名认证🤣, 阿里云不给我解析DNS。</p>
 ]]></content>
       <tags>
-        <tag>JAVA</tag>
-        <tag>Stream</tag>
+        <tag>hexo</tag>
+        <tag>github</tag>
       </tags>
   </entry>
   <entry>
