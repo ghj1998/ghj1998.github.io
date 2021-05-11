@@ -1,6 +1,6 @@
 ---
 title: ANTLR4项目入门
-date: 2021-05-10 14:43:30
+date: 2021-05-11 11:27:30
 tags:
 - ANTLR
 - 语法
@@ -153,7 +153,7 @@ public class Test {
     public static void main(String[] args) throws Exception {
         // 新建一个CharStream，从标准输入读取数据
         ANTLRInputStream input = new ANTLRInputStream(System.in);
-
+		
         // 新建一个词法分析器，处理输入的CharStream
         ArrayInitLexer lexer = new ArrayInitLexer(input);
 
@@ -210,4 +210,60 @@ line 2:0 missing '}' at '<EOF>'
 1. 把{翻译成"；
 2. 把}翻译成"；
 3. 把整数翻译成四位的十六进制形式，然后加前缀\u
+
+第一步：编写方法，继承`BaseListener`类。
+
+```java
+public class ShortToUnicodeString extends ArrayInitBaseListener{
+
+    @Override
+    public void enterInit(ArrayInitParser.InitContext ctx) {
+        System.out.print('"');
+    }
+
+    @Override
+    public void exitInit(ArrayInitParser.InitContext ctx) {
+        System.out.print('"');
+    }
+
+    @Override
+    public void enterValue(ArrayInitParser.ValueContext ctx) {
+        int value = Integer.valueOf(ctx.INT().getText());
+        System.out.printf("\\u%04x",value);
+    }
+}
+```
+
+第二部，扩展main函数。
+
+```java
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.*;
+
+
+public class Test {
+    public static void main(String[] args) throws Exception {
+        // 新建一个CharStream，从标准输入读取数据
+        ANTLRInputStream input = new ANTLRInputStream(System.in);
+		
+        // 新建一个词法分析器，处理输入的CharStream
+        ArrayInitLexer lexer = new ArrayInitLexer(input);
+
+        // 新建一个词法符号的缓冲区，用于存储词法分析器生成的词法符号
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        // 新建一个语法分析器，处理词法符号缓冲区的内容
+        ArrayInitParser parser = new ArrayInitParser(tokens);
+
+        // 遍历语法分析过程中生成的语法分析树，触发回调
+      	ParseTreeWalker walker = new ParseTreeWalker();
+        walker.walk(new ShortToUnicodeString(),tree);
+        System.out.println();
+    }
+}
+```
+
+执行结果：
+
+![image-20210511112729050](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511112729050.png)
 
