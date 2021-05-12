@@ -169,119 +169,6 @@
       </tags>
   </entry>
   <entry>
-    <title>ANTLR4项目入门</title>
-    <url>/2021/05/11/ANTLR4%E9%A1%B9%E7%9B%AE%E5%85%A5%E9%97%A8/</url>
-    <content><![CDATA[<h1 id="入门的ANTLR项目"><a href="#入门的ANTLR项目" class="headerlink" title="入门的ANTLR项目"></a>入门的ANTLR项目</h1><h1 id="1-项目需求"><a href="#1-项目需求" class="headerlink" title="1. 项目需求"></a>1. 项目需求</h1><p><strong>需求：</strong></p>
-<ul>
-<li>识别包含在花括号内或者嵌套花括号的整数，例如{1，2，3}或{1，{2，3}，4}。这种括号常见于初始化语句中。</li>
-<li>如果语句中的所有整数都可以用一个字节表示，将该整数数组转化为字节数组。</li>
-<li>将short数组转化为字符串。</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">short</span>[] data = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>转化为</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> String data = <span class="string">&quot;\u000u\u0002\u0003&quot;</span>;</span><br></pre></td></tr></table></figure>
-
-<p><strong>为什么提出这个需求：</strong></p>
-<p>Java的.class文件在处理时，将初始化语句等同于<code>data[0] = 1; data[1] = 2</code>。相比之下，JAVA的class文件把字符串存储成连续的short序列。将数组的初始化转化为字符串而可以得到更紧凑的class文件。避免了JAVA对初始化方法的长度限制。</p>
-<h2 id="2-ANTLR工具、运行库、自动生成的代码。"><a href="#2-ANTLR工具、运行库、自动生成的代码。" class="headerlink" title="2. ANTLR工具、运行库、自动生成的代码。"></a>2. ANTLR工具、运行库、自动生成的代码。</h2><h3 id="2-1-ANTLR工具"><a href="#2-1-ANTLR工具" class="headerlink" title="2.1 ANTLR工具"></a>2.1 ANTLR工具</h3><p>ANTLR工具中的两个关键部分：</p>
-<ul>
-<li>ANTLR工具</li>
-<li>ANTLR运行库</li>
-</ul>
-<p>当提到对一个语法运行ANTLR时，指的是利用<code>org.antlr.v4.Tool</code>类生成一些代码（语法分析器和词法分析器）。</p>
-<p>运行库是由若干类和方法组成的库，这些类和方法是自动生成的代码（如Parser，Lexer和Token）运行所必需的。</p>
-<p>故<strong>使用ANTLR的步骤：</strong></p>
-<ul>
-<li>对一个语法运行ANTLR，将生成的代码和jar包中的运行库一起编译。</li>
-<li>将编译好的代码和运行库一起运行。</li>
-</ul>
-<blockquote>
-<p><strong>关于如何编写语法文件？</strong></p>
-<p>链接：<strong>暂时留白！</strong></p>
-</blockquote>
-<h3 id="2-2-开始编写"><a href="#2-2-开始编写" class="headerlink" title="2.2 开始编写"></a>2.2 开始编写</h3><ol>
-<li><p>语法文件<code>ArrayInit.g4</code>：</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">grammar</span> <span class="string">ArrayInit;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">init :</span> <span class="string">&#x27;&#123;&#x27;</span> <span class="string">value</span> <span class="string">(</span> <span class="string">&#x27;,&#x27;</span> <span class="string">value)*</span> <span class="string">&#x27;&#125;&#x27;</span><span class="string">;</span></span><br><span class="line"></span><br><span class="line"><span class="string">value</span> <span class="string">:init</span></span><br><span class="line">    <span class="string">|</span> <span class="string">INT</span> </span><br><span class="line">    <span class="string">;</span></span><br><span class="line"><span class="attr">INT :</span> [<span class="number">0</span><span class="number">-9</span>]<span class="string">+</span> <span class="string">;</span></span><br><span class="line"><span class="attr">WS :</span> [<span class="string">\t\r\n</span>]<span class="string">+</span> <span class="string">-&gt;</span> <span class="string">skip;</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<ol start="2">
-<li><p>生成代码</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> antlr4 ArrayInit.g4</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>注意</strong>：直接<code>antlr4</code>命令要提前运行<code>antlr4=java org.antlr.v4.Tool $*</code></p>
-<blockquote>
-<p>参考：<a href="https://ghj1998.github.io/2021/04/26/ANTLR4%E6%8C%87%E5%8D%97/">https://ghj1998.github.io/2021/04/26/ANTLR4%E6%8C%87%E5%8D%97/</a></p>
-</blockquote>
-<p>生成文件如下所示：</p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210510153723801.png" alt="image-20210510153723801"></p>
-<p>生成文件介绍</p>
-<ul>
-<li><p><code>ArrayInitParser.java</code></p>
-<p>包含一个语法分析器的类的定义，用来识别语法<code>ArrayInit</code>。每条规则都有对应的方法。</p>
-</li>
-<li><p><code>ArrayInitLexer.java</code></p>
-<p>包含词法分析器的类定义，词法分析器的作用是将输入字符序列分解为词汇符号。</p>
-</li>
-<li><p><code>ArrayInit.tokens</code></p>
-<p>ANTLR会给每个词法符号指定一个数字形式的类型，同时存储关系在这个文件中。</p>
-</li>
-<li><p><code>ArrayInitListener.java</code></p>
-<p>定义遍历语法分析树的回调方法。</p>
-</li>
-</ul>
-</li>
-<li><p>编译</p>
-<p>需要提前设置好环境变量：</p>
-<blockquote>
-<p>参考：<a href="https://ghj1998.github.io/2021/04/26/ANTLR4%E6%8C%87%E5%8D%97/">https://ghj1998.github.io/2021/04/26/ANTLR4%E6%8C%87%E5%8D%97/</a></p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> javac *.java</span></span><br></pre></td></tr></table></figure></li>
-<li><p>运行</p>
-<p>同样要提前设置好才能使用<code>grun</code>，参考链接同上。</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> grun ArrayInit init -tokens</span></span><br><span class="line">&#123;99, 3, 451&#125;</span><br><span class="line">^Z</span><br><span class="line"></span><br><span class="line">// output:</span><br><span class="line">[@0,0:0=&#x27;&#123;&#x27;,&lt;1&gt;,1:0]</span><br><span class="line">[@1,1:2=&#x27;99&#x27;,&lt;4&gt;,1:1]</span><br><span class="line">[@2,3:3=&#x27;,&#x27;,&lt;2&gt;,1:3]</span><br><span class="line">[@3,5:5=&#x27;3&#x27;,&lt;4&gt;,1:5]</span><br><span class="line">[@4,6:6=&#x27;,&#x27;,&lt;2&gt;,1:6]</span><br><span class="line">[@5,8:10=&#x27;451&#x27;,&lt;4&gt;,1:8]</span><br><span class="line">[@6,11:11=&#x27;&#125;&#x27;,&lt;3&gt;,1:11]</span><br><span class="line">[@7,14:13=&#x27;&lt;EOF&gt;&#x27;,&lt;-1&gt;,2:0]</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ grun ArrayInit init -gui</span><br><span class="line">&#123;1,&#123;2,3&#125;,4&#125;</span><br><span class="line">^Z</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>output: </p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210510162450230.png" alt="image-20210510162450230"></p>
-</li>
-</ol>
-<h3 id="2-3-从其他JAVA程序中调用生成的语法分析器"><a href="#2-3-从其他JAVA程序中调用生成的语法分析器" class="headerlink" title="2.3 从其他JAVA程序中调用生成的语法分析器"></a>2.3 从其他JAVA程序中调用生成的语法分析器</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.*;</span><br><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.tree.*;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 新建一个CharStream，从标准输入读取数据</span></span><br><span class="line">        ANTLRInputStream input = <span class="keyword">new</span> ANTLRInputStream(System.in);</span><br><span class="line">		</span><br><span class="line">        <span class="comment">// 新建一个词法分析器，处理输入的CharStream</span></span><br><span class="line">        ArrayInitLexer lexer = <span class="keyword">new</span> ArrayInitLexer(input);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 新建一个词法符号的缓冲区，用于存储词法分析器生成的词法符号</span></span><br><span class="line">        CommonTokenStream tokens = <span class="keyword">new</span> CommonTokenStream(lexer);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 新建一个语法分析器，处理词法符号缓冲区的内容</span></span><br><span class="line">        ArrayInitParser parser = <span class="keyword">new</span> ArrayInitParser(tokens);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 针对init规则，开始进行语法分析</span></span><br><span class="line">        ParseTree tree = parser.init();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 用LISP风格打印出生成的树</span></span><br><span class="line">        System.out.println(tree.toStringTree(parser));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>验证：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> java Test</span></span><br><span class="line">&#123;1,&#123;2,3&#125;,4&#125;</span><br><span class="line">^Z</span><br><span class="line"></span><br><span class="line">(init &#123; (value 1) , (value (init &#123; (value 2) , (value 3) &#125;)) , (value 4) &#125;)</span><br></pre></td></tr></table></figure>
-
-<p>同时，ANTLR还能自动报告语法错误。</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> java Test</span></span><br><span class="line">&#123;1,3</span><br><span class="line">^Z</span><br><span class="line"></span><br><span class="line">line 2:0 missing &#x27;&#125;&#x27; at &#x27;&lt;EOF&gt;&#x27;</span><br><span class="line">(init &#123; (value 1) , (value 3) &lt;missing &#x27;&#125;&#x27;&gt;)</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>上面提到的类，可以参考: <strong>链接（此处留白）</strong></p>
-</blockquote>
-<h3 id="2-4-完成项目需求"><a href="#2-4-完成项目需求" class="headerlink" title="2.4 完成项目需求"></a>2.4 完成项目需求</h3><p>程序要从语法分析树中提取数据，然后在触发的回调函数中进行适当操作。如果要通过编写程序操纵输入数据，需要继承<code>ArrayInitBaseListener</code>类，覆盖其中必要的方法。</p>
-<p>我们的思想是：在遍历器进行语法分析树的遍历时，让每个监听器方法翻译输入数据的一部分并将结果打印出来。</p>
-<p><strong>监听器的优点</strong>在于：我们不需要写遍历语法分析树的代码。</p>
-<p>对于这个项目需求，我们可以找出通用的翻译逻辑。</p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210510174143835.png" alt="image-20210510174143835"></p>
-<ol>
-<li>把{翻译成”；</li>
-<li>把}翻译成”；</li>
-<li>把整数翻译成四位的十六进制形式，然后加前缀\u</li>
-</ol>
-<p>第一步：编写方法，继承<code>BaseListener</code>类。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ShortToUnicodeString</span> <span class="keyword">extends</span> <span class="title">ArrayInitBaseListener</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">enterInit</span><span class="params">(ArrayInitParser.InitContext ctx)</span> </span>&#123;</span><br><span class="line">        System.out.print(<span class="string">&#x27;&quot;&#x27;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exitInit</span><span class="params">(ArrayInitParser.InitContext ctx)</span> </span>&#123;</span><br><span class="line">        System.out.print(<span class="string">&#x27;&quot;&#x27;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">enterValue</span><span class="params">(ArrayInitParser.ValueContext ctx)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> value = Integer.valueOf(ctx.INT().getText());</span><br><span class="line">        System.out.printf(<span class="string">&quot;\\u%04x&quot;</span>,value);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>第二部，扩展main函数。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.*;</span><br><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.tree.*;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 新建一个CharStream，从标准输入读取数据</span></span><br><span class="line">        ANTLRInputStream input = <span class="keyword">new</span> ANTLRInputStream(System.in);</span><br><span class="line">		</span><br><span class="line">        <span class="comment">// 新建一个词法分析器，处理输入的CharStream</span></span><br><span class="line">        ArrayInitLexer lexer = <span class="keyword">new</span> ArrayInitLexer(input);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 新建一个词法符号的缓冲区，用于存储词法分析器生成的词法符号</span></span><br><span class="line">        CommonTokenStream tokens = <span class="keyword">new</span> CommonTokenStream(lexer);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 新建一个语法分析器，处理词法符号缓冲区的内容</span></span><br><span class="line">        ArrayInitParser parser = <span class="keyword">new</span> ArrayInitParser(tokens);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 遍历语法分析过程中生成的语法分析树，触发回调</span></span><br><span class="line">      	ParseTreeWalker walker = <span class="keyword">new</span> ParseTreeWalker();</span><br><span class="line">        walker.walk(<span class="keyword">new</span> ShortToUnicodeString(),tree);</span><br><span class="line">        System.out.println();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>执行结果：</p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511112729050.png" alt="image-20210511112729050"></p>
-]]></content>
-      <tags>
-        <tag>ANTLR</tag>
-        <tag>语法</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>ANTLR指南</title>
     <url>/2021/05/11/ANTLR%E6%8C%87%E5%8D%97/</url>
     <content><![CDATA[<h1 id="四个案例展示ANTLR的不同特性"><a href="#四个案例展示ANTLR的不同特性" class="headerlink" title="四个案例展示ANTLR的不同特性"></a>四个案例展示ANTLR的不同特性</h1><h2 id="1-简介"><a href="#1-简介" class="headerlink" title="1. 简介"></a>1. 简介</h2><ol>
@@ -408,6 +295,119 @@
       <tags>
         <tag>Hash</tag>
         <tag>Hmac</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ANTLR4项目入门</title>
+    <url>/2021/05/11/ANTLR4%E9%A1%B9%E7%9B%AE%E5%85%A5%E9%97%A8/</url>
+    <content><![CDATA[<h1 id="入门的ANTLR项目"><a href="#入门的ANTLR项目" class="headerlink" title="入门的ANTLR项目"></a>入门的ANTLR项目</h1><h1 id="1-项目需求"><a href="#1-项目需求" class="headerlink" title="1. 项目需求"></a>1. 项目需求</h1><p><strong>需求：</strong></p>
+<ul>
+<li>识别包含在花括号内或者嵌套花括号的整数，例如{1，2，3}或{1，{2，3}，4}。这种括号常见于初始化语句中。</li>
+<li>如果语句中的所有整数都可以用一个字节表示，将该整数数组转化为字节数组。</li>
+<li>将short数组转化为字符串。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">short</span>[] data = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>转化为</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> String data = <span class="string">&quot;\u000u\u0002\u0003&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么提出这个需求：</strong></p>
+<p>Java的.class文件在处理时，将初始化语句等同于<code>data[0] = 1; data[1] = 2</code>。相比之下，JAVA的class文件把字符串存储成连续的short序列。将数组的初始化转化为字符串而可以得到更紧凑的class文件。避免了JAVA对初始化方法的长度限制。</p>
+<h2 id="2-ANTLR工具、运行库、自动生成的代码。"><a href="#2-ANTLR工具、运行库、自动生成的代码。" class="headerlink" title="2. ANTLR工具、运行库、自动生成的代码。"></a>2. ANTLR工具、运行库、自动生成的代码。</h2><h3 id="2-1-ANTLR工具"><a href="#2-1-ANTLR工具" class="headerlink" title="2.1 ANTLR工具"></a>2.1 ANTLR工具</h3><p>ANTLR工具中的两个关键部分：</p>
+<ul>
+<li>ANTLR工具</li>
+<li>ANTLR运行库</li>
+</ul>
+<p>当提到对一个语法运行ANTLR时，指的是利用<code>org.antlr.v4.Tool</code>类生成一些代码（语法分析器和词法分析器）。</p>
+<p>运行库是由若干类和方法组成的库，这些类和方法是自动生成的代码（如Parser，Lexer和Token）运行所必需的。</p>
+<p>故<strong>使用ANTLR的步骤：</strong></p>
+<ul>
+<li>对一个语法运行ANTLR，将生成的代码和jar包中的运行库一起编译。</li>
+<li>将编译好的代码和运行库一起运行。</li>
+</ul>
+<blockquote>
+<p><strong>关于如何编写语法文件？</strong></p>
+<p>链接：<strong>暂时留白！</strong></p>
+</blockquote>
+<h3 id="2-2-开始编写"><a href="#2-2-开始编写" class="headerlink" title="2.2 开始编写"></a>2.2 开始编写</h3><ol>
+<li><p>语法文件<code>ArrayInit.g4</code>：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">grammar</span> <span class="string">ArrayInit;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">init :</span> <span class="string">&#x27;&#123;&#x27;</span> <span class="string">value</span> <span class="string">(</span> <span class="string">&#x27;,&#x27;</span> <span class="string">value)*</span> <span class="string">&#x27;&#125;&#x27;</span><span class="string">;</span></span><br><span class="line"></span><br><span class="line"><span class="string">value</span> <span class="string">:init</span></span><br><span class="line">    <span class="string">|</span> <span class="string">INT</span> </span><br><span class="line">    <span class="string">;</span></span><br><span class="line"><span class="attr">INT :</span> [<span class="number">0</span><span class="number">-9</span>]<span class="string">+</span> <span class="string">;</span></span><br><span class="line"><span class="attr">WS :</span> [<span class="string">\t\r\n</span>]<span class="string">+</span> <span class="string">-&gt;</span> <span class="string">skip;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<ol start="2">
+<li><p>生成代码</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> antlr4 ArrayInit.g4</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>注意</strong>：直接<code>antlr4</code>命令要提前运行<code>antlr4=java org.antlr.v4.Tool $*</code></p>
+<blockquote>
+<p>参考：<a href="https://ghj1998.github.io/2021/04/26/ANTLR4%E6%8C%87%E5%8D%97/">https://ghj1998.github.io/2021/04/26/ANTLR4%E6%8C%87%E5%8D%97/</a></p>
+</blockquote>
+<p>生成文件如下所示：</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210510153723801.png" alt="image-20210510153723801"></p>
+<p>生成文件介绍</p>
+<ul>
+<li><p><code>ArrayInitParser.java</code></p>
+<p>包含一个语法分析器的类的定义，用来识别语法<code>ArrayInit</code>。每条规则都有对应的方法。</p>
+</li>
+<li><p><code>ArrayInitLexer.java</code></p>
+<p>包含词法分析器的类定义，词法分析器的作用是将输入字符序列分解为词汇符号。</p>
+</li>
+<li><p><code>ArrayInit.tokens</code></p>
+<p>ANTLR会给每个词法符号指定一个数字形式的类型，同时存储关系在这个文件中。</p>
+</li>
+<li><p><code>ArrayInitListener.java</code></p>
+<p>定义遍历语法分析树的回调方法。</p>
+</li>
+</ul>
+</li>
+<li><p>编译</p>
+<p>需要提前设置好环境变量：</p>
+<blockquote>
+<p>参考：<a href="https://ghj1998.github.io/2021/04/26/ANTLR4%E6%8C%87%E5%8D%97/">https://ghj1998.github.io/2021/04/26/ANTLR4%E6%8C%87%E5%8D%97/</a></p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> javac *.java</span></span><br></pre></td></tr></table></figure></li>
+<li><p>运行</p>
+<p>同样要提前设置好才能使用<code>grun</code>，参考链接同上。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> grun ArrayInit init -tokens</span></span><br><span class="line">&#123;99, 3, 451&#125;</span><br><span class="line">^Z</span><br><span class="line"></span><br><span class="line">// output:</span><br><span class="line">[@0,0:0=&#x27;&#123;&#x27;,&lt;1&gt;,1:0]</span><br><span class="line">[@1,1:2=&#x27;99&#x27;,&lt;4&gt;,1:1]</span><br><span class="line">[@2,3:3=&#x27;,&#x27;,&lt;2&gt;,1:3]</span><br><span class="line">[@3,5:5=&#x27;3&#x27;,&lt;4&gt;,1:5]</span><br><span class="line">[@4,6:6=&#x27;,&#x27;,&lt;2&gt;,1:6]</span><br><span class="line">[@5,8:10=&#x27;451&#x27;,&lt;4&gt;,1:8]</span><br><span class="line">[@6,11:11=&#x27;&#125;&#x27;,&lt;3&gt;,1:11]</span><br><span class="line">[@7,14:13=&#x27;&lt;EOF&gt;&#x27;,&lt;-1&gt;,2:0]</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ grun ArrayInit init -gui</span><br><span class="line">&#123;1,&#123;2,3&#125;,4&#125;</span><br><span class="line">^Z</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>output: </p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210510162450230.png" alt="image-20210510162450230"></p>
+</li>
+</ol>
+<h3 id="2-3-从其他JAVA程序中调用生成的语法分析器"><a href="#2-3-从其他JAVA程序中调用生成的语法分析器" class="headerlink" title="2.3 从其他JAVA程序中调用生成的语法分析器"></a>2.3 从其他JAVA程序中调用生成的语法分析器</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.*;</span><br><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.tree.*;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 新建一个CharStream，从标准输入读取数据</span></span><br><span class="line">        ANTLRInputStream input = <span class="keyword">new</span> ANTLRInputStream(System.in);</span><br><span class="line">		</span><br><span class="line">        <span class="comment">// 新建一个词法分析器，处理输入的CharStream</span></span><br><span class="line">        ArrayInitLexer lexer = <span class="keyword">new</span> ArrayInitLexer(input);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 新建一个词法符号的缓冲区，用于存储词法分析器生成的词法符号</span></span><br><span class="line">        CommonTokenStream tokens = <span class="keyword">new</span> CommonTokenStream(lexer);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 新建一个语法分析器，处理词法符号缓冲区的内容</span></span><br><span class="line">        ArrayInitParser parser = <span class="keyword">new</span> ArrayInitParser(tokens);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 针对init规则，开始进行语法分析</span></span><br><span class="line">        ParseTree tree = parser.init();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 用LISP风格打印出生成的树</span></span><br><span class="line">        System.out.println(tree.toStringTree(parser));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>验证：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> java Test</span></span><br><span class="line">&#123;1,&#123;2,3&#125;,4&#125;</span><br><span class="line">^Z</span><br><span class="line"></span><br><span class="line">(init &#123; (value 1) , (value (init &#123; (value 2) , (value 3) &#125;)) , (value 4) &#125;)</span><br></pre></td></tr></table></figure>
+
+<p>同时，ANTLR还能自动报告语法错误。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> java Test</span></span><br><span class="line">&#123;1,3</span><br><span class="line">^Z</span><br><span class="line"></span><br><span class="line">line 2:0 missing &#x27;&#125;&#x27; at &#x27;&lt;EOF&gt;&#x27;</span><br><span class="line">(init &#123; (value 1) , (value 3) &lt;missing &#x27;&#125;&#x27;&gt;)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上面提到的类，可以参考: <strong>链接（此处留白）</strong></p>
+</blockquote>
+<h3 id="2-4-完成项目需求"><a href="#2-4-完成项目需求" class="headerlink" title="2.4 完成项目需求"></a>2.4 完成项目需求</h3><p>程序要从语法分析树中提取数据，然后在触发的回调函数中进行适当操作。如果要通过编写程序操纵输入数据，需要继承<code>ArrayInitBaseListener</code>类，覆盖其中必要的方法。</p>
+<p>我们的思想是：在遍历器进行语法分析树的遍历时，让每个监听器方法翻译输入数据的一部分并将结果打印出来。</p>
+<p><strong>监听器的优点</strong>在于：我们不需要写遍历语法分析树的代码。</p>
+<p>对于这个项目需求，我们可以找出通用的翻译逻辑。</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210510174143835.png" alt="image-20210510174143835"></p>
+<ol>
+<li>把{翻译成”；</li>
+<li>把}翻译成”；</li>
+<li>把整数翻译成四位的十六进制形式，然后加前缀\u</li>
+</ol>
+<p>第一步：编写方法，继承<code>BaseListener</code>类。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ShortToUnicodeString</span> <span class="keyword">extends</span> <span class="title">ArrayInitBaseListener</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">enterInit</span><span class="params">(ArrayInitParser.InitContext ctx)</span> </span>&#123;</span><br><span class="line">        System.out.print(<span class="string">&#x27;&quot;&#x27;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exitInit</span><span class="params">(ArrayInitParser.InitContext ctx)</span> </span>&#123;</span><br><span class="line">        System.out.print(<span class="string">&#x27;&quot;&#x27;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">enterValue</span><span class="params">(ArrayInitParser.ValueContext ctx)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> value = Integer.valueOf(ctx.INT().getText());</span><br><span class="line">        System.out.printf(<span class="string">&quot;\\u%04x&quot;</span>,value);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第二部，扩展main函数。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.*;</span><br><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.tree.*;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 新建一个CharStream，从标准输入读取数据</span></span><br><span class="line">        ANTLRInputStream input = <span class="keyword">new</span> ANTLRInputStream(System.in);</span><br><span class="line">		</span><br><span class="line">        <span class="comment">// 新建一个词法分析器，处理输入的CharStream</span></span><br><span class="line">        ArrayInitLexer lexer = <span class="keyword">new</span> ArrayInitLexer(input);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 新建一个词法符号的缓冲区，用于存储词法分析器生成的词法符号</span></span><br><span class="line">        CommonTokenStream tokens = <span class="keyword">new</span> CommonTokenStream(lexer);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 新建一个语法分析器，处理词法符号缓冲区的内容</span></span><br><span class="line">        ArrayInitParser parser = <span class="keyword">new</span> ArrayInitParser(tokens);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 遍历语法分析过程中生成的语法分析树，触发回调</span></span><br><span class="line">      	ParseTreeWalker walker = <span class="keyword">new</span> ParseTreeWalker();</span><br><span class="line">        walker.walk(<span class="keyword">new</span> ShortToUnicodeString(),tree);</span><br><span class="line">        System.out.println();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行结果：</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511112729050.png" alt="image-20210511112729050"></p>
+]]></content>
+      <tags>
+        <tag>ANTLR</tag>
+        <tag>语法</tag>
       </tags>
   </entry>
   <entry>
@@ -1623,6 +1623,257 @@
     <content><![CDATA[]]></content>
   </entry>
   <entry>
+    <title>git安装和配置</title>
+    <url>/2021/03/29/git%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/</url>
+    <content><![CDATA[<h1 id="git安装和配置"><a href="#git安装和配置" class="headerlink" title="git安装和配置"></a>git安装和配置</h1><h2 id="1-版本控制工具"><a href="#1-版本控制工具" class="headerlink" title="1. 版本控制工具"></a>1. 版本控制工具</h2><p><strong>SVN</strong>：集中式版本控制工具</p>
+<p>集中式版本控制工具，几乎所有的动作<strong>都需要服务器参与</strong>，并且<strong>数据安全性与服务器关系很大</strong>。</p>
+<p><strong>git</strong>：分布式版本控制工具</p>
+<p><strong>Git 是分布式版本控制工具</strong>，除了与服务器之前进行按需同步之外，<strong>所有的提交操作都不需要服务器</strong>。</p>
+<p><strong>SVN</strong>不适用的领域：</p>
+<ul>
+<li>跨地域协同开发</li>
+<li>追修高质量代码以及代码门禁</li>
+</ul>
+<p><strong>git</strong>不适合的领域：</p>
+<ul>
+<li>不适合Word等二进制文档的版本控制</li>
+<li>git没有锁定/解锁模式，不能派他式修改</li>
+<li>权限不能细分（例如将不同的文件分配不同的访问权限）</li>
+</ul>
+<h2 id="2-git安装和配置"><a href="#2-git安装和配置" class="headerlink" title="2. git安装和配置"></a>2. git安装和配置</h2><h3 id="2-1-Linux下安装-git"><a href="#2-1-Linux下安装-git" class="headerlink" title="2.1 Linux下安装 git"></a>2.1 Linux下安装 git</h3><p><strong>包管理器方式安装</strong></p>
+<p>Ubuntu 10.10(maverick)或更新版本，Debian(squeeze)或更新版本:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ sudo aptitude install git</span><br><span class="line">$ sudo aptitude install git-doc git-svn git-email gitk</span><br></pre></td></tr></table></figure>
+
+<p>Linux 系统:  RHEL、Fedora、CentOS 等版本:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ yum install git</span><br><span class="line">$ yum install git-svn git-email gitk</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>git</code>软件包包含了大部分Git命令，是必装的软件包。</p>
+<p>软件包<code>git-svn</code>、<code>git-email</code>、<code>gitk</code>本来也是Git软件包的一部分，但是因为有着不一样的软件包依赖（如更多<code>perl</code>模组，<code>tk</code>等），所以单独作为软件包发布。</p>
+<p><strong>源码安装</strong></p>
+<p>访问<a href="http://git-scm.com/%EF%BC%8C%E4%B8%8B%E8%BD%BDGit%E6%BA%90%E7%A0%81%E5%8C%85%EF%BC%8C%E4%BE%8B%E5%A6%82%EF%BC%9Agit-2.19.0.tar.gz%E3%80%82">http://git-scm.com/，下载Git源码包，例如：git-2.19.0.tar.gz。</a></p>
+<p>第一步：展开源码包，并进入到相应的目录中。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ tar -jxvf git-2.19.0.tar.bz2</span><br><span class="line">$ <span class="built_in">cd</span> git-2.19.0</span><br></pre></td></tr></table></figure>
+
+<p>第二步：安装。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ make prefix=/usr/<span class="built_in">local</span> all</span><br><span class="line">$ sudo make prefix=/usr/<span class="built_in">local</span> install</span><br></pre></td></tr></table></figure>
+
+<p>第三步：安装git文档（可选）</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ make prefix=/usr/<span class="built_in">local</span> doc info</span><br><span class="line">$ sudo make prefix=/usr/<span class="built_in">local</span> install-doc install-html install-info</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-Windows-下安装-git"><a href="#2-2-Windows-下安装-git" class="headerlink" title="2.2 Windows 下安装 git"></a>2.2 <strong>Windows</strong> <strong>下安装</strong> git</h3><p><strong>下载安装包</strong></p>
+<p><a href="https://git-scm.com/download/win">https://git-scm.com/download/win </a>下载 Windows 安装包</p>
+<p><strong>安装安装包</strong></p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329144403430.png" alt="image-20210329144403430"></p>
+<p>在这一步去掉git LFS选项。</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329144502858.png" alt="image-20210329144502858"></p>
+<p>在这一步可以选择编辑器，默认就可以。</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329144551825.png" alt="image-20210329144551825"></p>
+<p>这一步选择git bash作为命令行。</p>
+<p><strong>TortoiseGit</strong></p>
+<p><strong>TortoiseGit</strong>是一个git的可视化图形界面。个人认为用处不大。</p>
+<h3 id="2-3-git安装完成后的配置"><a href="#2-3-git安装完成后的配置" class="headerlink" title="2.3 git安装完成后的配置"></a>2.3 git安装完成后的配置</h3><p>git的配置分为三类，系统配置（适用所有用户），用户配置（适用于该用户），仓库配置（只对当前项目有效）。</p>
+<p><strong>系统配置</strong>（对所有用户都适用）</p>
+<p>存放在git的安装目录下：<code>%Git%/etc/gitconfig</code>；若使用 <code>git config</code> 时用<code> --system</code> 选项，读写的就是这个文件：</p>
+<p><code>git config --system core.autocrlf</code></p>
+<p><strong>用户配置</strong>（只适用于该用户）</p>
+<p>存放在用户目录下。例如linux存放在：<code>~/.gitconfig</code>；若使用 <code>git config</code> 时用<code> --global</code> 选项，读写的就是这个文件：</p>
+<p><code>git config --global user.name</code></p>
+<p><strong>仓库配置</strong>（只对当前项目有效）</p>
+<p>当前仓库的配置文件（也就是工作目录中的 <code>.git/config</code> 文件）；若使用<code>git config</code> 时用 <code>--local</code> 选项，读写的就是这个文件：</p>
+<p><code>git config --local remote.origin.url</code></p>
+<p><strong>配置第一步：配置用户信息</strong></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git config --global user.name “XXXXX”</span><br><span class="line">git config --global user.email XXXXXXXXXX@huawei.com</span><br></pre></td></tr></table></figure>
+
+<p>第一行设置自己git提交时的姓名，第二行设置提交时的邮箱。</p>
+<p><strong>配置第二步：配置文本换行符</strong></p>
+<p>原因：Windows时用回车和换行两个字符来换行，Linux只使用换行。如果涉及到多平台开发，就可能造成问题。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ git config --global core.autocrlf <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<p>在Windows下使用这个命令就可以让git在提交时自动帮忙转化。</p>
+<p><strong>配置第三步：文本编码配置</strong></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">\<span class="comment"># 中文编码支持</span></span><br><span class="line">git config --global gui.encoding utf-8</span><br><span class="line">git config --global i18n.commitencoding utf-8</span><br><span class="line">git config --global i18n.logoutputencoding utf-8</span><br><span class="line"></span><br><span class="line">\<span class="comment"># 显示路径中的中文：</span></span><br><span class="line">git config --global core.quotepath <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>i18n.commitEncoding</strong> <strong>选项：</strong>用来让git commit log存储时，采用的编码，默认UTF-8.</p>
+</li>
+<li><p><strong>i18n.logOutputEncoding</strong> <strong>选项：</strong>查看git log时，显示采用的编码，建议设置为UTF-8.</p>
+</li>
+</ul>
+<p><strong>配置第四步：生成ssh认证文件</strong></p>
+<blockquote>
+<p>认证：在与远程的git服务器，例如GitHub，GitLab进行通讯时，建立起来的认证，证明自己可以在当前这个机器上对远程仓库的内容进行修改。</p>
+</blockquote>
+<p>两种认证方法：</p>
+<ol>
+<li>http/https协议认证（不推荐使用，因此不写了）</li>
+<li>ssh协议认证</li>
+</ol>
+<p>ssh协议认证</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ ssh-keygen -t rsa –C zhangsan1123@huawei.com</span><br></pre></td></tr></table></figure>
+
+<p>在git bash中输入这段命令，敲击几次回车，会在计算机中生成ssh认证文件。</p>
+<p>ssh认证文件存放地址：</p>
+<p>Windows ：C:\Users\Administrator\.ssh    <em>Administrator为你当前登陆的用户名</em></p>
+<p>Linux： <del>/.ssh           *</del>为当前用户的家目录*</p>
+<p>打开文件夹，找到<code>id_rsa.pub</code>文件，打开复制内部的内容。</p>
+<p>添加公钥到代码平台：</p>
+<ol>
+<li><p>登录代码平台</p>
+</li>
+<li><p>进入“Profile Settings”</p>
+</li>
+<li><p>点击左侧栏的“SSH Keys”</p>
+</li>
+<li><p>点击“Add SSH Key”,将刚生成的公钥文件的内容，复制到“Public Key”栏，保存即可。</p>
+</li>
+</ol>
+]]></content>
+      <tags>
+        <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>哈希算法</title>
+    <url>/2021/05/06/%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95/</url>
+    <content><![CDATA[<h1 id="哈希算法"><a href="#哈希算法" class="headerlink" title="哈希算法"></a>哈希算法</h1><h2 id="1-Hash算法特点"><a href="#1-Hash算法特点" class="headerlink" title="1. Hash算法特点"></a>1. Hash算法特点</h2><p>哈希算法最重要的特点就是：</p>
+<ul>
+<li>相同的输入一定得到相同的输出；</li>
+<li>不同的输入大概率得到不同的输出。</li>
+</ul>
+<h2 id="2-Hash碰撞"><a href="#2-Hash碰撞" class="headerlink" title="2. Hash碰撞"></a>2. Hash碰撞</h2><p>哈希碰撞是指，两个不同的输入得到了相同的输出：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;AaAaAa&quot;</span>.hashCode(); <span class="comment">// 0x7460e8c0</span></span><br><span class="line"><span class="string">&quot;BBAaBB&quot;</span>.hashCode(); <span class="comment">// 0x7460e8c0</span></span><br></pre></td></tr></table></figure>
+
+<p>一个安全的哈希算法必须满足：</p>
+<ul>
+<li>碰撞概率低；</li>
+<li>不能猜测输出：不能根据hashCode的输出反推回输入。</li>
+</ul>
+<h2 id="3-常见hash算法"><a href="#3-常见hash算法" class="headerlink" title="3. 常见hash算法"></a>3. 常见hash算法</h2><p>常用的哈希算法有：</p>
+<table>
+<thead>
+<tr>
+<th align="left">算法</th>
+<th align="left">输出长度（位）</th>
+<th align="left">输出长度（字节）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">MD5</td>
+<td align="left">128 bits</td>
+<td align="left">16 bytes</td>
+</tr>
+<tr>
+<td align="left">SHA-1</td>
+<td align="left">160 bits</td>
+<td align="left">20 bytes</td>
+</tr>
+<tr>
+<td align="left">RipeMD-160</td>
+<td align="left">160 bits</td>
+<td align="left">20 bytes</td>
+</tr>
+<tr>
+<td align="left">SHA-256</td>
+<td align="left">256 bits</td>
+<td align="left">32 bytes</td>
+</tr>
+<tr>
+<td align="left">SHA-512</td>
+<td align="left">512 bits</td>
+<td align="left">64 bytes</td>
+</tr>
+</tbody></table>
+<p>根据碰撞概率，哈希算法的输出长度越长，就越难产生碰撞，也就越安全。</p>
+<p>Java标准库提供了常用的哈希算法，并且有一套统一的接口。MessageDigest是专门用来生成散列码的类，只能通过getInstance进行实例化。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 创建一个MessageDigest实例:</span></span><br><span class="line">        MessageDigest md = MessageDigest.getInstance(<span class="string">&quot;MD5&quot;</span>);</span><br><span class="line">        <span class="comment">// 反复调用update输入数据:</span></span><br><span class="line">        md.update(<span class="string">&quot;Hello&quot;</span>.getBytes(<span class="string">&quot;UTF-8&quot;</span>));</span><br><span class="line">        md.update(<span class="string">&quot;World&quot;</span>.getBytes(<span class="string">&quot;UTF-8&quot;</span>));</span><br><span class="line">        <span class="keyword">byte</span>[] result = md.digest(); <span class="comment">// 16 bytes: 68e109f0f40ca72a15e05cc22786f8e6</span></span><br><span class="line">        System.out.println(<span class="keyword">new</span> BigInteger(<span class="number">1</span>, result).toString(<span class="number">16</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>MessageDigest</code>时，我们首先根据哈希算法获取一个<code>MessageDigest</code>实例，然后，反复调用<code>update(byte[])</code>输入数据。当输入结束后，调用<code>digest()</code>方法获得byte[]数组表示的摘要，最后，把它转换为十六进制的字符串。</p>
+<p>运行上述代码，可以得到输入<code>HelloWorld</code>的MD5是<code>68e109f0f40ca72a15e05cc22786f8e6</code>。</p>
+<h2 id="4-hash算法用途"><a href="#4-hash算法用途" class="headerlink" title="4. hash算法用途"></a>4. hash算法用途</h2><ul>
+<li><p>下载文件</p>
+<p><img src="https://www.liaoxuefeng.com/files/attachments/1305351978745921/l" alt="file-md5"></p>
+<p>下载完文件可以计算本地文件的MD5哈希值，就可以知道文件有没有被修改。</p>
+</li>
+<li><p>存储用户口令</p>
+<p>不存储用户的原始口令，方法是存储用户口令的哈希，例如，MD5。</p>
+<p>在用户输入原始口令后，系统计算用户输入的原始口令的MD5并与数据库存储的MD5对比，如果一致，说明口令正确，否则，口令错误。</p>
+<p>数据库的存储应当如下所示：</p>
+<table>
+<thead>
+<tr>
+<th align="left">username</th>
+<th align="left">password</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">bob</td>
+<td align="left">f30aa7a662c728b7407c54ae6bfd27d1</td>
+</tr>
+<tr>
+<td align="left">alice</td>
+<td align="left">25d55ad283aa400af464c76d713c07ad</td>
+</tr>
+<tr>
+<td align="left">tim</td>
+<td align="left">bed128365216c019988915ed3add75fb</td>
+</tr>
+</tbody></table>
+<p>使用哈希口令时，还要注意防止彩虹表攻击。</p>
+<p>彩虹表是一个预先计算好的常用口令和它们的MD5的对照表。</p>
+<p>例如：</p>
+<table>
+<thead>
+<tr>
+<th align="left">常用口令</th>
+<th align="left">MD5</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">hello123</td>
+<td align="left">f30aa7a662c728b7407c54ae6bfd27d1</td>
+</tr>
+<tr>
+<td align="left">12345678</td>
+<td align="left">25d55ad283aa400af464c76d713c07ad</td>
+</tr>
+<tr>
+<td align="left">passw0rd</td>
+<td align="left">bed128365216c019988915ed3add75fb</td>
+</tr>
+<tr>
+<td align="left">19700101</td>
+<td align="left">570da6d5277a646f6552b8832012f5dc</td>
+</tr>
+<tr>
+<td align="left">…</td>
+<td align="left">…</td>
+</tr>
+<tr>
+<td align="left">20201231</td>
+<td align="left">6879c0ae9117b50074ce0a0d4c843060</td>
+</tr>
+</tbody></table>
+<p>所以说，尽量不要使用过于简单的密码。</p>
+</li>
+</ul>
+<h2 id="5-使用不在Java标准库中的哈希算法"><a href="#5-使用不在Java标准库中的哈希算法" class="headerlink" title="5. 使用不在Java标准库中的哈希算法"></a>5. 使用不在Java标准库中的哈希算法</h2><p><a href="https://www.bouncycastle.org/">BouncyCastle</a>就是一个提供了很多哈希算法和加密算法的第三方库。它提供了Java标准库没有的一些算法，例如，RipeMD160哈希算法。</p>
+<p>如何使用BouncyCastle这个第三方提供的算法？</p>
+<p>首先，我们必须把BouncyCastle提供的jar包放到classpath中。这个jar包就是<code>bcprov-jdk15on-xxx.jar</code>，可以从<a href="https://www.bouncycastle.org/latest_releases.html">官方网站</a>下载。</p>
+<p>Java标准库的<code>java.security</code>包提供了一种标准机制，允许第三方提供商无缝接入。我们要使用BouncyCastle提供的RipeMD160算法，需要先把BouncyCastle注册一下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 注册BouncyCastle:</span></span><br><span class="line">        Security.addProvider(<span class="keyword">new</span> BouncyCastleProvider());</span><br><span class="line">        <span class="comment">// 按名称正常调用:</span></span><br><span class="line">        MessageDigest md = MessageDigest.getInstance(<span class="string">&quot;RipeMD160&quot;</span>);</span><br><span class="line">        md.update(<span class="string">&quot;HelloWorld&quot;</span>.getBytes(<span class="string">&quot;UTF-8&quot;</span>));</span><br><span class="line">        <span class="keyword">byte</span>[] result = md.digest();</span><br><span class="line">        System.out.println(<span class="keyword">new</span> BigInteger(<span class="number">1</span>, result).toString(<span class="number">16</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中，注册BouncyCastle是通过下面的语句实现的：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Security.addProvider(<span class="keyword">new</span> BouncyCastleProvider());</span><br></pre></td></tr></table></figure>
+
+<p>注册只需要在启动时进行一次，后续就可以使用BouncyCastle提供的所有哈希算法和加密算法。</p>
+]]></content>
+      <tags>
+        <tag>JAVA</tag>
+        <tag>Hash</tag>
+        <tag>加密</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>使用Stream</title>
     <url>/2021/05/03/%E4%BD%BF%E7%94%A8Stream/</url>
     <content><![CDATA[<h1 id="Stream"><a href="#Stream" class="headerlink" title="Stream"></a>Stream</h1><h2 id="1-Stream简介"><a href="#1-Stream简介" class="headerlink" title="1. Stream简介"></a>1. Stream简介</h2><p>Stream代表的是任意Java对象的序列。<code>Stream</code>实现的是惰性计算.</p>
@@ -1807,257 +2058,6 @@
       <tags>
         <tag>JAVA</tag>
         <tag>Stream</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>哈希算法</title>
-    <url>/2021/05/06/%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95/</url>
-    <content><![CDATA[<h1 id="哈希算法"><a href="#哈希算法" class="headerlink" title="哈希算法"></a>哈希算法</h1><h2 id="1-Hash算法特点"><a href="#1-Hash算法特点" class="headerlink" title="1. Hash算法特点"></a>1. Hash算法特点</h2><p>哈希算法最重要的特点就是：</p>
-<ul>
-<li>相同的输入一定得到相同的输出；</li>
-<li>不同的输入大概率得到不同的输出。</li>
-</ul>
-<h2 id="2-Hash碰撞"><a href="#2-Hash碰撞" class="headerlink" title="2. Hash碰撞"></a>2. Hash碰撞</h2><p>哈希碰撞是指，两个不同的输入得到了相同的输出：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;AaAaAa&quot;</span>.hashCode(); <span class="comment">// 0x7460e8c0</span></span><br><span class="line"><span class="string">&quot;BBAaBB&quot;</span>.hashCode(); <span class="comment">// 0x7460e8c0</span></span><br></pre></td></tr></table></figure>
-
-<p>一个安全的哈希算法必须满足：</p>
-<ul>
-<li>碰撞概率低；</li>
-<li>不能猜测输出：不能根据hashCode的输出反推回输入。</li>
-</ul>
-<h2 id="3-常见hash算法"><a href="#3-常见hash算法" class="headerlink" title="3. 常见hash算法"></a>3. 常见hash算法</h2><p>常用的哈希算法有：</p>
-<table>
-<thead>
-<tr>
-<th align="left">算法</th>
-<th align="left">输出长度（位）</th>
-<th align="left">输出长度（字节）</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">MD5</td>
-<td align="left">128 bits</td>
-<td align="left">16 bytes</td>
-</tr>
-<tr>
-<td align="left">SHA-1</td>
-<td align="left">160 bits</td>
-<td align="left">20 bytes</td>
-</tr>
-<tr>
-<td align="left">RipeMD-160</td>
-<td align="left">160 bits</td>
-<td align="left">20 bytes</td>
-</tr>
-<tr>
-<td align="left">SHA-256</td>
-<td align="left">256 bits</td>
-<td align="left">32 bytes</td>
-</tr>
-<tr>
-<td align="left">SHA-512</td>
-<td align="left">512 bits</td>
-<td align="left">64 bytes</td>
-</tr>
-</tbody></table>
-<p>根据碰撞概率，哈希算法的输出长度越长，就越难产生碰撞，也就越安全。</p>
-<p>Java标准库提供了常用的哈希算法，并且有一套统一的接口。MessageDigest是专门用来生成散列码的类，只能通过getInstance进行实例化。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 创建一个MessageDigest实例:</span></span><br><span class="line">        MessageDigest md = MessageDigest.getInstance(<span class="string">&quot;MD5&quot;</span>);</span><br><span class="line">        <span class="comment">// 反复调用update输入数据:</span></span><br><span class="line">        md.update(<span class="string">&quot;Hello&quot;</span>.getBytes(<span class="string">&quot;UTF-8&quot;</span>));</span><br><span class="line">        md.update(<span class="string">&quot;World&quot;</span>.getBytes(<span class="string">&quot;UTF-8&quot;</span>));</span><br><span class="line">        <span class="keyword">byte</span>[] result = md.digest(); <span class="comment">// 16 bytes: 68e109f0f40ca72a15e05cc22786f8e6</span></span><br><span class="line">        System.out.println(<span class="keyword">new</span> BigInteger(<span class="number">1</span>, result).toString(<span class="number">16</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>使用<code>MessageDigest</code>时，我们首先根据哈希算法获取一个<code>MessageDigest</code>实例，然后，反复调用<code>update(byte[])</code>输入数据。当输入结束后，调用<code>digest()</code>方法获得byte[]数组表示的摘要，最后，把它转换为十六进制的字符串。</p>
-<p>运行上述代码，可以得到输入<code>HelloWorld</code>的MD5是<code>68e109f0f40ca72a15e05cc22786f8e6</code>。</p>
-<h2 id="4-hash算法用途"><a href="#4-hash算法用途" class="headerlink" title="4. hash算法用途"></a>4. hash算法用途</h2><ul>
-<li><p>下载文件</p>
-<p><img src="https://www.liaoxuefeng.com/files/attachments/1305351978745921/l" alt="file-md5"></p>
-<p>下载完文件可以计算本地文件的MD5哈希值，就可以知道文件有没有被修改。</p>
-</li>
-<li><p>存储用户口令</p>
-<p>不存储用户的原始口令，方法是存储用户口令的哈希，例如，MD5。</p>
-<p>在用户输入原始口令后，系统计算用户输入的原始口令的MD5并与数据库存储的MD5对比，如果一致，说明口令正确，否则，口令错误。</p>
-<p>数据库的存储应当如下所示：</p>
-<table>
-<thead>
-<tr>
-<th align="left">username</th>
-<th align="left">password</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">bob</td>
-<td align="left">f30aa7a662c728b7407c54ae6bfd27d1</td>
-</tr>
-<tr>
-<td align="left">alice</td>
-<td align="left">25d55ad283aa400af464c76d713c07ad</td>
-</tr>
-<tr>
-<td align="left">tim</td>
-<td align="left">bed128365216c019988915ed3add75fb</td>
-</tr>
-</tbody></table>
-<p>使用哈希口令时，还要注意防止彩虹表攻击。</p>
-<p>彩虹表是一个预先计算好的常用口令和它们的MD5的对照表。</p>
-<p>例如：</p>
-<table>
-<thead>
-<tr>
-<th align="left">常用口令</th>
-<th align="left">MD5</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">hello123</td>
-<td align="left">f30aa7a662c728b7407c54ae6bfd27d1</td>
-</tr>
-<tr>
-<td align="left">12345678</td>
-<td align="left">25d55ad283aa400af464c76d713c07ad</td>
-</tr>
-<tr>
-<td align="left">passw0rd</td>
-<td align="left">bed128365216c019988915ed3add75fb</td>
-</tr>
-<tr>
-<td align="left">19700101</td>
-<td align="left">570da6d5277a646f6552b8832012f5dc</td>
-</tr>
-<tr>
-<td align="left">…</td>
-<td align="left">…</td>
-</tr>
-<tr>
-<td align="left">20201231</td>
-<td align="left">6879c0ae9117b50074ce0a0d4c843060</td>
-</tr>
-</tbody></table>
-<p>所以说，尽量不要使用过于简单的密码。</p>
-</li>
-</ul>
-<h2 id="5-使用不在Java标准库中的哈希算法"><a href="#5-使用不在Java标准库中的哈希算法" class="headerlink" title="5. 使用不在Java标准库中的哈希算法"></a>5. 使用不在Java标准库中的哈希算法</h2><p><a href="https://www.bouncycastle.org/">BouncyCastle</a>就是一个提供了很多哈希算法和加密算法的第三方库。它提供了Java标准库没有的一些算法，例如，RipeMD160哈希算法。</p>
-<p>如何使用BouncyCastle这个第三方提供的算法？</p>
-<p>首先，我们必须把BouncyCastle提供的jar包放到classpath中。这个jar包就是<code>bcprov-jdk15on-xxx.jar</code>，可以从<a href="https://www.bouncycastle.org/latest_releases.html">官方网站</a>下载。</p>
-<p>Java标准库的<code>java.security</code>包提供了一种标准机制，允许第三方提供商无缝接入。我们要使用BouncyCastle提供的RipeMD160算法，需要先把BouncyCastle注册一下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 注册BouncyCastle:</span></span><br><span class="line">        Security.addProvider(<span class="keyword">new</span> BouncyCastleProvider());</span><br><span class="line">        <span class="comment">// 按名称正常调用:</span></span><br><span class="line">        MessageDigest md = MessageDigest.getInstance(<span class="string">&quot;RipeMD160&quot;</span>);</span><br><span class="line">        md.update(<span class="string">&quot;HelloWorld&quot;</span>.getBytes(<span class="string">&quot;UTF-8&quot;</span>));</span><br><span class="line">        <span class="keyword">byte</span>[] result = md.digest();</span><br><span class="line">        System.out.println(<span class="keyword">new</span> BigInteger(<span class="number">1</span>, result).toString(<span class="number">16</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>其中，注册BouncyCastle是通过下面的语句实现的：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Security.addProvider(<span class="keyword">new</span> BouncyCastleProvider());</span><br></pre></td></tr></table></figure>
-
-<p>注册只需要在启动时进行一次，后续就可以使用BouncyCastle提供的所有哈希算法和加密算法。</p>
-]]></content>
-      <tags>
-        <tag>JAVA</tag>
-        <tag>Hash</tag>
-        <tag>加密</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>git安装和配置</title>
-    <url>/2021/03/29/git%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE/</url>
-    <content><![CDATA[<h1 id="git安装和配置"><a href="#git安装和配置" class="headerlink" title="git安装和配置"></a>git安装和配置</h1><h2 id="1-版本控制工具"><a href="#1-版本控制工具" class="headerlink" title="1. 版本控制工具"></a>1. 版本控制工具</h2><p><strong>SVN</strong>：集中式版本控制工具</p>
-<p>集中式版本控制工具，几乎所有的动作<strong>都需要服务器参与</strong>，并且<strong>数据安全性与服务器关系很大</strong>。</p>
-<p><strong>git</strong>：分布式版本控制工具</p>
-<p><strong>Git 是分布式版本控制工具</strong>，除了与服务器之前进行按需同步之外，<strong>所有的提交操作都不需要服务器</strong>。</p>
-<p><strong>SVN</strong>不适用的领域：</p>
-<ul>
-<li>跨地域协同开发</li>
-<li>追修高质量代码以及代码门禁</li>
-</ul>
-<p><strong>git</strong>不适合的领域：</p>
-<ul>
-<li>不适合Word等二进制文档的版本控制</li>
-<li>git没有锁定/解锁模式，不能派他式修改</li>
-<li>权限不能细分（例如将不同的文件分配不同的访问权限）</li>
-</ul>
-<h2 id="2-git安装和配置"><a href="#2-git安装和配置" class="headerlink" title="2. git安装和配置"></a>2. git安装和配置</h2><h3 id="2-1-Linux下安装-git"><a href="#2-1-Linux下安装-git" class="headerlink" title="2.1 Linux下安装 git"></a>2.1 Linux下安装 git</h3><p><strong>包管理器方式安装</strong></p>
-<p>Ubuntu 10.10(maverick)或更新版本，Debian(squeeze)或更新版本:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ sudo aptitude install git</span><br><span class="line">$ sudo aptitude install git-doc git-svn git-email gitk</span><br></pre></td></tr></table></figure>
-
-<p>Linux 系统:  RHEL、Fedora、CentOS 等版本:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ yum install git</span><br><span class="line">$ yum install git-svn git-email gitk</span><br></pre></td></tr></table></figure>
-
-<p>其中<code>git</code>软件包包含了大部分Git命令，是必装的软件包。</p>
-<p>软件包<code>git-svn</code>、<code>git-email</code>、<code>gitk</code>本来也是Git软件包的一部分，但是因为有着不一样的软件包依赖（如更多<code>perl</code>模组，<code>tk</code>等），所以单独作为软件包发布。</p>
-<p><strong>源码安装</strong></p>
-<p>访问<a href="http://git-scm.com/%EF%BC%8C%E4%B8%8B%E8%BD%BDGit%E6%BA%90%E7%A0%81%E5%8C%85%EF%BC%8C%E4%BE%8B%E5%A6%82%EF%BC%9Agit-2.19.0.tar.gz%E3%80%82">http://git-scm.com/，下载Git源码包，例如：git-2.19.0.tar.gz。</a></p>
-<p>第一步：展开源码包，并进入到相应的目录中。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ tar -jxvf git-2.19.0.tar.bz2</span><br><span class="line">$ <span class="built_in">cd</span> git-2.19.0</span><br></pre></td></tr></table></figure>
-
-<p>第二步：安装。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ make prefix=/usr/<span class="built_in">local</span> all</span><br><span class="line">$ sudo make prefix=/usr/<span class="built_in">local</span> install</span><br></pre></td></tr></table></figure>
-
-<p>第三步：安装git文档（可选）</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ make prefix=/usr/<span class="built_in">local</span> doc info</span><br><span class="line">$ sudo make prefix=/usr/<span class="built_in">local</span> install-doc install-html install-info</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-2-Windows-下安装-git"><a href="#2-2-Windows-下安装-git" class="headerlink" title="2.2 Windows 下安装 git"></a>2.2 <strong>Windows</strong> <strong>下安装</strong> git</h3><p><strong>下载安装包</strong></p>
-<p><a href="https://git-scm.com/download/win">https://git-scm.com/download/win </a>下载 Windows 安装包</p>
-<p><strong>安装安装包</strong></p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329144403430.png" alt="image-20210329144403430"></p>
-<p>在这一步去掉git LFS选项。</p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329144502858.png" alt="image-20210329144502858"></p>
-<p>在这一步可以选择编辑器，默认就可以。</p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329144551825.png" alt="image-20210329144551825"></p>
-<p>这一步选择git bash作为命令行。</p>
-<p><strong>TortoiseGit</strong></p>
-<p><strong>TortoiseGit</strong>是一个git的可视化图形界面。个人认为用处不大。</p>
-<h3 id="2-3-git安装完成后的配置"><a href="#2-3-git安装完成后的配置" class="headerlink" title="2.3 git安装完成后的配置"></a>2.3 git安装完成后的配置</h3><p>git的配置分为三类，系统配置（适用所有用户），用户配置（适用于该用户），仓库配置（只对当前项目有效）。</p>
-<p><strong>系统配置</strong>（对所有用户都适用）</p>
-<p>存放在git的安装目录下：<code>%Git%/etc/gitconfig</code>；若使用 <code>git config</code> 时用<code> --system</code> 选项，读写的就是这个文件：</p>
-<p><code>git config --system core.autocrlf</code></p>
-<p><strong>用户配置</strong>（只适用于该用户）</p>
-<p>存放在用户目录下。例如linux存放在：<code>~/.gitconfig</code>；若使用 <code>git config</code> 时用<code> --global</code> 选项，读写的就是这个文件：</p>
-<p><code>git config --global user.name</code></p>
-<p><strong>仓库配置</strong>（只对当前项目有效）</p>
-<p>当前仓库的配置文件（也就是工作目录中的 <code>.git/config</code> 文件）；若使用<code>git config</code> 时用 <code>--local</code> 选项，读写的就是这个文件：</p>
-<p><code>git config --local remote.origin.url</code></p>
-<p><strong>配置第一步：配置用户信息</strong></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git config --global user.name “XXXXX”</span><br><span class="line">git config --global user.email XXXXXXXXXX@huawei.com</span><br></pre></td></tr></table></figure>
-
-<p>第一行设置自己git提交时的姓名，第二行设置提交时的邮箱。</p>
-<p><strong>配置第二步：配置文本换行符</strong></p>
-<p>原因：Windows时用回车和换行两个字符来换行，Linux只使用换行。如果涉及到多平台开发，就可能造成问题。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ git config --global core.autocrlf <span class="literal">true</span></span><br></pre></td></tr></table></figure>
-
-<p>在Windows下使用这个命令就可以让git在提交时自动帮忙转化。</p>
-<p><strong>配置第三步：文本编码配置</strong></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">\<span class="comment"># 中文编码支持</span></span><br><span class="line">git config --global gui.encoding utf-8</span><br><span class="line">git config --global i18n.commitencoding utf-8</span><br><span class="line">git config --global i18n.logoutputencoding utf-8</span><br><span class="line"></span><br><span class="line">\<span class="comment"># 显示路径中的中文：</span></span><br><span class="line">git config --global core.quotepath <span class="literal">false</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p><strong>i18n.commitEncoding</strong> <strong>选项：</strong>用来让git commit log存储时，采用的编码，默认UTF-8.</p>
-</li>
-<li><p><strong>i18n.logOutputEncoding</strong> <strong>选项：</strong>查看git log时，显示采用的编码，建议设置为UTF-8.</p>
-</li>
-</ul>
-<p><strong>配置第四步：生成ssh认证文件</strong></p>
-<blockquote>
-<p>认证：在与远程的git服务器，例如GitHub，GitLab进行通讯时，建立起来的认证，证明自己可以在当前这个机器上对远程仓库的内容进行修改。</p>
-</blockquote>
-<p>两种认证方法：</p>
-<ol>
-<li>http/https协议认证（不推荐使用，因此不写了）</li>
-<li>ssh协议认证</li>
-</ol>
-<p>ssh协议认证</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ ssh-keygen -t rsa –C zhangsan1123@huawei.com</span><br></pre></td></tr></table></figure>
-
-<p>在git bash中输入这段命令，敲击几次回车，会在计算机中生成ssh认证文件。</p>
-<p>ssh认证文件存放地址：</p>
-<p>Windows ：C:\Users\Administrator\.ssh    <em>Administrator为你当前登陆的用户名</em></p>
-<p>Linux： <del>/.ssh           *</del>为当前用户的家目录*</p>
-<p>打开文件夹，找到<code>id_rsa.pub</code>文件，打开复制内部的内容。</p>
-<p>添加公钥到代码平台：</p>
-<ol>
-<li><p>登录代码平台</p>
-</li>
-<li><p>进入“Profile Settings”</p>
-</li>
-<li><p>点击左侧栏的“SSH Keys”</p>
-</li>
-<li><p>点击“Add SSH Key”,将刚生成的公钥文件的内容，复制到“Public Key”栏，保存即可。</p>
-</li>
-</ol>
-]]></content>
-      <tags>
-        <tag>git</tag>
       </tags>
   </entry>
   <entry>
@@ -2267,8 +2267,7 @@
     <title>给hexo搭建的github-page绑定域名</title>
     <url>/2021/05/11/%E7%BB%99githubpage%E7%BB%91%E5%AE%9A%E5%9F%9F%E5%90%8D/</url>
     <content><![CDATA[<h1 id="github-page绑定域名"><a href="#github-page绑定域名" class="headerlink" title="github-page绑定域名"></a>github-page绑定域名</h1><p>心血来潮，别人家的博客都有域名，我也要！</p>
-<img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fdingyue.nosdn.127.net%2FzHz6HuOqltLyAdSJvjhSrQIcU5irErphu%3Dk3pPpXDOvK41516856240100compressflag.jpg&refer=http%3A%2F%2Fdingyue.nosdn.127.net&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1623332105&t=8140b449423b67261bfb0f4be4f7153f" alt="img" style="zoom:50%;" />
-
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210512170714387.png" alt="image-20210512170714387"></p>
 <h2 id="1-注册域名"><a href="#1-注册域名" class="headerlink" title="1. 注册域名"></a>1. 注册域名</h2><p>注册域名我选择的是阿里云的<a href="https://wanwang.aliyun.com/">万网</a>，由于是新人，选择了一元购域名专区。</p>
 <p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511214823347.png" alt="image-20210511214823347"></p>
 <p>一元购，冲冲冲！！</p>
