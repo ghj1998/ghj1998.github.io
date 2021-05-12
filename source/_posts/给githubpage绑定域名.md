@@ -10,7 +10,7 @@ tags:
 
 心血来潮，别人家的博客都有域名，我也要！
 
-<img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fdingyue.nosdn.127.net%2FzHz6HuOqltLyAdSJvjhSrQIcU5irErphu%3Dk3pPpXDOvK41516856240100compressflag.jpg&refer=http%3A%2F%2Fdingyue.nosdn.127.net&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1623332105&t=8140b449423b67261bfb0f4be4f7153f" alt="img" style="zoom:50%;" />
+![image-20210512170714387](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210512170714387.png)
 
 ## 1. 注册域名
 
