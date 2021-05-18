@@ -921,258 +921,6 @@
     <content><![CDATA[]]></content>
   </entry>
   <entry>
-    <title>Lambda学习</title>
-    <url>/2021/05/03/JAVA/Stream%E5%92%8CLambda/Lambda%E5%AD%A6%E4%B9%A0/</url>
-    <content><![CDATA[<h1 id="Lambda基础"><a href="#Lambda基础" class="headerlink" title="Lambda基础"></a>Lambda基础</h1><h2 id="1-函数式编程"><a href="#1-函数式编程" class="headerlink" title="1. 函数式编程"></a>1. 函数式编程</h2><p>函数式编程把函数作为基本运算单元，函数可以作为变量，可以接受函数，可以返回函数。<em>常把支持函数式编程的风格策划归纳为Lambda表达式</em></p>
-<h2 id="2-Lambda表达式"><a href="#2-Lambda表达式" class="headerlink" title="2. Lambda表达式"></a>2. Lambda表达式</h2><p>单方法接口：一个接口只定义了一个方法：</p>
-<ul>
-<li>Comparator</li>
-<li>Runnable</li>
-<li>Callable</li>
-</ul>
-<p>例如，调用<code>Arrays.sort()</code>时，可以传入一个<code>Comparator</code>实例，以前的写法是使用匿名类，如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String[] array = ...</span><br><span class="line">Arrays.sort(array, <span class="keyword">new</span> Comparator&lt;String&gt;() &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(String s1, String s2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> s1.compareTo(s2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>较为繁琐，JAVA 8 开始引入了Lambda表达式来替换<strong>单方法接口</strong>。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String[] array = <span class="keyword">new</span> String[] &#123; <span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Orange&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Lemon&quot;</span> &#125;;</span><br><span class="line">        Arrays.sort(array, (s1, s2) -&gt; &#123;</span><br><span class="line">            <span class="keyword">return</span> s1.compareTo(s2);</span><br><span class="line">        &#125;);</span><br><span class="line">        System.out.println(String.join(<span class="string">&quot;, &quot;</span>, array));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">(s1, s2) -&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> s1.compareTo(s2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>括号内是参数，参数类型可以忽略。<code>-&gt;&#123;&#125;</code>表示方法体。</p>
-<p>如果只有一行，可以省略大括号以及<code>return</code>。</p>
-<p>例如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Arrays.sort(array, (s1, s2) -&gt; s1.compareTo(s2));</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-FunctionalInterface"><a href="#3-FunctionalInterface" class="headerlink" title="3. FunctionalInterface"></a>3. FunctionalInterface</h2><p>只定义了单方法的接口称之为<code>FunctionalInterface</code>，用注解<code>@FunctionalInterface</code>标记。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Callable</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">V <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>接口中的<code>static</code>方法和<code>default</code>方法不被<code>FunctionalInterface</code>计算在内。</p>
-<p><code>Object</code>定义的方法也不算在接口方法内。</p>
-<p>例如<code>Comparator</code>也是<code>FunctionalInterface</code>。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Comparator</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">compare</span><span class="params">(T o1, T o2)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">default</span> Comparator&lt;T&gt; <span class="title">reversed</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Collections.reverseOrder(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">default</span> Comparator&lt;T&gt; <span class="title">thenComparing</span><span class="params">(Comparator&lt;? <span class="keyword">super</span> T&gt; other)</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="4-方法引用"><a href="#4-方法引用" class="headerlink" title="4. 方法引用"></a>4. 方法引用</h2><p>方法引用：如果某个方法签名和接口恰好一致，就可以直接传入方法引用。</p>
-<p>注意：在这里，方法签名只看<strong>参数类型和返回类型</strong>，<strong>不看方法名称，也不看类的继承关系。</strong></p>
-<p><strong>引用静态方法</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String[] array = <span class="keyword">new</span> String[] &#123; <span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Orange&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Lemon&quot;</span> &#125;;</span><br><span class="line">        Arrays.sort(array, Main::cmp);</span><br><span class="line">        System.out.println(String.join(<span class="string">&quot;, &quot;</span>, array));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">cmp</span><span class="params">(String s1, String s2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> s1.compareTo(s2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>Arrays.sort()</code>中直接传入了静态方法<code>cmp</code>的引用，用<code>Main::cmp</code>表示。</p>
-<p>因为<code>Comparator&lt;String&gt;</code>接口定义的方法是<code>int compare(String, String)</code>，和静态方法<code>int cmp(String, String)</code>相比，除了方法名外，方法参数一致，返回类型相同，因此，我们说两者的方法签名一致，可以直接把方法名作为Lambda表达式传入。</p>
-<p><strong>引用实例方法</strong></p>
-<p>实例方法有一个隐含的<code>this</code>参数，<code>String</code>类的<code>compareTo()</code>方法在实际调用的时候，第一个隐含参数总是传入<code>this</code>，相当于静态方法：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(<span class="keyword">this</span>, String o)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<p>所以引用实例方法可以这么写：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String[] array = <span class="keyword">new</span> String[] &#123; <span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Orange&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Lemon&quot;</span> &#125;;</span><br><span class="line">        Arrays.sort(array, String::compareTo);</span><br><span class="line">        System.out.println(String.join(<span class="string">&quot;, &quot;</span>, array));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>构造方法引用</strong></p>
-<p>如果要把一个<code>List&lt;String&gt;</code>转换为<code>List&lt;Person&gt;</code>。</p>
-<p>传统的做法是：定义一个<code>ArrayList&lt;Person&gt;</code>，然后用<code>for</code>循环填充这个<code>List</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; names = List.of(<span class="string">&quot;Bob&quot;</span>, <span class="string">&quot;Alice&quot;</span>, <span class="string">&quot;Tim&quot;</span>);</span><br><span class="line">List&lt;Person&gt; persons = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"><span class="keyword">for</span> (String name : names) &#123;</span><br><span class="line">    persons.add(<span class="keyword">new</span> Person(name));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>使用构造方法的话，可以改写成：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; names = List.of(<span class="string">&quot;Bob&quot;</span>, <span class="string">&quot;Alice&quot;</span>, <span class="string">&quot;Tim&quot;</span>);</span><br><span class="line">        List&lt;Person&gt; persons = names.stream().map(Person::<span class="keyword">new</span>).collect(Collectors.toList());</span><br><span class="line">        System.out.println(persons);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">    String name;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Person</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Person:&quot;</span> + <span class="keyword">this</span>.name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>map笔记见：<a href="https://ghj1998.github.io/2021/05/03/%E4%BD%BF%E7%94%A8Stream">map学习</a></p>
-</blockquote>
-<p><code>map()</code>需要传入的FunctionalInterface的定义是：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Function</span>&lt;<span class="title">T</span>, <span class="title">R</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">R <span class="title">apply</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>把泛型对应上就是方法签名<code>Person apply(String)</code>，即传入参数<code>String</code>，返回类型<code>Person</code>。而<code>Person</code>类的构造方法恰好满足这个条件，因为构造方法的参数是<code>String</code>，而构造方法虽然没有<code>return</code>语句，但它会隐式地返回<code>this</code>实例，类型就是<code>Person</code>，因此，此处可以引用构造方法。构造方法的引用写法是<code>类名::new</code>，因此，此处传入<code>Person::new</code>。</p>
-]]></content>
-      <tags>
-        <tag>JAVA</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>使用Stream</title>
-    <url>/2021/05/03/JAVA/Stream%E5%92%8CLambda/%E4%BD%BF%E7%94%A8Stream/</url>
-    <content><![CDATA[<h1 id="Stream"><a href="#Stream" class="headerlink" title="Stream"></a>Stream</h1><h2 id="1-Stream简介"><a href="#1-Stream简介" class="headerlink" title="1. Stream简介"></a>1. Stream简介</h2><p>Stream代表的是任意Java对象的序列。<code>Stream</code>实现的是惰性计算.</p>
-<table>
-<thead>
-<tr>
-<th align="left"></th>
-<th align="left">java.io</th>
-<th>java.util.stream</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">存储</td>
-<td align="left">顺序读写的<code>byte</code>或<code>char</code></td>
-<td>顺序输出的任意Java对象实例</td>
-</tr>
-<tr>
-<td align="left">用途</td>
-<td align="left">序列化至文件或网络</td>
-<td>内存计算／业务逻辑</td>
-</tr>
-</tbody></table>
-<table>
-<thead>
-<tr>
-<th align="left"></th>
-<th align="left">java.util.List</th>
-<th>java.util.stream</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">元素</td>
-<td align="left">已分配并存储在内存</td>
-<td>可能未分配，实时计算</td>
-</tr>
-<tr>
-<td align="left">用途</td>
-<td align="left">操作一组已存在的Java对象</td>
-<td>惰性计算</td>
-</tr>
-</tbody></table>
-<p>l例如：我们无法用List表示全部自然数，但是用Stream可以。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;BigInteger&gt; naturals = createNaturalStream(); <span class="comment">// 全体自然数</span></span><br></pre></td></tr></table></figure>
-
-<p>我们可以对每个自然数做一个平方，这样我们就把这个<code>Stream</code>转换成了另一个<code>Stream</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;BigInteger&gt; naturals = createNaturalStream(); <span class="comment">// 全体自然数</span></span><br><span class="line">Stream&lt;BigInteger&gt; streamNxN = naturals.map(n -&gt; n.multiply(n)); <span class="comment">// 全体自然数的平方</span></span><br></pre></td></tr></table></figure>
-
-<p>可以用<code>limit()</code> 截取数据，同时可以使用<code>forEach()</code>来处理每个元素。</p>
-<p><code>Stream</code>的另一个特点是，一个<code>Stream</code>可以轻易地转换为另一个<code>Stream</code>，而不是修改原<code>Stream</code>本身。真正的计算通常发生在最后结果的获取，也就是惰性计算。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;BigInteger&gt; naturals = createNaturalStream(); <span class="comment">// 不计算</span></span><br><span class="line">Stream&lt;BigInteger&gt; s2 = naturals.map(BigInteger::multiply); <span class="comment">// 不计算</span></span><br><span class="line">Stream&lt;BigInteger&gt; s3 = s2.limit(<span class="number">100</span>); <span class="comment">// 不计算</span></span><br><span class="line">s3.forEach(System.out::println); <span class="comment">// 计算</span></span><br></pre></td></tr></table></figure>
-
-<p>Stream API的基本用法就是：创建一个<code>Stream</code>，然后做若干次转换，最后调用一个求值方法获取真正计算的结果：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> result = createNaturalStream() <span class="comment">// 创建Stream</span></span><br><span class="line">             .filter(n -&gt; n % <span class="number">2</span> == <span class="number">0</span>) <span class="comment">// 任意个转换</span></span><br><span class="line">             .map(n -&gt; n * n) <span class="comment">// 任意个转换</span></span><br><span class="line">             .limit(<span class="number">100</span>) <span class="comment">// 任意个转换</span></span><br><span class="line">             .sum(); <span class="comment">// 最终计算结果</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="2-创建Stream"><a href="#2-创建Stream" class="headerlink" title="2. 创建Stream"></a>2. 创建Stream</h2><p><strong>Stream.of()</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;String&gt; stream = Stream.of(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;C&quot;</span>, <span class="string">&quot;D&quot;</span>);</span><br><span class="line">        <span class="comment">// forEach()方法相当于内部循环调用，</span></span><br><span class="line">        <span class="comment">// 可传入符合Consumer接口的void accept(T t)的方法引用：</span></span><br><span class="line">        stream.forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>基于数组或者Collection</strong></p>
-<p>创建<code>Stream</code>的方法是基于一个数组或者<code>Collection</code>，这样该<code>Stream</code>输出的元素就是数组或者<code>Collection</code>持有的元素：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;String&gt; stream1 = Arrays.stream(<span class="keyword">new</span> String[] &#123; <span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;C&quot;</span> &#125;);</span><br><span class="line">        Stream&lt;String&gt; stream2 = List.of(<span class="string">&quot;X&quot;</span>, <span class="string">&quot;Y&quot;</span>, <span class="string">&quot;Z&quot;</span>).stream();</span><br><span class="line">        stream1.forEach(System.out::println);</span><br><span class="line">        stream2.forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>把数组变成<code>Stream</code>使用<code>Arrays.stream()</code>方法。</p>
-<p>对于<code>Collection</code>（<code>List</code>、<code>Set</code>、<code>Queue</code>等），直接调用<code>stream()</code>方法就可以获得<code>Stream</code>。</p>
-<p><strong>基于Supplier</strong></p>
-<p>创建<code>Stream</code>还可以通过<code>Stream.generate()</code>方法，它需要传入一个<code>Supplier</code>对象：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; s = Stream.generate(Supplier&lt;String&gt; sp);</span><br></pre></td></tr></table></figure>
-
-<p>基于<code>Supplier</code>创建的<code>Stream</code>会不断调用<code>Supplier.get()</code>方法来不断产生下一个元素，这种<code>Stream</code>保存的不是元素，而是算法，它可以用来表示无限序列。</p>
-<p>例如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;Integer&gt; natual = Stream.generate(<span class="keyword">new</span> NatualSupplier());</span><br><span class="line">        <span class="comment">// 注意：无限序列必须先变成有限序列再打印:</span></span><br><span class="line">        natual.limit(<span class="number">20</span>).forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NatualSupplier</span> <span class="keyword">implements</span> <span class="title">Supplier</span>&lt;<span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n = <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        n++;</span><br><span class="line">        <span class="keyword">return</span> n;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>其他方法</strong></p>
-<p>创建<code>Stream</code>的第三种方法是通过一些API提供的接口，直接获得<code>Stream</code>。</p>
-<p>例如，<code>Files</code>类的<code>lines()</code>方法可以把一个文件变成一个<code>Stream</code>，每个元素代表文件的一行内容：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> (Stream&lt;String&gt; lines = Files.lines(Paths.get(<span class="string">&quot;/path/to/file.txt&quot;</span>))) &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>正则表达式的<code>Pattern</code>对象有一个<code>splitAsStream()</code>方法，可以直接把一个长字符串分割成<code>Stream</code>序列而不是数组：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Pattern p = Pattern.compile(<span class="string">&quot;\\s+&quot;</span>);</span><br><span class="line">Stream&lt;String&gt; s = p.splitAsStream(<span class="string">&quot;The quick brown fox jumps over the lazy dog&quot;</span>);</span><br><span class="line">s.forEach(System.out::println);</span><br></pre></td></tr></table></figure>
-
-<p><strong>基本类型</strong></p>
-<p>泛型不支持基本类型。</p>
-<p>Java标准库提供了<code>IntStream</code>、<code>LongStream</code>和<code>DoubleStream</code>这三种使用基本类型的<code>Stream</code>。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 将int[]数组变为IntStream:</span></span><br><span class="line">IntStream is = Arrays.stream(<span class="keyword">new</span> <span class="keyword">int</span>[] &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span> &#125;);</span><br><span class="line"><span class="comment">// 将Stream&lt;String&gt;转换为LongStream:</span></span><br><span class="line">LongStream ls = List.of(<span class="string">&quot;1&quot;</span>, <span class="string">&quot;2&quot;</span>, <span class="string">&quot;3&quot;</span>).stream().mapToLong(Long::parseLong);</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-map"><a href="#3-map" class="headerlink" title="3. map"></a>3. map</h2><p><code>Stream.map()</code>是<code>Stream</code>最常用的一个转换方法，它把一个<code>Stream</code>转换为另一个<code>Stream</code>。</p>
-<p>所谓<code>map</code>操作，就是把一种操作运算，映射到一个序列的每一个元素上。</p>
-<p>可见，<code>map</code>操作，把一个<code>Stream</code>的每个元素一一对应到应用了目标函数的结果上。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;Integer&gt; s = Stream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>);</span><br><span class="line">Stream&lt;Integer&gt; s2 = s.map(n -&gt; n * n);</span><br></pre></td></tr></table></figure>
-
-<p>map的例子：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List.of(<span class="string">&quot;  Apple &quot;</span>, <span class="string">&quot; pear &quot;</span>, <span class="string">&quot; ORANGE&quot;</span>, <span class="string">&quot; BaNaNa &quot;</span>)</span><br><span class="line">                .stream()</span><br><span class="line">                .map(String::trim) <span class="comment">// 去空格</span></span><br><span class="line">                .map(String::toLowerCase) <span class="comment">// 变小写</span></span><br><span class="line">                .forEach(System.out::println); <span class="comment">// 打印</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="4-filter"><a href="#4-filter" class="headerlink" title="4. filter"></a>4. filter</h2><p><code>Stream.filter()</code>是<code>Stream</code>的另一个常用转换方法。</p>
-<p>所谓<code>filter()</code>操作，就是对一个<code>Stream</code>的所有元素一一进行测试，不满足条件的就被“滤掉”了，剩下的满足条件的元素就构成了一个新的<code>Stream</code>。</p>
-<p>例如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        IntStream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>)</span><br><span class="line">                .filter(n -&gt; n % <span class="number">2</span> != <span class="number">0</span>)</span><br><span class="line">                .forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>filter()</code>方法接收的对象是<code>Predicate</code>接口对象，它定义了一个<code>test()</code>方法，负责判断元素是否符合条件：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Predicate</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// 判断元素t是否符合条件:</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">test</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>过滤周六周日。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream.generate(<span class="keyword">new</span> LocalDateSupplier())</span><br><span class="line">                .limit(<span class="number">31</span>)</span><br><span class="line">                .filter(ldt -&gt; ldt.getDayOfWeek() == DayOfWeek.SATURDAY || ldt.getDayOfWeek() == DayOfWeek.SUNDAY)</span><br><span class="line">                .forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LocalDateSupplier</span> <span class="keyword">implements</span> <span class="title">Supplier</span>&lt;<span class="title">LocalDate</span>&gt; </span>&#123;</span><br><span class="line">    LocalDate start = LocalDate.of(<span class="number">2020</span>, <span class="number">1</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">int</span> n = -<span class="number">1</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> LocalDate <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        n++;</span><br><span class="line">        <span class="keyword">return</span> start.plusDays(n);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="5-reduce"><a href="#5-reduce" class="headerlink" title="5. reduce"></a>5. reduce</h2><p><code>Stream.reduce()</code>则是<code>Stream</code>的一个聚合方法，它可以把一个<code>Stream</code>的所有元素按照聚合函数聚合成一个结果。</p>
-<p><code>reduce</code>的第一参数是初始值，<code>(acc, n) -&gt; acc + n</code>acc是上次计算的结果。</p>
-<p>递归求和（<code>reduce</code>参数是0）：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> sum = Stream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>).reduce(<span class="number">0</span>, (acc, n) -&gt; acc + n);</span><br><span class="line">        System.out.println(sum); <span class="comment">// 45</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>递归求积（<code>reduce</code>第一个参数是1）</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> s = Stream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>).reduce(<span class="number">1</span>, (acc, n) -&gt; acc * n);</span><br><span class="line">        System.out.println(s); <span class="comment">// 362880</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>复杂点的：（将配置文件聚合成Map）</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 按行读取配置文件:</span></span><br><span class="line">        List&lt;String&gt; props = List.of(<span class="string">&quot;profile=native&quot;</span>, <span class="string">&quot;debug=true&quot;</span>, <span class="string">&quot;logging=warn&quot;</span>, <span class="string">&quot;interval=500&quot;</span>);</span><br><span class="line">        Map&lt;String, String&gt; map = props.stream()</span><br><span class="line">                <span class="comment">// 把k=v转换为Map[k]=v:</span></span><br><span class="line">                .map(kv -&gt; &#123;</span><br><span class="line">                    String[] ss = kv.split(<span class="string">&quot;\\=&quot;</span>, <span class="number">2</span>);</span><br><span class="line">                    <span class="keyword">return</span> Map.of(ss[<span class="number">0</span>], ss[<span class="number">1</span>]);</span><br><span class="line">                &#125;)</span><br><span class="line">                <span class="comment">// 把所有Map聚合到一个Map:</span></span><br><span class="line">                .reduce(<span class="keyword">new</span> HashMap&lt;String, String&gt;(), (m, kv) -&gt; &#123;</span><br><span class="line">                    m.putAll(kv);</span><br><span class="line">                    <span class="keyword">return</span> m;</span><br><span class="line">                &#125;);</span><br><span class="line">        <span class="comment">// 打印结果:</span></span><br><span class="line">        map.forEach((k, v) -&gt; &#123;</span><br><span class="line">            System.out.println(k + <span class="string">&quot; = &quot;</span> + v);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="6-输出"><a href="#6-输出" class="headerlink" title="6. 输出"></a>6. 输出</h2><p><strong>输出到List</strong></p>
-<p>如何将一组<code>String</code>先过滤掉空字符串，然后把非空字符串保存到<code>List</code>中：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;String&gt; stream = Stream.of(<span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="keyword">null</span>, <span class="string">&quot;Pear&quot;</span>, <span class="string">&quot;  &quot;</span>, <span class="string">&quot;Orange&quot;</span>);</span><br><span class="line">        List&lt;String&gt; list = stream.filter(s -&gt; s != <span class="keyword">null</span> &amp;&amp; !s.isBlank()).collect(Collectors.toList());</span><br><span class="line">        System.out.println(list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>把<code>Stream</code>的每个元素收集到<code>List</code>的方法是调用<code>collect()</code>并传入<code>Collectors.toList()</code>对象，它实际上是一个<code>Collector</code>实例，通过类似<code>reduce()</code>的操作，把每个元素添加到一个收集器中（实际上是<code>ArrayList</code>）。</p>
-<p>类似的，<code>collect(Collectors.toSet())</code>可以把<code>Stream</code>的每个元素收集到<code>Set</code>中。</p>
-<p><strong>输出到数组</strong></p>
-<p>把Stream的元素输出为数组和输出为List类似，我们只需要调用<code>toArray()</code>方法，并传入数组的“构造方法”：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; list = List.of(<span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Orange&quot;</span>);</span><br><span class="line">String[] array = list.stream().toArray(String[]::<span class="keyword">new</span>);</span><br></pre></td></tr></table></figure>
-
-<p><code>String[]::new</code> 等价于new String[list.size()]</p>
-<p><strong>输出到Map</strong></p>
-<p>指定两个映射函数，分别把元素映射为key和value：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;String&gt; stream = Stream.of(<span class="string">&quot;APPL:Apple&quot;</span>, <span class="string">&quot;MSFT:Microsoft&quot;</span>);</span><br><span class="line">        Map&lt;String, String&gt; map = stream</span><br><span class="line">                .collect(Collectors.toMap(</span><br><span class="line">                        <span class="comment">// 把元素s映射为key:</span></span><br><span class="line">                        s -&gt; s.substring(<span class="number">0</span>, s.indexOf(<span class="string">&#x27;:&#x27;</span>)),</span><br><span class="line">                        <span class="comment">// 把元素s映射为value:</span></span><br><span class="line">                        s -&gt; s.substring(s.indexOf(<span class="string">&#x27;:&#x27;</span>) + <span class="number">1</span>)));</span><br><span class="line">        System.out.println(map);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>分组输出</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; list = List.of(<span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Blackberry&quot;</span>, <span class="string">&quot;Coconut&quot;</span>, <span class="string">&quot;Avocado&quot;</span>, <span class="string">&quot;Cherry&quot;</span>, <span class="string">&quot;Apricots&quot;</span>);</span><br><span class="line">        Map&lt;String, List&lt;String&gt;&gt; groups = list.stream()</span><br><span class="line">                .collect(Collectors.groupingBy(s -&gt; s.substring(<span class="number">0</span>, <span class="number">1</span>), Collectors.toList()));</span><br><span class="line">        System.out.println(groups);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">&#123;</span></span><br><span class="line"><span class="comment">    A=[Apple, Avocado, Apricots],</span></span><br><span class="line"><span class="comment">    B=[Banana, Blackberry],</span></span><br><span class="line"><span class="comment">    C=[Coconut, Cherry]</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-<p>使用<code>Collectors.groupingBy()</code>，它需要提供两个函数：一个是分组的key，这里使用<code>s -&gt; s.substring(0, 1)</code>，表示只要首字母相同的<code>String</code>分到一组，第二个是分组的value，这里直接使用<code>Collectors.toList()</code>，表示输出为<code>List</code>。</p>
-<h2 id="7-其他操作（排序，去重，截取，合并，flatMap，并行，聚合）"><a href="#7-其他操作（排序，去重，截取，合并，flatMap，并行，聚合）" class="headerlink" title="7. 其他操作（排序，去重，截取，合并，flatMap，并行，聚合）"></a>7. 其他操作（排序，去重，截取，合并，flatMap，并行，聚合）</h2><p><strong>排序</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; list = List.of(<span class="string">&quot;Orange&quot;</span>, <span class="string">&quot;apple&quot;</span>, <span class="string">&quot;Banana&quot;</span>)</span><br><span class="line">            .stream()</span><br><span class="line">            .sorted()</span><br><span class="line">            .collect(Collectors.toList());</span><br><span class="line">        System.out.println(list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>要求每个元素必须实现<code>Comparable</code>接口。</p>
-<p><strong>去重</strong></p>
-<p>对一个<code>Stream</code>的元素进行去重，没必要先转换为<code>Set</code>，可以直接用<code>distinct()</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List.of(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;A&quot;</span>, <span class="string">&quot;C&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;D&quot;</span>)</span><br><span class="line">    .stream()</span><br><span class="line">    .distinct()</span><br><span class="line">    .collect(Collectors.toList()); <span class="comment">// [A, B, C, D]</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>截取</strong></p>
-<p>截取操作常用于把一个无限的<code>Stream</code>转换成有限的<code>Stream</code>，<code>skip()</code>用于跳过当前<code>Stream</code>的前N个元素，<code>limit()</code>用于截取当前<code>Stream</code>最多前N个元素：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List.of(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;C&quot;</span>, <span class="string">&quot;D&quot;</span>, <span class="string">&quot;E&quot;</span>, <span class="string">&quot;F&quot;</span>)</span><br><span class="line">    .stream()</span><br><span class="line">    .skip(<span class="number">2</span>) <span class="comment">// 跳过A, B</span></span><br><span class="line">    .limit(<span class="number">3</span>) <span class="comment">// 截取C, D, E</span></span><br><span class="line">    .collect(Collectors.toList()); <span class="comment">// [C, D, E]</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>合并</strong></p>
-<p>将两个<code>Stream</code>合并为一个<code>Stream</code>可以使用<code>Stream</code>的静态方法<code>concat()</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; s1 = List.of(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;C&quot;</span>).stream();</span><br><span class="line">Stream&lt;String&gt; s2 = List.of(<span class="string">&quot;D&quot;</span>, <span class="string">&quot;E&quot;</span>).stream();</span><br><span class="line"><span class="comment">// 合并:</span></span><br><span class="line">Stream&lt;String&gt; s = Stream.concat(s1, s2);</span><br><span class="line">System.out.println(s.collect(Collectors.toList())); <span class="comment">// [A, B, C, D, E]</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>flatMap</strong></p>
-<p>如果<code>Stream</code>的元素是集合：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;List&lt;Integer&gt;&gt; s = Stream.of(</span><br><span class="line">        Arrays.asList(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>),</span><br><span class="line">        Arrays.asList(<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>),</span><br><span class="line">        Arrays.asList(<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>));</span><br></pre></td></tr></table></figure>
-
-<p>希望把上述<code>Stream</code>转换为<code>Stream&lt;Integer&gt;</code>，就可以使用<code>flatMap()</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;Integer&gt; i = s.flatMap(list -&gt; list.stream());</span><br></pre></td></tr></table></figure>
-
-<p><code>flatMap()</code>，是指把<code>Stream</code>的每个元素（这里是<code>List</code>）映射为<code>Stream</code>，然后合并成一个新的<code>Stream</code>：</p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210503220426922.png" alt="image-20210503220426922"></p>
-<p><strong>并行</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; s = ...</span><br><span class="line">String[] result = s.parallel() <span class="comment">// 变成一个可以并行处理的Stream</span></span><br><span class="line">                   .sorted() <span class="comment">// 可以进行并行排序</span></span><br><span class="line">                   .toArray(String[]::<span class="keyword">new</span>);</span><br></pre></td></tr></table></figure>
-
-<p>除了<code>reduce()</code>和<code>collect()</code>外，<code>Stream</code>还有一些常用的聚合方法：</p>
-<ul>
-<li><code>count()</code>：用于返回元素个数；</li>
-<li><code>max(Comparator&lt;? super T&gt; cp)</code>：找出最大元素；</li>
-<li><code>min(Comparator&lt;? super T&gt; cp)</code>：找出最小元素。</li>
-</ul>
-<p>针对<code>IntStream</code>、<code>LongStream</code>和<code>DoubleStream</code>，还额外提供了以下聚合方法：</p>
-<ul>
-<li><code>sum()</code>：对所有元素求和；</li>
-<li><code>average()</code>：对所有元素求平均数。</li>
-</ul>
-<p>还有一些方法，用来测试<code>Stream</code>的元素是否满足以下条件：</p>
-<ul>
-<li><code>boolean allMatch(Predicate&lt;? super T&gt;)</code>：测试是否所有元素均满足测试条件；</li>
-<li><code>boolean anyMatch(Predicate&lt;? super T&gt;)</code>：测试是否至少有一个元素满足测试条件。</li>
-</ul>
-<p>最后一个常用的方法是<code>forEach()</code>，它可以循环处理<code>Stream</code>的每个元素，我们经常传入<code>System.out::println</code>来打印<code>Stream</code>的元素：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; s = ...</span><br><span class="line">s.forEach(str -&gt; &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;Hello, &quot;</span> + str);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>JAVA</tag>
-        <tag>Stream</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Hmac算法</title>
     <url>/2021/05/06/JAVA/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%86/Hmac%E7%AE%97%E6%B3%95/</url>
     <content><![CDATA[<h1 id="Hmac算法"><a href="#Hmac算法" class="headerlink" title="Hmac算法"></a>Hmac算法</h1><p>存储用户的哈希口令时，要加盐存储，目的就在于抵御彩虹表攻击。</p>
@@ -1489,6 +1237,258 @@
       <tags>
         <tag>JAVA</tag>
         <tag>编码</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Lambda学习</title>
+    <url>/2021/05/03/JAVA/Stream%E5%92%8CLambda/Lambda%E5%AD%A6%E4%B9%A0/</url>
+    <content><![CDATA[<h1 id="Lambda基础"><a href="#Lambda基础" class="headerlink" title="Lambda基础"></a>Lambda基础</h1><h2 id="1-函数式编程"><a href="#1-函数式编程" class="headerlink" title="1. 函数式编程"></a>1. 函数式编程</h2><p>函数式编程把函数作为基本运算单元，函数可以作为变量，可以接受函数，可以返回函数。<em>常把支持函数式编程的风格策划归纳为Lambda表达式</em></p>
+<h2 id="2-Lambda表达式"><a href="#2-Lambda表达式" class="headerlink" title="2. Lambda表达式"></a>2. Lambda表达式</h2><p>单方法接口：一个接口只定义了一个方法：</p>
+<ul>
+<li>Comparator</li>
+<li>Runnable</li>
+<li>Callable</li>
+</ul>
+<p>例如，调用<code>Arrays.sort()</code>时，可以传入一个<code>Comparator</code>实例，以前的写法是使用匿名类，如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String[] array = ...</span><br><span class="line">Arrays.sort(array, <span class="keyword">new</span> Comparator&lt;String&gt;() &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(String s1, String s2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> s1.compareTo(s2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>较为繁琐，JAVA 8 开始引入了Lambda表达式来替换<strong>单方法接口</strong>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String[] array = <span class="keyword">new</span> String[] &#123; <span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Orange&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Lemon&quot;</span> &#125;;</span><br><span class="line">        Arrays.sort(array, (s1, s2) -&gt; &#123;</span><br><span class="line">            <span class="keyword">return</span> s1.compareTo(s2);</span><br><span class="line">        &#125;);</span><br><span class="line">        System.out.println(String.join(<span class="string">&quot;, &quot;</span>, array));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">(s1, s2) -&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> s1.compareTo(s2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>括号内是参数，参数类型可以忽略。<code>-&gt;&#123;&#125;</code>表示方法体。</p>
+<p>如果只有一行，可以省略大括号以及<code>return</code>。</p>
+<p>例如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Arrays.sort(array, (s1, s2) -&gt; s1.compareTo(s2));</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-FunctionalInterface"><a href="#3-FunctionalInterface" class="headerlink" title="3. FunctionalInterface"></a>3. FunctionalInterface</h2><p>只定义了单方法的接口称之为<code>FunctionalInterface</code>，用注解<code>@FunctionalInterface</code>标记。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Callable</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">V <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接口中的<code>static</code>方法和<code>default</code>方法不被<code>FunctionalInterface</code>计算在内。</p>
+<p><code>Object</code>定义的方法也不算在接口方法内。</p>
+<p>例如<code>Comparator</code>也是<code>FunctionalInterface</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Comparator</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">compare</span><span class="params">(T o1, T o2)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">default</span> Comparator&lt;T&gt; <span class="title">reversed</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Collections.reverseOrder(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">default</span> Comparator&lt;T&gt; <span class="title">thenComparing</span><span class="params">(Comparator&lt;? <span class="keyword">super</span> T&gt; other)</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-方法引用"><a href="#4-方法引用" class="headerlink" title="4. 方法引用"></a>4. 方法引用</h2><p>方法引用：如果某个方法签名和接口恰好一致，就可以直接传入方法引用。</p>
+<p>注意：在这里，方法签名只看<strong>参数类型和返回类型</strong>，<strong>不看方法名称，也不看类的继承关系。</strong></p>
+<p><strong>引用静态方法</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String[] array = <span class="keyword">new</span> String[] &#123; <span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Orange&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Lemon&quot;</span> &#125;;</span><br><span class="line">        Arrays.sort(array, Main::cmp);</span><br><span class="line">        System.out.println(String.join(<span class="string">&quot;, &quot;</span>, array));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">cmp</span><span class="params">(String s1, String s2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> s1.compareTo(s2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Arrays.sort()</code>中直接传入了静态方法<code>cmp</code>的引用，用<code>Main::cmp</code>表示。</p>
+<p>因为<code>Comparator&lt;String&gt;</code>接口定义的方法是<code>int compare(String, String)</code>，和静态方法<code>int cmp(String, String)</code>相比，除了方法名外，方法参数一致，返回类型相同，因此，我们说两者的方法签名一致，可以直接把方法名作为Lambda表达式传入。</p>
+<p><strong>引用实例方法</strong></p>
+<p>实例方法有一个隐含的<code>this</code>参数，<code>String</code>类的<code>compareTo()</code>方法在实际调用的时候，第一个隐含参数总是传入<code>this</code>，相当于静态方法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(<span class="keyword">this</span>, String o)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>所以引用实例方法可以这么写：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String[] array = <span class="keyword">new</span> String[] &#123; <span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Orange&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Lemon&quot;</span> &#125;;</span><br><span class="line">        Arrays.sort(array, String::compareTo);</span><br><span class="line">        System.out.println(String.join(<span class="string">&quot;, &quot;</span>, array));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>构造方法引用</strong></p>
+<p>如果要把一个<code>List&lt;String&gt;</code>转换为<code>List&lt;Person&gt;</code>。</p>
+<p>传统的做法是：定义一个<code>ArrayList&lt;Person&gt;</code>，然后用<code>for</code>循环填充这个<code>List</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; names = List.of(<span class="string">&quot;Bob&quot;</span>, <span class="string">&quot;Alice&quot;</span>, <span class="string">&quot;Tim&quot;</span>);</span><br><span class="line">List&lt;Person&gt; persons = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"><span class="keyword">for</span> (String name : names) &#123;</span><br><span class="line">    persons.add(<span class="keyword">new</span> Person(name));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用构造方法的话，可以改写成：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; names = List.of(<span class="string">&quot;Bob&quot;</span>, <span class="string">&quot;Alice&quot;</span>, <span class="string">&quot;Tim&quot;</span>);</span><br><span class="line">        List&lt;Person&gt; persons = names.stream().map(Person::<span class="keyword">new</span>).collect(Collectors.toList());</span><br><span class="line">        System.out.println(persons);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">    String name;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Person</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Person:&quot;</span> + <span class="keyword">this</span>.name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>map笔记见：<a href="https://ghj1998.github.io/2021/05/03/%E4%BD%BF%E7%94%A8Stream">map学习</a></p>
+</blockquote>
+<p><code>map()</code>需要传入的FunctionalInterface的定义是：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Function</span>&lt;<span class="title">T</span>, <span class="title">R</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">R <span class="title">apply</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>把泛型对应上就是方法签名<code>Person apply(String)</code>，即传入参数<code>String</code>，返回类型<code>Person</code>。而<code>Person</code>类的构造方法恰好满足这个条件，因为构造方法的参数是<code>String</code>，而构造方法虽然没有<code>return</code>语句，但它会隐式地返回<code>this</code>实例，类型就是<code>Person</code>，因此，此处可以引用构造方法。构造方法的引用写法是<code>类名::new</code>，因此，此处传入<code>Person::new</code>。</p>
+]]></content>
+      <tags>
+        <tag>JAVA</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用Stream</title>
+    <url>/2021/05/03/JAVA/Stream%E5%92%8CLambda/%E4%BD%BF%E7%94%A8Stream/</url>
+    <content><![CDATA[<h1 id="Stream"><a href="#Stream" class="headerlink" title="Stream"></a>Stream</h1><h2 id="1-Stream简介"><a href="#1-Stream简介" class="headerlink" title="1. Stream简介"></a>1. Stream简介</h2><p>Stream代表的是任意Java对象的序列。<code>Stream</code>实现的是惰性计算.</p>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">java.io</th>
+<th>java.util.stream</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">存储</td>
+<td align="left">顺序读写的<code>byte</code>或<code>char</code></td>
+<td>顺序输出的任意Java对象实例</td>
+</tr>
+<tr>
+<td align="left">用途</td>
+<td align="left">序列化至文件或网络</td>
+<td>内存计算／业务逻辑</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">java.util.List</th>
+<th>java.util.stream</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">元素</td>
+<td align="left">已分配并存储在内存</td>
+<td>可能未分配，实时计算</td>
+</tr>
+<tr>
+<td align="left">用途</td>
+<td align="left">操作一组已存在的Java对象</td>
+<td>惰性计算</td>
+</tr>
+</tbody></table>
+<p>l例如：我们无法用List表示全部自然数，但是用Stream可以。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;BigInteger&gt; naturals = createNaturalStream(); <span class="comment">// 全体自然数</span></span><br></pre></td></tr></table></figure>
+
+<p>我们可以对每个自然数做一个平方，这样我们就把这个<code>Stream</code>转换成了另一个<code>Stream</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;BigInteger&gt; naturals = createNaturalStream(); <span class="comment">// 全体自然数</span></span><br><span class="line">Stream&lt;BigInteger&gt; streamNxN = naturals.map(n -&gt; n.multiply(n)); <span class="comment">// 全体自然数的平方</span></span><br></pre></td></tr></table></figure>
+
+<p>可以用<code>limit()</code> 截取数据，同时可以使用<code>forEach()</code>来处理每个元素。</p>
+<p><code>Stream</code>的另一个特点是，一个<code>Stream</code>可以轻易地转换为另一个<code>Stream</code>，而不是修改原<code>Stream</code>本身。真正的计算通常发生在最后结果的获取，也就是惰性计算。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;BigInteger&gt; naturals = createNaturalStream(); <span class="comment">// 不计算</span></span><br><span class="line">Stream&lt;BigInteger&gt; s2 = naturals.map(BigInteger::multiply); <span class="comment">// 不计算</span></span><br><span class="line">Stream&lt;BigInteger&gt; s3 = s2.limit(<span class="number">100</span>); <span class="comment">// 不计算</span></span><br><span class="line">s3.forEach(System.out::println); <span class="comment">// 计算</span></span><br></pre></td></tr></table></figure>
+
+<p>Stream API的基本用法就是：创建一个<code>Stream</code>，然后做若干次转换，最后调用一个求值方法获取真正计算的结果：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> result = createNaturalStream() <span class="comment">// 创建Stream</span></span><br><span class="line">             .filter(n -&gt; n % <span class="number">2</span> == <span class="number">0</span>) <span class="comment">// 任意个转换</span></span><br><span class="line">             .map(n -&gt; n * n) <span class="comment">// 任意个转换</span></span><br><span class="line">             .limit(<span class="number">100</span>) <span class="comment">// 任意个转换</span></span><br><span class="line">             .sum(); <span class="comment">// 最终计算结果</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-创建Stream"><a href="#2-创建Stream" class="headerlink" title="2. 创建Stream"></a>2. 创建Stream</h2><p><strong>Stream.of()</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;String&gt; stream = Stream.of(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;C&quot;</span>, <span class="string">&quot;D&quot;</span>);</span><br><span class="line">        <span class="comment">// forEach()方法相当于内部循环调用，</span></span><br><span class="line">        <span class="comment">// 可传入符合Consumer接口的void accept(T t)的方法引用：</span></span><br><span class="line">        stream.forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>基于数组或者Collection</strong></p>
+<p>创建<code>Stream</code>的方法是基于一个数组或者<code>Collection</code>，这样该<code>Stream</code>输出的元素就是数组或者<code>Collection</code>持有的元素：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;String&gt; stream1 = Arrays.stream(<span class="keyword">new</span> String[] &#123; <span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;C&quot;</span> &#125;);</span><br><span class="line">        Stream&lt;String&gt; stream2 = List.of(<span class="string">&quot;X&quot;</span>, <span class="string">&quot;Y&quot;</span>, <span class="string">&quot;Z&quot;</span>).stream();</span><br><span class="line">        stream1.forEach(System.out::println);</span><br><span class="line">        stream2.forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>把数组变成<code>Stream</code>使用<code>Arrays.stream()</code>方法。</p>
+<p>对于<code>Collection</code>（<code>List</code>、<code>Set</code>、<code>Queue</code>等），直接调用<code>stream()</code>方法就可以获得<code>Stream</code>。</p>
+<p><strong>基于Supplier</strong></p>
+<p>创建<code>Stream</code>还可以通过<code>Stream.generate()</code>方法，它需要传入一个<code>Supplier</code>对象：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; s = Stream.generate(Supplier&lt;String&gt; sp);</span><br></pre></td></tr></table></figure>
+
+<p>基于<code>Supplier</code>创建的<code>Stream</code>会不断调用<code>Supplier.get()</code>方法来不断产生下一个元素，这种<code>Stream</code>保存的不是元素，而是算法，它可以用来表示无限序列。</p>
+<p>例如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;Integer&gt; natual = Stream.generate(<span class="keyword">new</span> NatualSupplier());</span><br><span class="line">        <span class="comment">// 注意：无限序列必须先变成有限序列再打印:</span></span><br><span class="line">        natual.limit(<span class="number">20</span>).forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NatualSupplier</span> <span class="keyword">implements</span> <span class="title">Supplier</span>&lt;<span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n = <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        n++;</span><br><span class="line">        <span class="keyword">return</span> n;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>其他方法</strong></p>
+<p>创建<code>Stream</code>的第三种方法是通过一些API提供的接口，直接获得<code>Stream</code>。</p>
+<p>例如，<code>Files</code>类的<code>lines()</code>方法可以把一个文件变成一个<code>Stream</code>，每个元素代表文件的一行内容：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> (Stream&lt;String&gt; lines = Files.lines(Paths.get(<span class="string">&quot;/path/to/file.txt&quot;</span>))) &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>正则表达式的<code>Pattern</code>对象有一个<code>splitAsStream()</code>方法，可以直接把一个长字符串分割成<code>Stream</code>序列而不是数组：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Pattern p = Pattern.compile(<span class="string">&quot;\\s+&quot;</span>);</span><br><span class="line">Stream&lt;String&gt; s = p.splitAsStream(<span class="string">&quot;The quick brown fox jumps over the lazy dog&quot;</span>);</span><br><span class="line">s.forEach(System.out::println);</span><br></pre></td></tr></table></figure>
+
+<p><strong>基本类型</strong></p>
+<p>泛型不支持基本类型。</p>
+<p>Java标准库提供了<code>IntStream</code>、<code>LongStream</code>和<code>DoubleStream</code>这三种使用基本类型的<code>Stream</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 将int[]数组变为IntStream:</span></span><br><span class="line">IntStream is = Arrays.stream(<span class="keyword">new</span> <span class="keyword">int</span>[] &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span> &#125;);</span><br><span class="line"><span class="comment">// 将Stream&lt;String&gt;转换为LongStream:</span></span><br><span class="line">LongStream ls = List.of(<span class="string">&quot;1&quot;</span>, <span class="string">&quot;2&quot;</span>, <span class="string">&quot;3&quot;</span>).stream().mapToLong(Long::parseLong);</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-map"><a href="#3-map" class="headerlink" title="3. map"></a>3. map</h2><p><code>Stream.map()</code>是<code>Stream</code>最常用的一个转换方法，它把一个<code>Stream</code>转换为另一个<code>Stream</code>。</p>
+<p>所谓<code>map</code>操作，就是把一种操作运算，映射到一个序列的每一个元素上。</p>
+<p>可见，<code>map</code>操作，把一个<code>Stream</code>的每个元素一一对应到应用了目标函数的结果上。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;Integer&gt; s = Stream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>);</span><br><span class="line">Stream&lt;Integer&gt; s2 = s.map(n -&gt; n * n);</span><br></pre></td></tr></table></figure>
+
+<p>map的例子：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List.of(<span class="string">&quot;  Apple &quot;</span>, <span class="string">&quot; pear &quot;</span>, <span class="string">&quot; ORANGE&quot;</span>, <span class="string">&quot; BaNaNa &quot;</span>)</span><br><span class="line">                .stream()</span><br><span class="line">                .map(String::trim) <span class="comment">// 去空格</span></span><br><span class="line">                .map(String::toLowerCase) <span class="comment">// 变小写</span></span><br><span class="line">                .forEach(System.out::println); <span class="comment">// 打印</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-filter"><a href="#4-filter" class="headerlink" title="4. filter"></a>4. filter</h2><p><code>Stream.filter()</code>是<code>Stream</code>的另一个常用转换方法。</p>
+<p>所谓<code>filter()</code>操作，就是对一个<code>Stream</code>的所有元素一一进行测试，不满足条件的就被“滤掉”了，剩下的满足条件的元素就构成了一个新的<code>Stream</code>。</p>
+<p>例如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        IntStream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>)</span><br><span class="line">                .filter(n -&gt; n % <span class="number">2</span> != <span class="number">0</span>)</span><br><span class="line">                .forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>filter()</code>方法接收的对象是<code>Predicate</code>接口对象，它定义了一个<code>test()</code>方法，负责判断元素是否符合条件：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Predicate</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// 判断元素t是否符合条件:</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">test</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>过滤周六周日。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream.generate(<span class="keyword">new</span> LocalDateSupplier())</span><br><span class="line">                .limit(<span class="number">31</span>)</span><br><span class="line">                .filter(ldt -&gt; ldt.getDayOfWeek() == DayOfWeek.SATURDAY || ldt.getDayOfWeek() == DayOfWeek.SUNDAY)</span><br><span class="line">                .forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LocalDateSupplier</span> <span class="keyword">implements</span> <span class="title">Supplier</span>&lt;<span class="title">LocalDate</span>&gt; </span>&#123;</span><br><span class="line">    LocalDate start = LocalDate.of(<span class="number">2020</span>, <span class="number">1</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">int</span> n = -<span class="number">1</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> LocalDate <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        n++;</span><br><span class="line">        <span class="keyword">return</span> start.plusDays(n);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-reduce"><a href="#5-reduce" class="headerlink" title="5. reduce"></a>5. reduce</h2><p><code>Stream.reduce()</code>则是<code>Stream</code>的一个聚合方法，它可以把一个<code>Stream</code>的所有元素按照聚合函数聚合成一个结果。</p>
+<p><code>reduce</code>的第一参数是初始值，<code>(acc, n) -&gt; acc + n</code>acc是上次计算的结果。</p>
+<p>递归求和（<code>reduce</code>参数是0）：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> sum = Stream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>).reduce(<span class="number">0</span>, (acc, n) -&gt; acc + n);</span><br><span class="line">        System.out.println(sum); <span class="comment">// 45</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>递归求积（<code>reduce</code>第一个参数是1）</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> s = Stream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>).reduce(<span class="number">1</span>, (acc, n) -&gt; acc * n);</span><br><span class="line">        System.out.println(s); <span class="comment">// 362880</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>复杂点的：（将配置文件聚合成Map）</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 按行读取配置文件:</span></span><br><span class="line">        List&lt;String&gt; props = List.of(<span class="string">&quot;profile=native&quot;</span>, <span class="string">&quot;debug=true&quot;</span>, <span class="string">&quot;logging=warn&quot;</span>, <span class="string">&quot;interval=500&quot;</span>);</span><br><span class="line">        Map&lt;String, String&gt; map = props.stream()</span><br><span class="line">                <span class="comment">// 把k=v转换为Map[k]=v:</span></span><br><span class="line">                .map(kv -&gt; &#123;</span><br><span class="line">                    String[] ss = kv.split(<span class="string">&quot;\\=&quot;</span>, <span class="number">2</span>);</span><br><span class="line">                    <span class="keyword">return</span> Map.of(ss[<span class="number">0</span>], ss[<span class="number">1</span>]);</span><br><span class="line">                &#125;)</span><br><span class="line">                <span class="comment">// 把所有Map聚合到一个Map:</span></span><br><span class="line">                .reduce(<span class="keyword">new</span> HashMap&lt;String, String&gt;(), (m, kv) -&gt; &#123;</span><br><span class="line">                    m.putAll(kv);</span><br><span class="line">                    <span class="keyword">return</span> m;</span><br><span class="line">                &#125;);</span><br><span class="line">        <span class="comment">// 打印结果:</span></span><br><span class="line">        map.forEach((k, v) -&gt; &#123;</span><br><span class="line">            System.out.println(k + <span class="string">&quot; = &quot;</span> + v);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-输出"><a href="#6-输出" class="headerlink" title="6. 输出"></a>6. 输出</h2><p><strong>输出到List</strong></p>
+<p>如何将一组<code>String</code>先过滤掉空字符串，然后把非空字符串保存到<code>List</code>中：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;String&gt; stream = Stream.of(<span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="keyword">null</span>, <span class="string">&quot;Pear&quot;</span>, <span class="string">&quot;  &quot;</span>, <span class="string">&quot;Orange&quot;</span>);</span><br><span class="line">        List&lt;String&gt; list = stream.filter(s -&gt; s != <span class="keyword">null</span> &amp;&amp; !s.isBlank()).collect(Collectors.toList());</span><br><span class="line">        System.out.println(list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>把<code>Stream</code>的每个元素收集到<code>List</code>的方法是调用<code>collect()</code>并传入<code>Collectors.toList()</code>对象，它实际上是一个<code>Collector</code>实例，通过类似<code>reduce()</code>的操作，把每个元素添加到一个收集器中（实际上是<code>ArrayList</code>）。</p>
+<p>类似的，<code>collect(Collectors.toSet())</code>可以把<code>Stream</code>的每个元素收集到<code>Set</code>中。</p>
+<p><strong>输出到数组</strong></p>
+<p>把Stream的元素输出为数组和输出为List类似，我们只需要调用<code>toArray()</code>方法，并传入数组的“构造方法”：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; list = List.of(<span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Orange&quot;</span>);</span><br><span class="line">String[] array = list.stream().toArray(String[]::<span class="keyword">new</span>);</span><br></pre></td></tr></table></figure>
+
+<p><code>String[]::new</code> 等价于new String[list.size()]</p>
+<p><strong>输出到Map</strong></p>
+<p>指定两个映射函数，分别把元素映射为key和value：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Stream&lt;String&gt; stream = Stream.of(<span class="string">&quot;APPL:Apple&quot;</span>, <span class="string">&quot;MSFT:Microsoft&quot;</span>);</span><br><span class="line">        Map&lt;String, String&gt; map = stream</span><br><span class="line">                .collect(Collectors.toMap(</span><br><span class="line">                        <span class="comment">// 把元素s映射为key:</span></span><br><span class="line">                        s -&gt; s.substring(<span class="number">0</span>, s.indexOf(<span class="string">&#x27;:&#x27;</span>)),</span><br><span class="line">                        <span class="comment">// 把元素s映射为value:</span></span><br><span class="line">                        s -&gt; s.substring(s.indexOf(<span class="string">&#x27;:&#x27;</span>) + <span class="number">1</span>)));</span><br><span class="line">        System.out.println(map);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>分组输出</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; list = List.of(<span class="string">&quot;Apple&quot;</span>, <span class="string">&quot;Banana&quot;</span>, <span class="string">&quot;Blackberry&quot;</span>, <span class="string">&quot;Coconut&quot;</span>, <span class="string">&quot;Avocado&quot;</span>, <span class="string">&quot;Cherry&quot;</span>, <span class="string">&quot;Apricots&quot;</span>);</span><br><span class="line">        Map&lt;String, List&lt;String&gt;&gt; groups = list.stream()</span><br><span class="line">                .collect(Collectors.groupingBy(s -&gt; s.substring(<span class="number">0</span>, <span class="number">1</span>), Collectors.toList()));</span><br><span class="line">        System.out.println(groups);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">&#123;</span></span><br><span class="line"><span class="comment">    A=[Apple, Avocado, Apricots],</span></span><br><span class="line"><span class="comment">    B=[Banana, Blackberry],</span></span><br><span class="line"><span class="comment">    C=[Coconut, Cherry]</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>使用<code>Collectors.groupingBy()</code>，它需要提供两个函数：一个是分组的key，这里使用<code>s -&gt; s.substring(0, 1)</code>，表示只要首字母相同的<code>String</code>分到一组，第二个是分组的value，这里直接使用<code>Collectors.toList()</code>，表示输出为<code>List</code>。</p>
+<h2 id="7-其他操作（排序，去重，截取，合并，flatMap，并行，聚合）"><a href="#7-其他操作（排序，去重，截取，合并，flatMap，并行，聚合）" class="headerlink" title="7. 其他操作（排序，去重，截取，合并，flatMap，并行，聚合）"></a>7. 其他操作（排序，去重，截取，合并，flatMap，并行，聚合）</h2><p><strong>排序</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; list = List.of(<span class="string">&quot;Orange&quot;</span>, <span class="string">&quot;apple&quot;</span>, <span class="string">&quot;Banana&quot;</span>)</span><br><span class="line">            .stream()</span><br><span class="line">            .sorted()</span><br><span class="line">            .collect(Collectors.toList());</span><br><span class="line">        System.out.println(list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>要求每个元素必须实现<code>Comparable</code>接口。</p>
+<p><strong>去重</strong></p>
+<p>对一个<code>Stream</code>的元素进行去重，没必要先转换为<code>Set</code>，可以直接用<code>distinct()</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List.of(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;A&quot;</span>, <span class="string">&quot;C&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;D&quot;</span>)</span><br><span class="line">    .stream()</span><br><span class="line">    .distinct()</span><br><span class="line">    .collect(Collectors.toList()); <span class="comment">// [A, B, C, D]</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>截取</strong></p>
+<p>截取操作常用于把一个无限的<code>Stream</code>转换成有限的<code>Stream</code>，<code>skip()</code>用于跳过当前<code>Stream</code>的前N个元素，<code>limit()</code>用于截取当前<code>Stream</code>最多前N个元素：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List.of(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;C&quot;</span>, <span class="string">&quot;D&quot;</span>, <span class="string">&quot;E&quot;</span>, <span class="string">&quot;F&quot;</span>)</span><br><span class="line">    .stream()</span><br><span class="line">    .skip(<span class="number">2</span>) <span class="comment">// 跳过A, B</span></span><br><span class="line">    .limit(<span class="number">3</span>) <span class="comment">// 截取C, D, E</span></span><br><span class="line">    .collect(Collectors.toList()); <span class="comment">// [C, D, E]</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>合并</strong></p>
+<p>将两个<code>Stream</code>合并为一个<code>Stream</code>可以使用<code>Stream</code>的静态方法<code>concat()</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; s1 = List.of(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>, <span class="string">&quot;C&quot;</span>).stream();</span><br><span class="line">Stream&lt;String&gt; s2 = List.of(<span class="string">&quot;D&quot;</span>, <span class="string">&quot;E&quot;</span>).stream();</span><br><span class="line"><span class="comment">// 合并:</span></span><br><span class="line">Stream&lt;String&gt; s = Stream.concat(s1, s2);</span><br><span class="line">System.out.println(s.collect(Collectors.toList())); <span class="comment">// [A, B, C, D, E]</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>flatMap</strong></p>
+<p>如果<code>Stream</code>的元素是集合：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;List&lt;Integer&gt;&gt; s = Stream.of(</span><br><span class="line">        Arrays.asList(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>),</span><br><span class="line">        Arrays.asList(<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>),</span><br><span class="line">        Arrays.asList(<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>));</span><br></pre></td></tr></table></figure>
+
+<p>希望把上述<code>Stream</code>转换为<code>Stream&lt;Integer&gt;</code>，就可以使用<code>flatMap()</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;Integer&gt; i = s.flatMap(list -&gt; list.stream());</span><br></pre></td></tr></table></figure>
+
+<p><code>flatMap()</code>，是指把<code>Stream</code>的每个元素（这里是<code>List</code>）映射为<code>Stream</code>，然后合并成一个新的<code>Stream</code>：</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210503220426922.png" alt="image-20210503220426922"></p>
+<p><strong>并行</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; s = ...</span><br><span class="line">String[] result = s.parallel() <span class="comment">// 变成一个可以并行处理的Stream</span></span><br><span class="line">                   .sorted() <span class="comment">// 可以进行并行排序</span></span><br><span class="line">                   .toArray(String[]::<span class="keyword">new</span>);</span><br></pre></td></tr></table></figure>
+
+<p>除了<code>reduce()</code>和<code>collect()</code>外，<code>Stream</code>还有一些常用的聚合方法：</p>
+<ul>
+<li><code>count()</code>：用于返回元素个数；</li>
+<li><code>max(Comparator&lt;? super T&gt; cp)</code>：找出最大元素；</li>
+<li><code>min(Comparator&lt;? super T&gt; cp)</code>：找出最小元素。</li>
+</ul>
+<p>针对<code>IntStream</code>、<code>LongStream</code>和<code>DoubleStream</code>，还额外提供了以下聚合方法：</p>
+<ul>
+<li><code>sum()</code>：对所有元素求和；</li>
+<li><code>average()</code>：对所有元素求平均数。</li>
+</ul>
+<p>还有一些方法，用来测试<code>Stream</code>的元素是否满足以下条件：</p>
+<ul>
+<li><code>boolean allMatch(Predicate&lt;? super T&gt;)</code>：测试是否所有元素均满足测试条件；</li>
+<li><code>boolean anyMatch(Predicate&lt;? super T&gt;)</code>：测试是否至少有一个元素满足测试条件。</li>
+</ul>
+<p>最后一个常用的方法是<code>forEach()</code>，它可以循环处理<code>Stream</code>的每个元素，我们经常传入<code>System.out::println</code>来打印<code>Stream</code>的元素：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; s = ...</span><br><span class="line">s.forEach(str -&gt; &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;Hello, &quot;</span> + str);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>JAVA</tag>
+        <tag>Stream</tag>
       </tags>
   </entry>
   <entry>
