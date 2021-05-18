@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ghj1998.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="三个案例展示ANTLR的不同特性1. 简介 分析一个简单的算术表达式语言的语法， 深入学习语法分析器的启动过程。 如何使用语法导入将语法文件切分为容易管理的小块。 语法分析器处理非法输入。   使用访问者模式构建计算器 遍历算术表达式的语法分析树并获得计算结果 自动生成访问器接口和空的实现类。   构建一个翻译器 读取JAVA类定义将其翻译成一个仅有方法声明的接口 ANTLR生成的监听器机制">
+<meta property="og:type" content="article">
+<meta property="og:title" content="三个案例展示ANTLR的不同特性">
+<meta property="og:url" content="https://ghj1998.github.io/2021/05/13/ANTLR/ANTLR%E6%8C%87%E5%8D%97/index.html">
+<meta property="og:site_name" content="小高同学の技术博客">
+<meta property="og:description" content="三个案例展示ANTLR的不同特性1. 简介 分析一个简单的算术表达式语言的语法， 深入学习语法分析器的启动过程。 如何使用语法导入将语法文件切分为容易管理的小块。 语法分析器处理非法输入。   使用访问者模式构建计算器 遍历算术表达式的语法分析树并获得计算结果 自动生成访问器接口和空的实现类。   构建一个翻译器 读取JAVA类定义将其翻译成一个仅有方法声明的接口 ANTLR生成的监听器机制">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511204440048.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210512204014029.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210512204216966.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210512204235718.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210512210734768.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210513100528473.png">
+<meta property="article:published_time" content="2021-05-13T03:30:45.000Z">
+<meta property="article:modified_time" content="2021-05-18T01:55:32.969Z">
+<meta property="article:author" content="高虎军">
+<meta property="article:tag" content="JAVA">
+<meta property="article:tag" content="ANTLR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511204440048.png">
+
+<link rel="canonical" href="https://ghj1998.github.io/2021/05/13/ANTLR/ANTLR%E6%8C%87%E5%8D%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>三个案例展示ANTLR的不同特性 | 小高同学の技术博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">小高同学の技术博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生即是一段艰难曲折的旅程,人生无坦途。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ghj1998.github.io/2021/05/13/ANTLR/ANTLR%E6%8C%87%E5%8D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="高虎军">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小高同学の技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          三个案例展示ANTLR的不同特性
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-13 11:30:45" itemprop="dateCreated datePublished" datetime="2021-05-13T11:30:45+08:00">2021-05-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-18 09:55:32" itemprop="dateModified" datetime="2021-05-18T09:55:32+08:00">2021-05-18</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="三个案例展示ANTLR的不同特性"><a href="#三个案例展示ANTLR的不同特性" class="headerlink" title="三个案例展示ANTLR的不同特性"></a>三个案例展示ANTLR的不同特性</h1><h2 id="1-简介"><a href="#1-简介" class="headerlink" title="1. 简介"></a>1. 简介</h2><ol>
+<li>分析一个简单的算术表达式语言的语法，<ul>
+<li>深入学习语法分析器的启动过程。</li>
+<li>如何使用语法导入将语法文件切分为容易管理的小块。</li>
+<li>语法分析器处理非法输入。</li>
+</ul>
+</li>
+<li>使用访问者模式构建计算器<ul>
+<li>遍历算术表达式的语法分析树并获得计算结果</li>
+<li>自动生成访问器接口和空的实现类。</li>
+</ul>
+</li>
+<li>构建一个翻译器<ul>
+<li>读取JAVA类定义将其翻译成一个仅有方法声明的接口</li>
+<li>ANTLR生成的监听器机制</li>
+</ul>
+</li>
+<li>如何将代码嵌入语法文件<ul>
+<li>实现极端的灵活性</li>
+</ul>
+</li>
+<li>ANTLR如何处理包含不止一种语言的输入文件<ul>
+<li><code>TokenStreamRewriter</code></li>
+<li>修改词法符号流不影响原来的输入流</li>
+</ul>
+</li>
+</ol>
+<h2 id="2-环境搭建"><a href="#2-环境搭建" class="headerlink" title="2. 环境搭建"></a>2. 环境搭建</h2><p><strong>注意：ANTLR4.0目前只支持JAVA7，如果使用高版本的JAVA，会报异常。</strong></p>
+<p>该文章所有源代码点击 <a target="_blank" rel="noopener" href="https://media.pragprog.com/titles/tpantlr2/code/tpantlr2-code.zip%E4%B8%8B%E8%BD%BD">https://media.pragprog.com/titles/tpantlr2/code/tpantlr2-code.zip下载</a></p>
+<p>使用maven搭建环境，在配置文件<code>pom.xml</code>中增加依赖：</p>
+<blockquote>
+<p>maven的使用参考我的另一篇博客：<a href="https://ghj1998.github.io/2021/05/07/Maven%E4%BD%BF%E7%94%A8/#more">Maven</a></p>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- https://mvnrepository.com/artifact/org.antlr/antlr4 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.antlr<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>antlr4<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.9.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- https://mvnrepository.com/artifact/org.antlr/antlr4-runtime --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.antlr<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>antlr4-runtime<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.9.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-匹配算术表达式"><a href="#3-匹配算术表达式" class="headerlink" title="3. 匹配算术表达式"></a>3. 匹配算术表达式</h2><p>要处理的表达式如下所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">193</span></span><br><span class="line">a = <span class="number">5</span></span><br><span class="line">b = <span class="number">6</span></span><br><span class="line">a+b*<span class="number">2</span></span><br><span class="line">(<span class="number">1</span>+<span class="number">2</span>)*<span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<p>解析该表达式的ANTLR语法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">grammar Expr;</span><br><span class="line"></span><br><span class="line">&#x2F;** The start rule; begin parsing here. *&#x2F;</span><br><span class="line">prog:   stat+ ; </span><br><span class="line"></span><br><span class="line">stat:   expr NEWLINE                </span><br><span class="line">    |   ID &#39;&#x3D;&#39; expr NEWLINE        </span><br><span class="line">    |   NEWLINE                   </span><br><span class="line">    ;</span><br><span class="line"></span><br><span class="line">expr:   expr (&#39;*&#39;|&#39;&#x2F;&#39;) expr   </span><br><span class="line">    |   expr (&#39;+&#39;|&#39;-&#39;) expr   </span><br><span class="line">    |   INT                    </span><br><span class="line">    |   ID                    </span><br><span class="line">    |   &#39;(&#39; expr &#39;)&#39;         </span><br><span class="line">    ;</span><br><span class="line"></span><br><span class="line">ID  :   [a-zA-Z]+ ;      &#x2F;&#x2F; match identifiers &lt;label id&#x3D;&quot;code.tour.expr.3&quot;&#x2F;&gt;</span><br><span class="line">INT :   [0-9]+ ;         &#x2F;&#x2F; match integers</span><br><span class="line">NEWLINE:&#39;\r&#39;? &#39;\n&#39; ;     &#x2F;&#x2F; return newlines to parser (is end-statement signal)</span><br><span class="line">WS  :   [ \t]+ -&gt; skip ; &#x2F;&#x2F; toss out whitespace</span><br></pre></td></tr></table></figure>
+
+<p><code>stat</code> 和<code>expr</code>表示语法结构。<code>ID</code> <code>INT</code>是词法符号。</p>
+<ul>
+<li>语法分析器的规则以小写字母开头</li>
+<li>词法分析器的规则以大写字母开头</li>
+<li>用| 分割同一个语言规则的若干备选分支，用圆括号把一些符号组合成子规则。例如（’*’|’’/‘）匹配一个乘法符号或者一个除法符号。</li>
+</ul>
+<p>更多的内容在<strong>留白</strong> 进行讨论。</p>
+<p>使用该语法分析器对上述的表达式进行分析。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ antlr4 Expr.g4</span><br><span class="line">$ javac Expr*.java</span><br><span class="line">$ grun Expr prog -gui t.expr</span><br></pre></td></tr></table></figure>
+
+<p>*在执行第一部的时候抛出了<code>IndexOutOfBoundsException</code>*，是<code>antlr4.0</code>的问题，去官网下载最新版解决了这个问题。</p>
+<p>注意修改时要同步修改<code>pom.xml</code> 中的版本号。</p>
+<p>运行结果如下😁：</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511204440048.png" alt="image-20210511204440048"></p>
+<p>最终，我们需要把ANTLR为我们自动生成的语法分析器集成到程序中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.*;</span><br><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.tree.*;</span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExprJoyRide</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        String inputFile =<span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span>(args.length&gt;<span class="number">0</span>) inputFile = args[<span class="number">0</span>];</span><br><span class="line">        InputStream is = System.in;</span><br><span class="line">        <span class="keyword">if</span>(inputFile!=Null) is = <span class="keyword">new</span> FileInputStream(inputFile);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 新建一个CharStream，从标准输入读取数据</span></span><br><span class="line">        ANTLRInputStream input = <span class="keyword">new</span> ANTLRInputStream(is);</span><br><span class="line">		</span><br><span class="line">        <span class="comment">// 新建一个词法分析器，处理输入的CharStream</span></span><br><span class="line">        ExprLexer lexer = <span class="keyword">new</span> ArrayInitLexer(input);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 新建一个词法符号的缓冲区，用于存储词法分析器生成的词法符号</span></span><br><span class="line">        CommonTokenStream tokens = <span class="keyword">new</span> CommonTokenStream(lexer);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 新建一个语法分析器，处理词法符号缓冲区的内容</span></span><br><span class="line">        ExprParser parser = <span class="keyword">new</span> ArrayInitParser(tokens);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 针对init规则，开始进行语法分析</span></span><br><span class="line">        ParseTree tree = parser.prog();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 用LISP风格打印出生成的树</span></span><br><span class="line">        System.out.println(tree.toStringTree(parser));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ javac ExprJoyRide.java Expr*.java</span><br><span class="line">$ java ExprJoyRide t.expr</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-1-语法导入"><a href="#3-1-语法导入" class="headerlink" title="3.1 语法导入"></a>3.1 语法导入</h3><p>语法拆分成两个逻辑单元，分别是语法分析器和词法分析器的语法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">grammar Expr;</span><br><span class="line"></span><br><span class="line">&#x2F;** The start rule; begin parsing here. *&#x2F;</span><br><span class="line">prog:   stat+ ; </span><br><span class="line"></span><br><span class="line">stat:   expr NEWLINE                </span><br><span class="line">    |   ID &#39;&#x3D;&#39; expr NEWLINE        </span><br><span class="line">    |   NEWLINE                   </span><br><span class="line">    ;</span><br><span class="line"></span><br><span class="line">expr:   expr (&#39;*&#39;|&#39;&#x2F;&#39;) expr   </span><br><span class="line">    |   expr (&#39;+&#39;|&#39;-&#39;) expr   </span><br><span class="line">    |   INT                    </span><br><span class="line">    |   ID                    </span><br><span class="line">    |   &#39;(&#39; expr &#39;)&#39;         </span><br><span class="line">    ;</span><br><span class="line"></span><br><span class="line">ID  :   [a-zA-Z]+ ;      &#x2F;&#x2F; match identifiers &lt;label id&#x3D;&quot;code.tour.expr.3&quot;&#x2F;&gt;</span><br><span class="line">INT :   [0-9]+ ;         &#x2F;&#x2F; match integers</span><br><span class="line">NEWLINE:&#39;\r&#39;? &#39;\n&#39; ;     &#x2F;&#x2F; return newlines to parser (is end-statement signal)</span><br><span class="line">WS  :   [ \t]+ -&gt; skip ; &#x2F;&#x2F; toss out whitespace</span><br></pre></td></tr></table></figure>
+
+<p>例如，可以把这个拆分成两个。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">## CommonLexerRules</span><br><span class="line"></span><br><span class="line">lexer grammar CommonLexerRules; &#x2F;&#x2F; 注意是lexer grammar</span><br><span class="line"></span><br><span class="line">ID  :   [a-zA-Z]+ ;      &#x2F;&#x2F; match identifiers &lt;label id&#x3D;&quot;code.tour.expr.3&quot;&#x2F;&gt;</span><br><span class="line">INT :   [0-9]+ ;         &#x2F;&#x2F; match integers</span><br><span class="line">NEWLINE:&#39;\r&#39;? &#39;\n&#39; ;     &#x2F;&#x2F; return newlines to parser (is end-statement signal)</span><br><span class="line">WS  :   [ \t]+ -&gt; skip ; &#x2F;&#x2F; toss out whitespace</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">## LibExpr.g4</span><br><span class="line"></span><br><span class="line">grammar LibExpr;</span><br><span class="line">import CommonLexerRules;</span><br><span class="line"></span><br><span class="line">prog:   stat+ ; </span><br><span class="line"></span><br><span class="line">stat:   expr NEWLINE                </span><br><span class="line">    |   ID &#39;&#x3D;&#39; expr NEWLINE        </span><br><span class="line">    |   NEWLINE                   </span><br><span class="line">    ;</span><br><span class="line"></span><br><span class="line">expr:   expr (&#39;*&#39;|&#39;&#x2F;&#39;) expr   </span><br><span class="line">    |   expr (&#39;+&#39;|&#39;-&#39;) expr   </span><br><span class="line">    |   INT                    </span><br><span class="line">    |   ID                    </span><br><span class="line">    |   &#39;(&#39; expr &#39;)&#39;         </span><br><span class="line">    ;</span><br></pre></td></tr></table></figure>
+
+<p>利用import导入词法规则。</p>
+<p><strong>在执行anltr时不需要对被导入的语法执行antlr。</strong></p>
+<h3 id="3-2-错误输入"><a href="#3-2-错误输入" class="headerlink" title="3.2 错误输入"></a>3.2 错误输入</h3><p>ANTLR能自动报告语法错误并从错误中恢复。</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210512204014029.png" alt="image-20210512204014029"></p>
+<p>语法分析器遇到语法错误能够正确向下分析。</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210512204216966.png" alt="image-20210512204216966"></p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210512204235718.png" alt="image-20210512204235718"></p>
+<h2 id="4-利用访问器构建计算器"><a href="#4-利用访问器构建计算器" class="headerlink" title="4. 利用访问器构建计算器"></a>4. 利用访问器构建计算器</h2><p>语法文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">grammar LabeledExpr; &#x2F;&#x2F; rename to distinguish from Expr.g4</span><br><span class="line"></span><br><span class="line">prog:   stat+ ;</span><br><span class="line"></span><br><span class="line">stat:   expr NEWLINE                # printExpr</span><br><span class="line">    |   ID &#39;&#x3D;&#39; expr NEWLINE         # assign</span><br><span class="line">    |   NEWLINE                     # blank</span><br><span class="line">    ;</span><br><span class="line"></span><br><span class="line">expr:   expr op&#x3D;(&#39;*&#39;|&#39;&#x2F;&#39;) expr      # MulDiv</span><br><span class="line">    |   expr op&#x3D;(&#39;+&#39;|&#39;-&#39;) expr      # AddSub</span><br><span class="line">    |   INT                         # int</span><br><span class="line">    |   ID                          # id</span><br><span class="line">    |   &#39;(&#39; expr &#39;)&#39;                # parens</span><br><span class="line">    ;</span><br><span class="line"></span><br><span class="line">MUL :   &#39;*&#39; ; &#x2F;&#x2F; assigns token name to &#39;*&#39; used above in grammar</span><br><span class="line">DIV :   &#39;&#x2F;&#39; ;</span><br><span class="line">ADD :   &#39;+&#39; ;</span><br><span class="line">SUB :   &#39;-&#39; ;</span><br><span class="line">ID  :   [a-zA-Z]+ ;      &#x2F;&#x2F; match identifiers</span><br><span class="line">INT :   [0-9]+ ;         &#x2F;&#x2F; match integers</span><br><span class="line">NEWLINE:&#39;\r&#39;? &#39;\n&#39; ;     &#x2F;&#x2F; return newlines to parser (is end-statement signal)</span><br><span class="line">WS  :   [ \t]+ -&gt; skip ; &#x2F;&#x2F; toss out whitespace</span><br></pre></td></tr></table></figure>
+
+<p>计算器：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.*;</span><br><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.tree.ParseTree;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Calc</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        String inputFile = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span> ( args.length&gt;<span class="number">0</span> ) inputFile = args[<span class="number">0</span>];</span><br><span class="line">        InputStream is = System.in;</span><br><span class="line">        <span class="keyword">if</span> ( inputFile!=<span class="keyword">null</span> ) is = <span class="keyword">new</span> FileInputStream(inputFile);</span><br><span class="line">        ANTLRInputStream input = <span class="keyword">new</span> ANTLRInputStream(is);</span><br><span class="line">        LabeledExprLexer lexer = <span class="keyword">new</span> LabeledExprLexer(input);</span><br><span class="line">        CommonTokenStream tokens = <span class="keyword">new</span> CommonTokenStream(lexer);</span><br><span class="line">        LabeledExprParser parser = <span class="keyword">new</span> LabeledExprParser(tokens);</span><br><span class="line">        ParseTree tree = parser.prog(); <span class="comment">// parse</span></span><br><span class="line"></span><br><span class="line">        EvalVisitor eval = <span class="keyword">new</span> EvalVisitor();</span><br><span class="line">        eval.visit(tree);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>开始：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ antlr4 -no-listener -visitor LabeledExpr.g4</span><br></pre></td></tr></table></figure>
+
+<p>ANTLR自动生成了访问器接口，并且为每个带标签的备选分支生成了一个方法。</p>
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210512210734768.png" alt="image-20210512210734768"></p>
+<p>因为使用了泛型，所以我们的实现类可以自定义返回类型。</p>
+<p>同时，ANTLR生成了该访问器的默认实现类<code>LabeledExprBaseVisitor</code>。因为我们的计算结果都是整数，所以我们的<code>EvalVistor</code>类应该继承<code>LabeledExprBaseVisitor&lt;Integer&gt;</code>类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> labelExpr;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyEvalVisitor</span> <span class="keyword">extends</span> <span class="title">LabelExprBaseVisitor</span>&lt;<span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 保存运行中的结果</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    Map&lt;String, Integer&gt; memory = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"> </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">visitAssign</span><span class="params">(LabelExprParser.AssignContext ctx)</span> </span>&#123;</span><br><span class="line">        String id = ctx.ID().getText();</span><br><span class="line">        <span class="keyword">int</span> value = visit(ctx.expr());</span><br><span class="line">        memory.put(id, value);</span><br><span class="line">        <span class="keyword">return</span> value;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">visitPrintExpr</span><span class="params">(LabelExprParser.PrintExprContext ctx)</span> </span>&#123;</span><br><span class="line">        Integer value = visit(ctx.expr());</span><br><span class="line">        System.out.println(value);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">visitInt</span><span class="params">(LabelExprParser.IntContext ctx)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Integer.valueOf(ctx.INT().getText());</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">visitId</span><span class="params">(LabelExprParser.IdContext ctx)</span> </span>&#123;</span><br><span class="line">        String id = ctx.ID().getText();</span><br><span class="line">        <span class="keyword">if</span> (memory.containsKey(id)) &#123;</span><br><span class="line">            <span class="keyword">return</span> memory.get(id);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">visitMulDiv</span><span class="params">(LabelExprParser.MulDivContext ctx)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> left = visit(ctx.expr(<span class="number">0</span>));</span><br><span class="line">        <span class="keyword">int</span> right = visit(ctx.expr(<span class="number">1</span>));</span><br><span class="line">        <span class="keyword">if</span> (ctx.op.getType() == LabelExprParser.MUL) &#123;</span><br><span class="line">            <span class="keyword">return</span> left * right;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> left / right;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">visitAddSub</span><span class="params">(LabelExprParser.AddSubContext ctx)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> left = visit(ctx.expr(<span class="number">0</span>));</span><br><span class="line">        <span class="keyword">int</span> right = visit(ctx.expr(<span class="number">1</span>));</span><br><span class="line">        <span class="keyword">if</span> (ctx.op.getType() == LabelExprParser.Add) &#123;</span><br><span class="line">            <span class="keyword">return</span> left + right;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> left - right;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">visitParens</span><span class="params">(LabelExprParser.ParensContext ctx)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> visit(ctx.expr());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ antlr4 -no-listener -visitor LabeledExpr.g4</span><br><span class="line">$ ls LabeledExpr*.java</span><br><span class="line">$ javac Calc.java LabeledExpr*.java EvalVisitor.java</span><br><span class="line">$ java Calc t.expr</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210513100528473.png" alt="image-20210513100528473"></p>
+<p>如果有任何一步报错或者异常，请检查JAVA版本和ANTLR版本。</p>
+<h2 id="5-利用监听器构建翻译程序"><a href="#5-利用监听器构建翻译程序" class="headerlink" title="5. 利用监听器构建翻译程序"></a>5. 利用监听器构建翻译程序</h2><p>目标：解析一个类，用其中的方法签名生成接口，保留全部的空白字符和注释。</p>
+<p>我们可以通过ANTLR的监听器来完成，监听JAVA语法分析树遍历器触发的事件。ANTLR会自动生成接口：包含遍历器进入和离开类定义时，遍历器遇到方法时的抽象方法。</p>
+<p><strong>访问器和监听器的区别：</strong></p>
+<p>访问器的方法中，必须显式调用visit方法来访问子节点。不调用visit方法，对应的子树就不会被访问。</p>
+<p>监听器的方法会被ANTLR提供的遍历器对象自动调用。</p>
+<p>我们不需要实现接口中的全部方法，ANTLR提供了一个默认的<code>JAVABaseListener</code>的实现，我们可以继承该类，然后覆写我们需要的方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ExtractInterfaceListener继承BaseListener类</span></span><br><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.TokenStream;</span><br><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.misc.Interval;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExtractInterfaceListener</span> <span class="keyword">extends</span> <span class="title">JavaBaseListener</span> </span>&#123;</span><br><span class="line">    JavaParser parser;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ExtractInterfaceListener</span><span class="params">(JavaParser parser)</span> </span>&#123;<span class="keyword">this</span>.parser = parser;&#125;</span><br><span class="line">    <span class="comment">/** Listen to matches of classDeclaration */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">enterClassDeclaration</span><span class="params">(JavaParser.ClassDeclarationContext ctx)</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;interface I&quot;</span>+ctx.Identifier()+<span class="string">&quot; &#123;&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exitClassDeclaration</span><span class="params">(JavaParser.ClassDeclarationContext ctx)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;&#125;&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/** Listen to matches of methodDeclaration */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">enterMethodDeclaration</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        JavaParser.MethodDeclarationContext ctx</span></span></span><br><span class="line"><span class="function"><span class="params">    )</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// need parser to get tokens</span></span><br><span class="line">        TokenStream tokens = parser.getTokenStream();</span><br><span class="line">        String type = <span class="string">&quot;void&quot;</span>;</span><br><span class="line">        <span class="keyword">if</span> ( ctx.type()!=<span class="keyword">null</span> ) &#123;</span><br><span class="line">            type = tokens.getText(ctx.type());</span><br><span class="line">        &#125;</span><br><span class="line">        String args = tokens.getText(ctx.formalParameters());</span><br><span class="line">        System.out.println(<span class="string">&quot;\t&quot;</span>+type+<span class="string">&quot; &quot;</span>+ctx.Identifier()+args+<span class="string">&quot;;&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 提供main方法</span></span><br><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.ANTLRInputStream;</span><br><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.CommonTokenStream;</span><br><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.ParserRuleContext;</span><br><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.Token;</span><br><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.tree.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExtractInterfaceTool</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        String inputFile = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span> ( args.length&gt;<span class="number">0</span> ) inputFile = args[<span class="number">0</span>];</span><br><span class="line">        InputStream is = System.in;</span><br><span class="line">        <span class="keyword">if</span> ( inputFile!=<span class="keyword">null</span> ) &#123;</span><br><span class="line">            is = <span class="keyword">new</span> FileInputStream(inputFile);</span><br><span class="line">        &#125;</span><br><span class="line">        ANTLRInputStream input = <span class="keyword">new</span> ANTLRInputStream(is);</span><br><span class="line"></span><br><span class="line">        JavaLexer lexer = <span class="keyword">new</span> JavaLexer(input);</span><br><span class="line">        CommonTokenStream tokens = <span class="keyword">new</span> CommonTokenStream(lexer);</span><br><span class="line">        JavaParser parser = <span class="keyword">new</span> JavaParser(tokens);</span><br><span class="line">        ParseTree tree = parser.compilationUnit(); <span class="comment">// parse</span></span><br><span class="line"></span><br><span class="line">        ParseTreeWalker walker = <span class="keyword">new</span> ParseTreeWalker(); <span class="comment">// create standard walker</span></span><br><span class="line">        ExtractInterfaceListener extractor = <span class="keyword">new</span> ExtractInterfaceListener(parser);</span><br><span class="line">        walker.walk(extractor, tree); <span class="comment">// initiate walk of tree with listener</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ antlr4 Java.g4</span><br><span class="line">$ javac Java*.java Extract*.java</span><br><span class="line">$ java ExtractInterfaceTool Demo.java</span><br></pre></td></tr></table></figure>
+
+<p>原Demo.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> x, String y)</span> </span>&#123; &#125;</span><br><span class="line">	<span class="keyword">int</span>[ ] g(<span class="comment">/*no args*/</span>) &#123; <span class="keyword">return</span> <span class="keyword">null</span>; &#125;</span><br><span class="line">	List&lt;Map&lt;String, Integer&gt;&gt;[] h() &#123; <span class="keyword">return</span> <span class="keyword">null</span>; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>生成的结果：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IDemo</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> x, String y)</span></span>;</span><br><span class="line">        <span class="keyword">int</span>[ ] g(<span class="comment">/*no args*/</span>);</span><br><span class="line">        List&lt;Map&lt;String, Integer&gt;&gt;[] h();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JAVA/" rel="tag"># JAVA</a>
+              <a href="/tags/ANTLR/" rel="tag"># ANTLR</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/05/11/%E5%A5%87%E5%A6%99%E5%B0%8F%E5%B7%A5%E5%85%B7/%E7%BB%99githubpage%E7%BB%91%E5%AE%9A%E5%9F%9F%E5%90%8D/" rel="prev" title="给hexo搭建的github-page绑定域名">
+      <i class="fa fa-chevron-left"></i> 给hexo搭建的github-page绑定域名
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/05/14/JAVA/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/Web/JAVA-Web/" rel="next" title="JAVA_Web">
+      JAVA_Web <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%89%E4%B8%AA%E6%A1%88%E4%BE%8B%E5%B1%95%E7%A4%BAANTLR%E7%9A%84%E4%B8%8D%E5%90%8C%E7%89%B9%E6%80%A7"><span class="nav-text">三个案例展示ANTLR的不同特性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%AE%80%E4%BB%8B"><span class="nav-text">1. 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-text">2. 环境搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%8C%B9%E9%85%8D%E7%AE%97%E6%9C%AF%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-text">3. 匹配算术表达式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E8%AF%AD%E6%B3%95%E5%AF%BC%E5%85%A5"><span class="nav-text">3.1 语法导入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E9%94%99%E8%AF%AF%E8%BE%93%E5%85%A5"><span class="nav-text">3.2 错误输入</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%88%A9%E7%94%A8%E8%AE%BF%E9%97%AE%E5%99%A8%E6%9E%84%E5%BB%BA%E8%AE%A1%E7%AE%97%E5%99%A8"><span class="nav-text">4. 利用访问器构建计算器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%88%A9%E7%94%A8%E7%9B%91%E5%90%AC%E5%99%A8%E6%9E%84%E5%BB%BA%E7%BF%BB%E8%AF%91%E7%A8%8B%E5%BA%8F"><span class="nav-text">5. 利用监听器构建翻译程序</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="高虎军"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">高虎军</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ghj1998" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ghj1998" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/gao-hu-jun-77" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;gao-hu-jun-77" rel="noopener" target="_blank"><i class="fa fa-bolt fa-fw"></i>知乎</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:im.gaohj@foxmail.com" title="E-Mail → mailto:im.gaohj@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">高虎军</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false});</script></body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
