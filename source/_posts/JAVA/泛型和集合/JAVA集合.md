@@ -519,7 +519,7 @@ public class Main {
 - `E remove()`/`E poll()`：获取队首元素并从队列中删除；
 - `E element()`/`E peek()`：获取队首元素但并不从队列中删除。
 
-| throw Exception    | 返回false或null |                    |
+| |throw Exception    | 返回false或null |
 | :----------------- | :-------------- | ------------------ |
 | 添加元素到队尾     | add(E e)        | boolean offer(E e) |
 | 取队首元素并删除   | E remove()      | E poll()           |
