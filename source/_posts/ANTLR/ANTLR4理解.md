@@ -1,6 +1,6 @@
 ---
 title: ANTLR4理解
-date: 2021-05-8 16:04:47
+date: 2021-05-10 14:40:47
 tags: 
 - ANTLR
 - 语法分析
@@ -143,4 +143,30 @@ ANTLR类：`CharStream`，`Lexer`，`Token`，`Parser`，`ParseTree`。
 <img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210508163241574.png" alt="image-20210508163241574" style="zoom:75%;" />
 
 
+
+## 5. 语法分析树监听器和访问器
+
+### 5.1 监听器
+
+ANTLR为了把遍历树触发的事件转化为监听器的调用，提供了`ParseTree-Walker`类，我们通过自行实现ParseTreeListener接口来构建我们自己的语言类应用程序。
+
+ANTLR为每一个语法文件生成一个`ParseTreeListener`的子类，用来遍历语法树。
+
+遍历顺序如下所示：
+
+![image-20210510110628906](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210510110628906.png)
+
+监听器不需要我们编写语法分析树的遍历代码，也不需要显示的访问子节点。
+
+### 5.2 访问器
+
+有时，我们想控制语法分析树的过程，显式访问子节点。
+
+我们可以通过访问器来实现这一点。
+
+在命令行中加入-visitor选项可以让ANTLR生成访问器接口，每条规则对应接口中的一个visit方法。
+
+我们可以在程序中实现访问器接口，调用`visit()`方法来对语法分析树遍历。
+
+![image-20210510112903697](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210510112903697.png)
 

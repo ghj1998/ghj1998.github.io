@@ -31,7 +31,9 @@ jar包包含了ANTLR工具、运行库、树形结构生成库、SrtingTemplate�
 
 **UNIX系统**
 
-0. 安装JAVA
+0. 安装JAVA7
+
+   **注意：ANTLR4.0目前只支持JAVA7，如果使用高版本的JAVA，会报异常`java.lang.IndexOutOfBoundsException`。**
 
 1. 下载
 

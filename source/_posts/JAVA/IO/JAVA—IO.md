@@ -409,13 +409,13 @@ try (ZipInputStream zip = new ZipInputStream(new FileInputStream(...))) {
 `ZipOutputStream`是一种`FilterOutputStream`，它可以直接写入内容到zip包。我们要先创建一个`ZipOutputStream`，通常是包装一个`FileOutputStream`，然后，每写入一个文件前，先调用`putNextEntry()`，然后用`write()`写入`byte[]`数据，写入完毕后调用`closeEntry()`结束这个文件的打包。
 
 ```java
-try (ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(...))) {
-    File[] files = ...
-    for (File file : files) {
-        zip.putNextEntry(new ZipEntry(file.getName()));
-        zip.write(getFileDataAsBytes(file));
-        zip.closeEntry();
-    }
+try(ZipOutputStream zip = new ZipOutputStream(new FileOutputStream("D:\\Users\\pc\\Desktop\\a.zip"))){
+      File[] files = new File("D:\\Users\\pc\\Desktop\\aab").listFiles();
+      for (File file : files){
+           zip.putNextEntry(new ZipEntry(file.getName()));
+           zip.write(new FileInputStream(file.getAbsolutePath()).readAllBytes());
+           zip.closeEntry();
+       }
 }
 ```
 

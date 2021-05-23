@@ -519,7 +519,7 @@ public class Main {
 - `E remove()`/`E poll()`：获取队首元素并从队列中删除；
 - `E element()`/`E peek()`：获取队首元素但并不从队列中删除。
 
-| throw Exception    | 返回false或null |                    |
+| |throw Exception    | 返回false或null |
 | :----------------- | :-------------- | ------------------ |
 | 添加元素到队尾     | add(E e)        | boolean offer(E e) |
 | 取队首元素并删除   | E remove()      | E poll()           |
@@ -599,6 +599,8 @@ class User {
 
 双端队列（Double Ended Queue），学名`Deque`。
 
+可以用`LinkedList`实现`Queue`接口。
+
 Java集合提供了接口`Deque`来实现一个双端队列，它的功能是：
 
 - 既可以添加到队尾，也可以添加到队首；
@@ -624,6 +626,15 @@ d1.offerLast("z");
 // 推荐的写法：
 Deque<String> d2 = new LinkedList<>();
 d2.offerLast("z");
+```
+
+我们还可以发现，`LinkedList`即实现了`List`接口，又实现了`Queue`接口，但是，在使用的时候，如果我们把它当作List，就获取List的引用，如果我们把它当作Queue，就获取Queue的引用：
+
+```java
+// 这是一个List:
+List<String> list = new LinkedList<>();
+// 这是一个Queue:
+Queue<String> queue = new LinkedList<>();
 ```
 
 ## 10. Stack
