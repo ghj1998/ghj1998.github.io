@@ -1971,11 +1971,11 @@ select from where id in (1,2,3)
 ```
 
 写在配置文件中是：
-
+```xml
 <select id="getBlogFromID" parameterType="map" resultType="Blog">
     select * from blog where id in (1,2,3)
 </select>
-
+```
 利用foreach可以改写成。
 
 ```xml
