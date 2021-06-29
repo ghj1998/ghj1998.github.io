@@ -871,7 +871,3 @@ public class UserServlet extends HttpServlet {
 
 但是目前用的都是**Spring MVC**。
 
-## 9. MVC高级开发
-
-
-
