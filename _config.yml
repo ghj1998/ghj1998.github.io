@@ -143,3 +143,10 @@ deploy:
 -  type: git
    repo: git@47.100.203.79:/var/repo/blog.git
    branch: master
+
+
+# hexo-admin authentification
+admin:
+  username: gao
+  password_hash: $2a$10$4kLCs/Nw9fMsCnVIYKDdbuUWcWA8m0lhBtClg8C302VN1wxB9LsRW
+  secret: ghj1998
