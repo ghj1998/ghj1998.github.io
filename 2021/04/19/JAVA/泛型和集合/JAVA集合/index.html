@@ -28,15 +28,15 @@
 <meta property="og:site_name" content="小高同学の技术博客">
 <meta property="og:description" content="JAVA集合1. 集合定义什么是集合（Collection）？集合就是“由若干个确定的元素所构成的整体”。 在Java中，如果一个Java对象可以在内部持有若干其他Java对象，并对外提供访问接口，我们把这种Java对象称为集合。很显然，Java的数组可以看作是一种集合： 123String[] ss &#x3D; new String[10]; &#x2F;&#x2F; 可以持有10个String对象ss[0] &#x3D; &amp;quo">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329222122956.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329222407584.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210330103050799.png">
+<meta property="og:image" content="https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210329222122956.png">
+<meta property="og:image" content="https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210329222407584.png">
+<meta property="og:image" content="https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210330103050799.png">
 <meta property="article:published_time" content="2021-04-19T11:44:25.000Z">
-<meta property="article:modified_time" content="2021-05-21T02:47:37.513Z">
+<meta property="article:modified_time" content="2021-07-02T03:20:54.866Z">
 <meta property="article:author" content="高虎军">
 <meta property="article:tag" content="JAVA">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329222122956.png">
+<meta name="twitter:image" content="https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210329222122956.png">
 
 <link rel="canonical" href="https://ghj1998.github.io/2021/04/19/JAVA/%E6%B3%9B%E5%9E%8B%E5%92%8C%E9%9B%86%E5%90%88/JAVA%E9%9B%86%E5%90%88/">
 
@@ -216,7 +216,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-21 10:47:37" itemprop="dateModified" datetime="2021-05-21T10:47:37+08:00">2021-05-21</time>
+                <time title="修改时间：2021-07-02 11:20:54" itemprop="dateModified" datetime="2021-07-02T11:20:54+08:00">2021-07-02</time>
               </span>
 
           
@@ -260,9 +260,9 @@
 <li>获取链表大小（包含元素的个数）：<code>int size()</code></li>
 </ul>
 <p>实现<code>List</code>接口并非只能通过数组（即<code>ArrayList</code>的实现方式）来实现，另一种<code>LinkedList</code>通过“链表”也实现了List接口。</p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329222122956.png" alt="ArrayList" title="ArrayList"></p>
+<p><img src="https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210329222122956.png" alt="image-20210329222122956.png"></p>
 <p>​                                                                    ArrayLIst</p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329222407584.png" alt="image-20210329222407584" title="LinkList"></p>
+<p><img src="https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210329222407584.png" alt="image-20210329222407584.png"></p>
 <p>​                                                                    LinkedList</p>
 <table>
 <thead>
@@ -394,7 +394,7 @@
 
 <p><strong>TreeMap</strong></p>
 <p>还有一种<code>Map</code>，它在内部会对Key进行排序，这种<code>Map</code>就是<code>SortedMap</code>。注意到<code>SortedMap</code>是接口，它的实现类是<code>TreeMap</code>。</p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210330103050799.png" alt="image-20210330103050799"></p>
+<p><img src="https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210330103050799.png" alt="image-20210330103050799.png"></p>
 <p><code>SortedMap</code>保证遍历时以Key的顺序来进行排序。例如，放入的Key是<code>&quot;apple&quot;</code>、<code>&quot;pear&quot;</code>、<code>&quot;orange&quot;</code>，遍历的顺序一定是<code>&quot;apple&quot;</code>、<code>&quot;orange&quot;</code>、<code>&quot;pear&quot;</code>，因为<code>String</code>默认按字母排序：</p>
 <p>使用<code>TreeMap</code>时，放入的Key必须实现<code>Comparable</code>接口。<code>String</code>、<code>Integer</code>这些类已经实现了<code>Comparable</code>接口，因此可以直接作为Key使用。</p>
 <p>如果作为Key的class没有实现<code>Comparable</code>接口，那么，必须在创建<code>TreeMap</code>时同时指定一个自定义排序算法：</p>
@@ -715,14 +715,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

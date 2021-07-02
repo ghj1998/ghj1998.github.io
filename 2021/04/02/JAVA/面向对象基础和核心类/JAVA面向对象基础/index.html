@@ -28,18 +28,18 @@
 <meta property="og:site_name" content="小高同学の技术博客">
 <meta property="og:description" content="JAVA面向对象基础感谢廖雪峰老师的教程！ JAVA教程 1. 方法classclass由field和method组成。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/%E7%BB%A7%E6%89%BF%E5%85%B3%E7%B3%BB.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/%E9%9D%99%E6%80%81%E5%AD%97%E6%AE%B5.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/%E7%9B%AE%E5%BD%95%E5%92%8C%E5%8C%85.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/jar%E5%8C%85%E7%9A%84%E6%A0%BC%E5%BC%8F.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/%E5%8C%85%E7%9A%84%E7%BB%93%E6%9E%84.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="https://ghj1998.oss-cn-beijing.aliyuncs.com/1425423424754.png">
+<meta property="og:image" content="https://ghj1998.oss-cn-beijing.aliyuncs.com/5567512578452.png">
+<meta property="og:image" content="https://ghj1998.oss-cn-beijing.aliyuncs.com/86765436434898.png">
+<meta property="og:image" content="https://ghj1998.oss-cn-beijing.aliyuncs.com/89656879456456456456.png">
+<meta property="og:image" content="https://ghj1998.oss-cn-beijing.aliyuncs.com/678678123489796.png">
+<meta property="og:image" content="https://ghj1998.oss-cn-beijing.aliyuncs.com/978645678789789.png">
 <meta property="article:published_time" content="2021-04-02T11:44:25.000Z">
-<meta property="article:modified_time" content="2021-04-26T01:12:23.617Z">
+<meta property="article:modified_time" content="2021-07-02T03:24:23.043Z">
 <meta property="article:author" content="高虎军">
 <meta property="article:tag" content="JAVA">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/ghj1998/image_repository/main/%E7%BB%A7%E6%89%BF%E5%85%B3%E7%B3%BB.png">
+<meta name="twitter:image" content="https://ghj1998.oss-cn-beijing.aliyuncs.com/1425423424754.png">
 
 <link rel="canonical" href="https://ghj1998.github.io/2021/04/02/JAVA/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80%E5%92%8C%E6%A0%B8%E5%BF%83%E7%B1%BB/JAVA%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80/">
 
@@ -219,7 +219,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-26 09:12:23" itemprop="dateModified" datetime="2021-04-26T09:12:23+08:00">2021-04-26</time>
+                <time title="修改时间：2021-07-02 11:24:23" itemprop="dateModified" datetime="2021-07-02T11:24:23+08:00">2021-07-02</time>
               </span>
 
           
@@ -373,10 +373,10 @@
 
 <p> 实现类可以不用重写default方法。</p>
 <p><strong>继承关系：</strong></p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/%E7%BB%A7%E6%89%BF%E5%85%B3%E7%B3%BB.png" alt="image-20210321205845624"></p>
+<p><img src="https://ghj1998.oss-cn-beijing.aliyuncs.com/1425423424754.png" alt="1425423424754.png"></p>
 <h2 id="8-静态字段和静态方法"><a href="#8-静态字段和静态方法" class="headerlink" title="8.静态字段和静态方法"></a>8.静态字段和静态方法</h2><p>用<code>static</code>修饰的字段，称为静态字段：<code>static field</code>。</p>
 <p>静态字段通常使用 <code>类名.静态字段</code>访问静态对象。</p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/%E9%9D%99%E6%80%81%E5%AD%97%E6%AE%B5.png" alt="image-20210321210415333"></p>
+<p><img src="https://ghj1998.oss-cn-beijing.aliyuncs.com/5567512578452.png" alt="5567512578452.png"></p>
 <p>所有实例和类共享同一个静态字段。</p>
 <p>静态方法也是相同的。用<code>static</code>修饰的方法称为静态方法。通过类名可以调用静态方法。</p>
 <p>静态方法经常用于工具类，例如<code>Arrays.sort()</code>,<code>Math.random()</code></p>
@@ -391,7 +391,7 @@
 <p>包可以是多层结构，用<code>.</code>隔开。例如：<code>java.util</code>。</p>
 <p>包没有父子关系。<code>java.util</code>和<code>java.util.zip</code>是不同的包，两者没有任何继承关系。</p>
 <p>还需要按照包结构把上面的Java文件组织起来。</p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/%E7%9B%AE%E5%BD%95%E5%92%8C%E5%8C%85.png" alt="image-20210321211340003"></p>
+<p><img src="https://ghj1998.oss-cn-beijing.aliyuncs.com/86765436434898.png" alt="86765436434898.png"></p>
 <p>位于同一个包的类，可以访问包作用域的字段和方法。</p>
 <p><strong>import</strong></p>
 <p>在一个<code>class</code>中，我们总会引用其他的<code>class</code>。</p>
@@ -501,7 +501,7 @@
 
 <p>这样JVM会自动在<code>hello.jar</code>文件里去搜索某个类。</p>
 <p>jar包的格式如图所示：</p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/jar%E5%8C%85%E7%9A%84%E6%A0%BC%E5%BC%8F.png" alt="image-20210321230823218"></p>
+<p><img src="https://ghj1998.oss-cn-beijing.aliyuncs.com/89656879456456456456.png" alt="89656879456456456456.png"></p>
 <p><code>MANIFEST.MF</code>文件可以提供jar包的信息，如<code>Main-Class</code>，这样可以直接运行jar包。<code>MANIFEST.MF</code>是纯文本，可以指定<code>Main-Class</code>和其它信息。JVM会自动读取这个<code>MANIFEST.MF</code>文件，如果存在<code>Main-Class</code>，我们就不必在命令行指定启动的类名，而是用更方便的命令：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar hello.jar</span><br></pre></td></tr></table></figure>
 
@@ -516,7 +516,7 @@
 </ul>
 <p>这些<code>.jmod</code>文件每一个都是一个模块，模块名就是文件名。例如：模块<code>java.base</code>对应的文件就是<code>java.base.jmod</code>。模块之间的依赖关系已经被写入到模块内的<code>module-info.class</code>文件了。所有的模块都依赖<code>java.base</code>模块，只有<code>java.base</code>模块不依赖任何模块，它可以被看作是“根模块”，好比所有的类都是从<code>Object</code>直接或间接继承而来。</p>
 <p>把class封装成包不仅要打包，而且要写入依赖关系。</p>
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/%E5%8C%85%E7%9A%84%E7%BB%93%E6%9E%84.png" alt="image-20210321231547669"></p>
+<p><img src="https://ghj1998.oss-cn-beijing.aliyuncs.com/678678123489796.png" alt="678678123489796.png"></p>
 <p>包的机构与Java项目类似，module-info.java如下所示：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> hello.world &#123;</span><br><span class="line">	<span class="keyword">requires</span> java.base; <span class="comment">// 可不写，任何模块都会自动引入java.base</span></span><br><span class="line">	<span class="keyword">requires</span> java.xml;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -527,7 +527,7 @@
 <p>对<code>oop-module</code>项目进行编译</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ javac -d bin src/module-info.java src/com/itranswarp/sample/*.java</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84.png" alt="image-20210321232103842"></p>
+<p><img src="https://ghj1998.oss-cn-beijing.aliyuncs.com/978645678789789.png" alt="978645678789789.png"></p>
 <p>下一步将bin目录下的class打包成jar。传入<code>--main-class</code>参数，让这个jar包能自己定位<code>main</code>方法所在的类：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jar --create --file hello.jar --main-class com.itranswarp.sample.Main -C bin .</span><br></pre></td></tr></table></figure>
 
@@ -541,6 +541,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jlink --module-path hello.jmod --add-modules java.base,java.xml,hello.world --output jre/</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ jre/bin/java --module hello.world</span><br><span class="line">Hello, xml!</span><br></pre></td></tr></table></figure>
+
     </div>
 
     
@@ -639,14 +640,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
