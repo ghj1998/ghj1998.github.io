@@ -10,17 +10,17 @@ tags:
 
 心血来潮，别人家的博客都有域名，我也要！
 
-![image-20210512170714387](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210512170714387.png)
+![image-20210512170714387.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210512170714387.png)
 
 ## 1. 注册域名
 
 注册域名我选择的是阿里云的[万网](https://wanwang.aliyun.com/)，由于是新人，选择了一元购域名专区。
 
-![image-20210511214823347](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511214823347.png)
+![image-20210511214823347.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210511214823347.png)
 
 一元购，冲冲冲！！
 
-![image-20210511215212606](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511215212606.png)
+![image-20210511215212606.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210511215212606.png)
 
 支付时需要创建信息模板才可以支付，点击创建新的信息模板创建就OK啦。
 
@@ -51,11 +51,11 @@ $ hexo d
 
 ## 3. 添加域名解析
 
-![image-20210511220015320](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511220015320.png)
+![image-20210511220015320.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210511220015320.png)
 
 在域名管理页面点击解析
 
-![image-20210511220117898](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511220117898.png)
+![image-20210511220117898.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210511220117898.png)
 
 添加两条记录，主机记录一个填写@，一个填写www。
 

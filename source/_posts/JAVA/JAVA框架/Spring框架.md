@@ -37,7 +37,7 @@ Maven导入：
 
 ## 2. Spring组成和扩展
 
-![image-20210605233732916](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210605233732916.png)
+![image-20210605233732916.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210605233732916.png)
 
 - Spring Boot
   - 一个快速开发的脚手架
@@ -58,7 +58,7 @@ Maven导入：
 
 整体架构图：
 
-![image-20210606002135773](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210606002135773.png)
+![image-20210606002135773.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/diagram.png)
 
 1. UserDao接口
 
@@ -228,7 +228,7 @@ public void testSpringHello(){
 
 ClassPathXmlApplicationContext类的继承关系如下：
 
-![diagram](https://raw.githubusercontent.com/ghj1998/image_repository/main/diagram.png)
+![diagram.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210614124325848.png)
 
 我们全程没有使用new关键字！
 
@@ -1238,7 +1238,7 @@ invoke(Object proxy, Method method, Object[] args)
 
 动态代理的调用关系：
 
-![image-20210614124325848](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210614124325848.png)
+![image-20210614124325848.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210606002135773.png)
 
 见如下例子：
 
@@ -1329,7 +1329,7 @@ AOP（Aspect Oriented Programming）意为：面向切面编程，通过预编�
 
 利用AOP可以对业务逻辑的各个部分进行隔离，从而使得业务逻辑各部分之间的耦合度降低，提高程序的可重用性，同时提高了开发的效率。
 
-![image-20210623194313619](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210623194313619.png)
+![image-20210623194313619.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210623194313619.png)
 
 ### 11.3 Spring中Aop的相关概念
 
@@ -1345,7 +1345,7 @@ AOP（Aspect Oriented Programming）意为：面向切面编程，通过预编�
 - 切入点（PointCut）：切面通知 执行的 “地点”的定义。
 - 连接点（JointPoint）：与切入点匹配的执行点。
 
-![image-20210623194533722](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210623194533722.png)
+![image-20210623194533722.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210623194533722.png)
 
 SpringAOP中，通过Advice定义横切逻辑，Spring中支持5种类型的Advice:
 

@@ -20,7 +20,7 @@ tags:
 
 例如：
 
-![image-20210426213615055](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210426213615055.png)
+![image-20210426213615055.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210426213615055.png)
 
 **语法分析树解析**：
 
@@ -29,7 +29,7 @@ tags:
 - 树的结构在后续很好处理，并且能传递完整的符号信息。
 - 子树的根节点是对应语法规则的名字。
 
-![image-20210426215414826](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210426215414826.png)
+![image-20210426215414826.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210426215414826.png)
 
 这就是语法规则。
 
@@ -118,7 +118,7 @@ expr: ID '(' ')'
 
 上述规则如果匹配 "`f();`"
 
-![image-20210508160604632](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210508160604632.png)
+![image-20210508160604632.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210508160604632.png)
 
 就会出现如上两种情况。左边是匹配了expr规则，右边是匹配了stat规则的第二个备选分支。
 
@@ -134,13 +134,13 @@ ANTLR类：`CharStream`，`Lexer`，`Token`，`Parser`，`ParseTree`。
 
 整体交互如图所示：
 
-<img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210508162752717.png" alt="image-20210508162752717" style="zoom:50%;" />
+![image-20210508162752717.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210508162752717.png)
 
 `TokenStream`只记录了`CharStream`中字符序列的开始位置和结束位置。目的是：共享数据结构来节约内存。
 
 `ParseTree`的子类`RuleNode`和`TerminalNode`，分别是子树的根节点和叶子节点。`RuleNode`规则不是一成不变，实际上是`StatContext`、`AssignContext`以及`ExprContext`。
 
-<img src="https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210508163241574.png" alt="image-20210508163241574" style="zoom:75%;" />
+![image-20210508163241574.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210508163241574.png)
 
 
 
@@ -154,7 +154,7 @@ ANTLR为每一个语法文件生成一个`ParseTreeListener`的子类，用来�
 
 遍历顺序如下所示：
 
-![image-20210510110628906](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210510110628906.png)
+![image-20210510110628906.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210510110628906.png)
 
 监听器不需要我们编写语法分析树的遍历代码，也不需要显示的访问子节点。
 
@@ -168,5 +168,5 @@ ANTLR为每一个语法文件生成一个`ParseTreeListener`的子类，用来�
 
 我们可以在程序中实现访问器接口，调用`visit()`方法来对语法分析树遍历。
 
-![image-20210510112903697](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210510112903697.png)
+![image-20210510112903697.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210510112903697.png)
 

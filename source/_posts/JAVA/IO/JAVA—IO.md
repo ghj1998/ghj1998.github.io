@@ -332,7 +332,7 @@ InputStream gzip = new GZIPInputStream(buffered);
 
 无论我们包装多少次，得到的对象始终是`InputStream`，我们直接用`InputStream`来引用它，就可以正常读取：
 
-![image-20210414164510382](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210414164510382.png)
+![image-20210414164510382.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210414164510382.png)
 
 **编写`FilterInputStream`**
 
@@ -383,7 +383,7 @@ class CountInputStream extends FilterInputStream {
 
 `ZipInputStream`是一种`FilterInputStream`，它可以直接读取zip包的内容：
 
-![image-20210414165125721](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210414165125721.png)
+![image-20210414165125721.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210414165125721.png)
 
 我们要创建一个`ZipInputStream`，通常是传入一个`FileInputStream`作为数据源，然后，循环调用`getNextEntry()`，直到返回`null`，表示zip流结束。
 

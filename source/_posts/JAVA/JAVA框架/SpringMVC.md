@@ -40,9 +40,9 @@ DispatcherServlet的作用是将请求分发到不同的处理器。
 
 SpringMVC执行流程如下：
 
-![图片](https://raw.githubusercontent.com/ghj1998/image_repository/main/a.jpg)
+![a.jpg](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210630113649057.png)
 
-![图片](https://raw.githubusercontent.com/ghj1998/image_repository/main/b.jpg)
+![b.jpg](https://ghj1998.oss-cn-beijing.aliyuncs.com/a.jpg)
 
 上图为SpringMVC的一个较完整的流程图，实线表示SpringMVC框架提供的技术，不需要开发者实现，虚线表示需要开发者实现。
 
@@ -90,9 +90,9 @@ SpringMVC执行流程如下：
 
 2. **添加Web框架支持**（会多出来一个web目录，并且上面有个蓝点）
 
-   ![](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210630113649057.png)
+![image-20210630113649057.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210630114714186.png)
 
-   ![image-20210630113847782](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210630113847782.png)
+![image-20210630113847782.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/b.jpg)
 
 3. 配置web.xml ，注册DispatcherServlet。
 
@@ -208,9 +208,9 @@ SpringMVC执行流程如下：
 
 11. 配置Tomcat
 
-    ![image-20210630114652889](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210630114652889.png)
+![image-20210630114652889.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210630121118223.png)
 
-    ![image-20210630114714186](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210630114714186.png)
+![image-20210630114714186.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210630114652889.png)
 
 12. 启动Tomcat，完成测试。
 
@@ -350,7 +350,7 @@ SpringMVC执行流程如下：
 
 5. 打开服务器，访问http://localhost:8080/hello
 
-   ![image-20210630121118223](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210630121118223.png)
+![image-20210630121118223.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210630113847782.png)
 
 使用springMVC必须配置的三大件：
 
@@ -406,7 +406,7 @@ public String test(@PathVariable String a, @PathVariable String b, Model model){
 
 由于使用地址栏是get，因此无法正常访问域名了。
 
-![image-20210630153247890](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210630153247890.png)
+![image-20210630153247890.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210630153247890.png)
 
 我们还可以使用方法级别的注解：
 

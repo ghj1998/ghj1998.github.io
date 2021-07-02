@@ -83,15 +83,15 @@ $ sudo make prefix=/usr/local install-doc install-html install-info
 
 **安装安装包**
 
-![image-20210329144403430](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329144403430.png)
+![image-20210329144403430.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210329144403430.png)
 
 在这一步去掉git LFS选项。
 
-![image-20210329144502858](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329144502858.png)
+![image-20210329144502858.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210329144502858.png)
 
 在这一步可以选择编辑器，默认就可以。
 
-![image-20210329144551825](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329144551825.png)
+![image-20210329144551825.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210329144551825.png)
 
 这一步选择git bash作为命令行。
 

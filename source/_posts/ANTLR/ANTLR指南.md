@@ -113,7 +113,7 @@ $ grun Expr prog -gui t.expr
 
 运行结果如下😁：
 
-![image-20210511204440048](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511204440048.png)
+![image-20210511204440048.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210511204440048.png)
 
 
 
@@ -229,13 +229,13 @@ expr:   expr ('*'|'/') expr
 
 ANTLR能自动报告语法错误并从错误中恢复。
 
-![image-20210512204014029](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210512204014029.png)
+![image-20210512204014029.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210512204014029.png)
 
 语法分析器遇到语法错误能够正确向下分析。
 
-![image-20210512204216966](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210512204216966.png)
+![image-20210512204216966.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210512204216966.png)
 
-![image-20210512204235718](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210512204235718.png)
+![image-20210512204235718.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210512204235718.png)
 
 ## 4. 利用访问器构建计算器
 
@@ -303,7 +303,7 @@ $ antlr4 -no-listener -visitor LabeledExpr.g4
 
 ANTLR自动生成了访问器接口，并且为每个带标签的备选分支生成了一个方法。
 
-![image-20210512210734768](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210512210734768.png)
+![image-20210512210734768.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210512210734768.png)
 
 因为使用了泛型，所以我们的实现类可以自定义返回类型。
 
@@ -387,7 +387,7 @@ $ javac Calc.java LabeledExpr*.java EvalVisitor.java
 $ java Calc t.expr
 ```
 
-![image-20210513100528473](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210513100528473.png)
+![image-20210513100528473.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210513100528473.png)
 
 如果有任何一步报错或者异常，请检查JAVA版本和ANTLR版本。
 

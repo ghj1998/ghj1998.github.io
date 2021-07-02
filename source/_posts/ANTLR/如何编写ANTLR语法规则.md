@@ -17,7 +17,7 @@ tags:
 
 依照这个逻辑，可以写出这样的伪代码：
 
-![image-20210513160904827](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210513160904827.png)
+![image-20210513160904827.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210513160904827.png)
 
 ## 2. 常见语言模式
 
@@ -113,7 +113,7 @@ expr : ID '[' expr ']'
 
 能解析出两种语法分析树：
 
-![image-20210517165044163](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210517165044163.png)
+![image-20210517165044163.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210517165044163.png)
 
 **ANTLR通过优先选择位置靠前的备选分支来解决歧义问题。**例如在expr规则中将乘法放在加法前，就可以有限处理乘法。
 

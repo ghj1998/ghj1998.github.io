@@ -430,7 +430,7 @@ Stream<Integer> i = s.flatMap(list -> list.stream());
 
 `flatMap()`，是指把`Stream`的每个元素（这里是`List`）映射为`Stream`，然后合并成一个新的`Stream`：
 
-![image-20210503220426922](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210503220426922.png)
+![image-20210503220426922.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210503220426922.png)
 
 **并行**
 

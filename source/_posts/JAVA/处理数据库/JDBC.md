@@ -17,7 +17,7 @@ SQL教程：https://www.liaoxuefeng.com/wiki/1177760294764384
 
 JDBC？JDBC是Java DataBase Connectivity的缩写，它是Java程序访问数据库的标准接口。
 
-![image-20210510201125410](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210510201125410.png)
+![image-20210510201125410.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210510201125410.png)
 
 使用JDBC的好处是：
 

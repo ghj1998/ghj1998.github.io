@@ -43,11 +43,11 @@ Java访问集合总是通过统一的方式——迭代器（Iterator）来实�
 
 实现`List`接口并非只能通过数组（即`ArrayList`的实现方式）来实现，另一种`LinkedList`通过“链表”也实现了List接口。
 
-![ArrayList](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329222122956.png "ArrayList")
+![image-20210329222122956.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210329222122956.png)
 
 ​																	ArrayLIst
 
-![image-20210329222407584](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210329222407584.png "LinkList")
+![image-20210329222407584.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210329222407584.png)
 
 ​																	LinkedList
 
@@ -372,7 +372,7 @@ public class Main {
 
 还有一种`Map`，它在内部会对Key进行排序，这种`Map`就是`SortedMap`。注意到`SortedMap`是接口，它的实现类是`TreeMap`。
 
-![image-20210330103050799](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210330103050799.png)
+![image-20210330103050799.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210330103050799.png)
 
 `SortedMap`保证遍历时以Key的顺序来进行排序。例如，放入的Key是`"apple"`、`"pear"`、`"orange"`，遍历的顺序一定是`"apple"`、`"orange"`、`"pear"`，因为`String`默认按字母排序：
 

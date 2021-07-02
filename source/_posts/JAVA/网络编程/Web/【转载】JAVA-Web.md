@@ -50,7 +50,7 @@ web应用程序编写完毕后，若想提供给外界访问：需要一个服�
 
 - *.htm, *.html,这些都是网页的后缀，如果服务器上一直存在这些东西，我们就可以直接进行读取。通络；
 
-![1567822802516](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567822802516.png)
+![1567822802516.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567822802516.png)
 
 - 静态web存在的缺点
   - Web页面无法动态更新，所有用户看到都是同一个页面
@@ -65,7 +65,7 @@ web应用程序编写完毕后，若想提供给外界访问：需要一个服�
 
 页面会动态展示： “Web的页面展示的效果因人而异”；
 
-![1567823191289](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567823191289.png)
+![1567823191289.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567823191289.png)
 
 缺点：
 
@@ -77,7 +77,7 @@ web应用程序编写完毕后，若想提供给外界访问：需要一个服�
 - Web页面可以动态更新，所有用户看到都不是同一个页面
 - 它可以与数据库交互 （数据持久化：注册，商品信息，用户信息........）
 
-![1567823350584](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567824446428.png)
+![1567823350584.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567823350584.png)
 
 新手村：--魔鬼训练（分析原理，看源码）--> PK场
 
@@ -155,9 +155,9 @@ C/S:  客户端和服务器
 
 **Tomcat**
 
-![1567824446428](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567825627138.png)
-
 面向百度编程；
+
+![1567824446428.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567824446428.png)
 
 Tomcat是Apache 软件基金会（Apache Software Foundation）的Jakarta 项目中的一个核心项目，最新的Servlet 和JSP 规范总是能在Tomcat 中得到体现，因为Tomcat 技术先进、性能稳定，而且**免费**，因而深受Java 爱好者的喜爱并得到了部分软件开发商的认可，成为目前比较流行的Web 应用服务器。
 
@@ -183,21 +183,19 @@ Tomcat 实际上运行JSP 页面和Servlet。Tomcat最新版本为**9.0。**
 
 tomcat官网：http://tomcat.apache.org/
 
-![1567825600842](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567825600842.png)
+![1567825627138.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567825627138.png)
 
-![1567825627138](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567825763180.png)
-
-
+![1567825600842.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567825600842.png)
 
 ### 3.2、Tomcat启动和配置
 
 文件夹作用：
 
-![1567825763180](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567825840657.png)
+![1567825763180.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567825763180.png)
 
 **启动。关闭Tomcat**
 
-![1567825840657](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567825967256.png)
+![1567825840657.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567825840657.png)
 
 访问测试：http://localhost:8080/
 
@@ -209,7 +207,9 @@ tomcat官网：http://tomcat.apache.org/
 
 ### 3.3、配置
 
-![1567825967256](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567827057913.png)
+![1567825967256.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567825967256.png)
+
+![1567827057913.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567827057913.png)
 
 可以配置启动的端口号
 
@@ -247,8 +247,6 @@ tomcat官网：http://tomcat.apache.org/
       ```
 
    2. 没有：去DNS服务器找，找到的话就返回，找不到就返回找不到；
-
-   ![1567827057913](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567842350606.png)
 
 4. 可以配置一下环境变量（可选性）
 
@@ -418,8 +416,6 @@ Location：让网页重新定位；
 
    由此，Maven诞生了！
 
-
-
 ### 5.1 Maven项目架构管理工具
 
 我们目前用来就是方便导入jar包的！
@@ -434,13 +430,11 @@ Maven会规定好你该如何去编写我们的Java代码，必须要按照这�
 
 官网;https://maven.apache.org/
 
-![1567842350606](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567842882993.png)
+![1567842350606.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567842350606.png)
 
 下载完成后，解压即可；
 
 小狂神友情建议：电脑上的所有环境都放在一个文件夹下，方便管理；
-
-
 
 ### 5.3 配置环境变量
 
@@ -452,13 +446,13 @@ Maven会规定好你该如何去编写我们的Java代码，必须要按照这�
 - MAVEN_HOME      maven的目录
 - 在系统的path中配置  %MAVEN_HOME%\bin
 
-![1567842882993](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567844609399.png)
-
 测试Maven是否安装成功，保证必须配置完毕！
+
+![1567842882993.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567842882993.png)
 
 ### 5.4 阿里云镜像
 
-![1567844609399](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567844785602.png)
+![1567844609399.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567844609399.png)
 
 - 镜像：mirrors
   - 作用：加速我们的下载
@@ -486,24 +480,23 @@ Maven会规定好你该如何去编写我们的Java代码，必须要按照这�
 ### 5.6、在IDEA中使用Maven
 
 1. 启动IDEA
-
 2. 创建一个MavenWeb项目
 
-   ![1567844785602](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567844841172.png)
+![1567844785602.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567844785602.png)
 
-   ![1567844841172](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567844956177.png)
+![1567844841172.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567844841172.png)
 
-   ![1567844917185](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567823350584.png)
+![1567844956177.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567844956177.png)
 
-   ![1567844956177](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567845029864.png)
+![1567845029864.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567845029864.png)
 
-   ![1567845029864](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567845105970.png)
+![1567845105970.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567845137978.png)
 
 3. 等待项目初始化完毕
 
-   ![1567845105970](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567845137978.png)
+![1567845137978.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567845105970.png)
 
-   ![1567845137978](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567845341956.png)
+![1567845341956.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567845341956.png)
 
 4. 观察maven仓库中多了什么东西？
 
@@ -511,59 +504,59 @@ Maven会规定好你该如何去编写我们的Java代码，必须要按照这�
 
    注意：IDEA项目创建成功后，看一眼Maven的配置
 
-   ![1567845341956](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567845413672.png)
+![1567845413672.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567845557744.png)
 
-   ![1567845413672](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567844917185.png)
+![1567844917185.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567845413672.png)
 
 6. 到这里，Maven在IDEA中的配置和使用就OK了!
 
 ### 5.7、创建一个普通的Maven项目
 
-![1567845557744](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567845557744.png)
+![1567845557744.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567844917185.png)
 
-![1567845717377](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567845717377.png)
+![1567845717377.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567845717377.png)
 
 这个只有在Web应用下才会有！
 
-![1567845782034](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567845782034.png)
+![1567845782034.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567845782034.png)
 
 ### 5.8 标记文件夹功能
 
-![1567845910728](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567845910728.png)
+![1567845910728.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567845910728.png)
 
-![1567845957139](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567845957139.png)
+![1567845957139.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567845957139.png)
 
-![1567846034906](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567846034906.png)
+![1567846034906.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567846034906.png)
 
-![1567846073511](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567846140348.png)
+![1567846073511.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567846073511.png)
 
 ### 5.9 在 IDEA中配置Tomcat
 
-![1567846140348](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567846073511.png)
+![1567846140348.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567846140348.png)
 
-![1567846179573](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567846234175.png)
+![1567846234175.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567846234175.png)
 
-![1567846234175](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567846369751.png)
+![1567846369751.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567846369751.png)
 
-![1567846369751](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567846421963.png)
+![1567846421963.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567846421963.png)
 
 解决警告问题
 
 必须要的配置：**为什么会有这个问题：我们访问一个网站，需要指定一个文件夹名字；**
 
-![1567846421963](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567846179573.png)
+![1567846179573.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567846179573.png)
 
-![1567846546465](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567846546465.png)
+![1567846546465.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567846546465.png)
 
-![1567846559111](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567846559111.png)
+![1567846559111.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567846559111.png)
 
-![1567846640372](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567846784849.png)
+![1567846784849.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567846784849.png)
+
+![1567846640372.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567846640372.png)
 
 ### 5.10 pom文件
 
 pom.xml 是Maven的核心配置文件
-
-![1567846784849](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567846640372.png)
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -644,7 +637,7 @@ pom.xml 是Maven的核心配置文件
 
 ```
 
-![1567847410771](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567847410771.png)
+![1567847410771.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567847410771.png)
 
 
 
@@ -678,11 +671,11 @@ maven由于他的约定大于配置，我们之后可以能遇到我们写的配
 
 ### 5.12 IDEA操作
 
-![1567847630808](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567847630808.png)
+![1567847630808.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567847630808.png)
 
 
 
-![1567847662429](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567847662429.png)
+![1567847662429.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567847662429.png)
 
 
 
@@ -692,24 +685,24 @@ maven由于他的约定大于配置，我们之后可以能遇到我们写的配
 
    解决方法：降级为3.6.1
 
-   ![1567904721301](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567904721301.png)
+![1567904721301.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567904721301.png)
 
 2. Tomcat闪退
 
-   
+   **Tomcat降级到9.0**
 
 3. IDEA中每次都要重复配置Maven
    在IDEA中的全局默认配置中去配置
 
-   ![1567905247201](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567905247201.png)
+![1567905247201.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567905247201.png)
 
-   ![1567905291002](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567905537026.png)
+![1567905537026.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567905537026.png)
 
 4. Maven项目中Tomcat无法配置
 
 5. maven默认web项目中的web.xml版本问题
 
-   ![1567905537026](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567905291002.png)
+![1567905291002.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567905291002.png)
 
 6. 替换为webapp4.0版本和tomcat一致
 
@@ -733,13 +726,13 @@ maven由于他的约定大于配置，我们之后可以能遇到我们写的配
 
    地址：https://mvnrepository.com/
 
-   ![1567905870750](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567905870750.png)
+![1567905870750.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567905870750.png)
 
-   ![1567905982979](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567905982979.png)
+![1567905982979.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567905982979.png)
 
-   ![1567906017448](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567906017448.png)
+![1567906017448.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567906017448.png)
 
-   ![1567906039469](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567906039469.png)
+![1567906039469.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567911804700.png)
 
 
 
@@ -795,7 +788,7 @@ Serlvet接口Sun公司有两个默认的实现类：HttpServlet，GenericServlet
 
 4. 编写一个Servlet程序
 
-   ![1567911804700](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567911804700.png)
+![1567911804700.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567906039469.png)
 
    1. 编写一个普通类
 
@@ -851,7 +844,7 @@ Serlvet接口Sun公司有两个默认的实现类：HttpServlet，GenericServlet
 
 Servlet是由Web服务器调用，web服务器在收到浏览器请求之后，会：
 
-![1567913793252](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567913793252.png)
+![1567913793252.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567913793252.png)
 
 ### 6.4、Mapping问题
 
@@ -1045,7 +1038,7 @@ protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws Se
 }
 ```
 
-![1567924457532](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567924457532.png)
+![1567924457532.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567924457532.png)
 
 #### 4、读取资源文件
 
@@ -1290,7 +1283,7 @@ public class ImageServlet extends HttpServlet {
 
 #### 4、实现重定向
 
-![1567931587955](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567931587955.png)
+![1567931587955.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567932163430.png)
 
 B一个web资源收到客户端A请求后，B他会通知A客户端去访问另外一个web资源C，这个过程叫重定向
 
@@ -1327,7 +1320,7 @@ protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws Se
 - 请求转发的时候，url不会产生变化
 - 重定向时候，url地址栏会发生变化；
 
-![1567932163430](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567932163430.png)
+![1567932163430.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567934023106.png)
 
 #### 5、简单实现登录重定向
 
@@ -1389,13 +1382,13 @@ protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws Se
 
 HttpServletRequest代表客户端的请求，用户通过Http协议访问服务器，HTTP请求中的所有信息会被封装到HttpServletRequest，通过这个HttpServletRequest的方法，获得客户端的所有信息；
 
-![1567933996830](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567933996830.png)
+![1567933996830.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567933996830.png)
 
-![1567934023106](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567934023106.png)
+![1567934023106.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567934110794.png)
 
 #### 获取参数，请求转发
 
-![1567934110794](https://raw.githubusercontent.com/ghj1998/image_repository/main/1567934110794.png)
+![1567934110794.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1568344447291.png)
 
 ```java
 @Override
@@ -1476,7 +1469,7 @@ protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws Se
 
 ### 7.3、Cookie
 
-![1568344447291](https://raw.githubusercontent.com/ghj1998/image_repository/main/1568344447291.png)
+![1568344447291.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1568342773861.png)
 
 1. 从请求中拿到cookie信息
 2. 服务器响应给客户端cookie
@@ -1521,7 +1514,7 @@ URLDecoder.decode(cookie.getValue(),"UTF-8")
 
 ### 7.4、Session（重点）
 
-![1568344560794](https://raw.githubusercontent.com/ghj1998/image_repository/main/1568344560794.png)
+![1568344560794.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1568344560794.png)
 
 什么是Session：
 
@@ -1529,7 +1522,7 @@ URLDecoder.decode(cookie.getValue(),"UTF-8")
 - 一个Seesion独占一个浏览器，只要浏览器没有关闭，这个Session就存在；
 - 用户登录之后，整个网站它都可以访问！--> 保存用户的信息；保存购物车的信息…..
 
-![1568342773861](https://raw.githubusercontent.com/ghj1998/image_repository/main/1568342773861.png)
+![1568342773861.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1567931587955.png)
 
 Session和cookie的区别：
 
@@ -1620,7 +1613,7 @@ session.invalidate();
 
 
 
-![1568344679763](https://raw.githubusercontent.com/ghj1998/image_repository/main/1568344679763.png)
+![1568344679763.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1568345948307.png)
 
 
 
@@ -1651,7 +1644,7 @@ Java Server Pages ： Java服务器端页面，也和Servlet一样，用于动�
 
   IDEA中使用Tomcat的会在IDEA的tomcat中生产一个work目录
 
-  ![1568345873736](https://raw.githubusercontent.com/ghj1998/image_repository/main/1568345948307.png)
+![1568345948307.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1568344679763.png)
 
   我电脑的地址：
 
@@ -1661,7 +1654,7 @@ Java Server Pages ： Java服务器端页面，也和Servlet一样，用于动�
 
   发现页面转变成了Java程序！
 
-  ![1568345948307](https://raw.githubusercontent.com/ghj1998/image_repository/main/1568347078207.png)
+![1568347078207.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1568345873736.png)
 
 
 
@@ -1715,7 +1708,7 @@ JSP最终也会被转换成为一个Java类！
 
 4. 以上的这些个对象我们可以在JSP页面中直接使用！
 
-![1568347078207](https://raw.githubusercontent.com/ghj1998/image_repository/main/1568345873736.png)
+![1568345873736.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1568347078207.png)
 
 
 
@@ -1937,7 +1930,7 @@ JSTL标签库的使用就是为了弥补HTML标签的不足；它自定义许多
 
 **核心标签** （掌握部分）
 
-![1568362473764](https://raw.githubusercontent.com/ghj1998/image_repository/main/1568362473764.png)
+![1568362473764.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1568362473764.png)
 
 **JSTL标签库使用步骤**
 
@@ -2094,7 +2087,7 @@ class A{
 
 ### 10.1、早些年
 
-![1568423664332](https://raw.githubusercontent.com/ghj1998/image_repository/main/1568423664332.png)
+![1568423664332.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1568423664332.png)
 
 用户直接访问控制层，控制层就可以直接操作数据库；
 
@@ -2113,7 +2106,7 @@ Mysql Oracle SqlServer ....
 
 ### 10.2、MVC三层架构
 
-![1568424227281](https://raw.githubusercontent.com/ghj1998/image_repository/main/1568424227281.png)
+![1568424227281.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1568424227281.png)
 
 
 
@@ -2148,7 +2141,7 @@ Filter：过滤器 ，用来过滤网站的数据；
 - 处理中文乱码
 - 登录验证….
 
-![1568424858708](https://raw.githubusercontent.com/ghj1998/image_repository/main/1568424858708.png)
+![1568424858708.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1568424858708.png)
 
 Filter开发步骤：
 
@@ -2158,10 +2151,10 @@ Filter开发步骤：
 
    1. 导包不要错
 
-      ![1568425162525](https://raw.githubusercontent.com/ghj1998/image_repository/main/1568440926845.png)
+![1568440926845.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1568440926845.png)
 
       实现Filter接口，重写对应的方法即可
-
+    
       ```java
       public class CharacterEncodingFilter implements Filter {
       
@@ -2344,7 +2337,7 @@ public class TestPanel {
 
 什么是JDBC ： Java连接数据库！
 
-![1568439601825](https://raw.githubusercontent.com/ghj1998/image_repository/main/1568425162525.png)
+![1568425162525.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1568442261610.png)
 
 需要jar包的支持：
 
@@ -2393,7 +2386,7 @@ SELECT	* FROM users;
 
 IDEA中连接数据库：
 
-![1568440926845](https://raw.githubusercontent.com/ghj1998/image_repository/main/1568442261610.png)
+![1568442261610.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1568439601825.png)
 
 
 
@@ -2538,11 +2531,11 @@ public void test(){
 }
 ```
 
-![1568442261610](https://raw.githubusercontent.com/ghj1998/image_repository/main/1568439601825.png)
+![1568439601825.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1568425162525.png)
 
 失败的时候是红色：
 
-![1568442289597](https://raw.githubusercontent.com/ghj1998/image_repository/main/1568442289597.png)
+![1568442289597.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1568442289597.png)
 
 
 

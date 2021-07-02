@@ -12,49 +12,49 @@ tags:
 
 ### 1.1 TDD
 
-![image-20210422222709239](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210422222709239.png)
+![image-20210422222709239.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210422222709239.png)
 
 这就是传说的TDD。
 
-![image-20210422222726238](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210422222726238.png)
+![image-20210422222726238.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210422222726238.png)
 
 ### 1.2 **如何在idea使用Junit？**
 
 1. 右键点击类名，点击`Generate`，选择`test`，点击`OK`。
 
-![image-20210506093726089](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210506093726089.png)
+![image-20210506093726089.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210506093726089.png)
 
-![image-20210506094116686](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210506094116686.png)
+![image-20210506094116686.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210506094116686.png)
 
 2. 选择要测试的方法（不选也可以，选了会自动生成测试函数）。以及测试类的类名，通常采用默认即可。
 
-![image-20210506094133977](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210506094133977.png)
+![image-20210506094133977.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210506094133977.png)
 
 3. 注意到提示`Junit5 library not found in the module`。点击Fix进行修复，勾选Downlad 的选项。
 
-![image-20210506094426316](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210506094426316.png)
+![image-20210506094426316.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210506094426316.png)
 
 4. 点击`OK`会自动生成Test类，进去之后发现
 
-![image-20210506095058368](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210506095058368.png)
+![image-20210506095058368.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210506095058368.png)
 
 5. 点击Add Library Junit5 to Classpath。
 
-![image-20210506095143021](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210506095143021.png)
+![image-20210506095143021.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210506095143021.png)
 
 6. 同时，为了减少注释的复杂度。我们将`org.junit.jupiter.api.Test`导入进来。最终显示如下：
 
-![image-20210506095348637](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210506095348637.png)
+![image-20210506095348637.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210506095348637.png)
 
 接下来就可以使用idea进行单元测试了。
 
 验证如下：
 
-![image-20210506095607159](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210506095607159.png)
+![image-20210506095607159.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210506095607159.png)
 
 点击左边的绿色三角即可进行测试。
 
-![image-20210506095651944](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210506095651944.png)
+![image-20210506095651944.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210506095651944.png)
 
 **注意**：Maven需要在pom.xml中添加依赖。
 
@@ -73,7 +73,7 @@ tags:
 
 `Assertion`还定义了其他断言方法，例如：
 
-- ![image-20210506110509206](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210506110509206.png)
+- ![image-20210506110509206](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210506110509206.png)
 
 **注意**：使用浮点数时，由于浮点数无法精确地进行比较，因此，我们需要调用`assertEquals(double expected, double actual, double delta)`这个重载方法，指定一个误差值：
 

@@ -59,7 +59,7 @@ DTD文档可以指定一系列规则，例如：
 
 如果解析为DOM结构，它大概长这样：
 
-![image-20210510215159229](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210510215159229.png)
+![image-20210510215159229.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210510215159229.png)
 
 Java提供了DOM API来解析XML，它使用下面的对象来表示XML的内容：
 

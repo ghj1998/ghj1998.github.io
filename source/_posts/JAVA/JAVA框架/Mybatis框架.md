@@ -77,7 +77,7 @@ Spring，SpringMVC，SpringBoot。
 
 创建
 
-![image-20210524185853081](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210524185853081.png)
+![image-20210524185853081.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210524185853081.png)
 
  ### 2.2 新建Maven项目
 
@@ -641,7 +641,7 @@ mybatis-config.xml
 
 MyBatis 的配置文件包含了会深深影响 MyBatis 行为的设置和属性信息。 
 
-![image-20210528093457804](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210528093457804.png)
+![image-20210528093457804.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210528100704196.png)
 
 重点掌握这几个配置，其他的了解即可。
 
@@ -708,7 +708,7 @@ MyBatis 可以配置成适应多种环境。
 
 1. 编写数据库配置文件。
 
-   ![image-20210528100704196](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210528100704196.png)
+![image-20210528100704196.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210528093457804.png)
 
 ```properties
 driver=com.mysql.jdbc.Driver
@@ -879,9 +879,9 @@ Java 类型内建的类型别名：
 
 设置很多，具体查询https://mybatis.org/mybatis-3/zh/configuration.html#settings
 
-![image-20210528105032738](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210528105032738.png)
+![image-20210528105032738.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210528105032738.png)
 
-![image-20210528105107848](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210528105107848.png)
+![image-20210528105107848.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210528112148642.png)
 
 ### 4.5 其他设置
 
@@ -937,7 +937,7 @@ MapperRegistry：注册绑定我们的Mapper文件
 
 ### 4.7 生命周期和注册域
 
-![image-20210528111650684](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210528111650684.png)
+![image-20210528111650684.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210528105107848.png)
 
 作用域和生命周期类别是至关重要的，因为错误的使用会导致非常严重的**并发问题**。
 
@@ -966,11 +966,11 @@ MapperRegistry：注册绑定我们的Mapper文件
 
 字段名：pwd
 
-![image-20210528112148642](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210528112148642.png)
+![image-20210528112148642.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210528111650684.png)
 
 属性名：
 
-![image-20210528112210572](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210528112210572.png)
+![image-20210528112210572.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210528120420406.png)
 
 此时如果执行查询，会出现查询结果如下：
 
@@ -1049,7 +1049,7 @@ colunm对应的是数据库中的列，property对应的是实体类的属性。
 
 曾经：sout、debug。
 
-![image-20210528120420406](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210528120420406.png)
+![image-20210528120420406.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210528121204384.png)
 
 - SLF4J
 - LOG4J【掌握】
@@ -1079,7 +1079,7 @@ colunm对应的是数据库中的列，property对应的是实体类的属性。
 
 主要关注位置：
 
-![image-20210528121204384](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210528121204384.png)
+![image-20210528121204384.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210528112210572.png)
 
 ### 6.3 LOG4J
 
@@ -1394,7 +1394,7 @@ public class User {
 }
 ```
 
-![image-20210528213828582](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210528213828582.png)
+![image-20210528213828582.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210528213828582.png)
 
 ## 10. 处理多对一查询
 
@@ -1495,7 +1495,7 @@ VALUES ( 5, '小王', 1 );
 
   建议在resources下建立同名包，将Mapper.xml放入其中，要保证文件目录一致。创建包时用`/`分割。
 
-  ![image-20210529174451565](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210529174451565.png)
+![image-20210529174451565.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210529174451565.png)
 
   ```xml
   <?xml version="1.0" encoding="UTF-8" ?>
@@ -2042,7 +2042,7 @@ System.out.println(mapper.getBlogFromID(map));
 
 只有一次查询数据库
 
-![image-20210605195406525](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210605195406525.png)
+![image-20210605195406525.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210605195406525.png)
 
 这就是一级缓存的作用。
 
@@ -2126,7 +2126,7 @@ try(final SqlSession sqlSession = MybatisUtils.getSqlSession()){
 
 在两个sqlsession中进行查询同一条数据。
 
-![image-20210605204512709](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210605204512709.png)
+![image-20210605204512709.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210605204512709.png)
 
 结果显示只查询了一次数据库。
 

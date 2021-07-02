@@ -18,7 +18,7 @@ Maven就是是专门为Java项目打造的管理和构建工具，它的主要�
 
 ### 1.1 Maven项目结构
 
-![image-20210507085528340](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210507085528340.png)
+![image-20210507085528340.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210507085528340.png)
 
 项目的根目录`a-maven-project`是项目名，它有一个项目描述文件`pom.xml`，存放Java源码的目录是`src/main/java`，存放资源文件的目录是`src/main/resources`，存放测试源码的目录是`src/test/java`，存放测试资源的目录是`src/test/resources`，最后，所有编译、打包生成的文件都放在`target`目录里。这些就是一个Maven项目的标准目录结构。
 
@@ -136,7 +136,7 @@ Maven维护了一个中央仓库（[repo1.maven.org](https://repo1.maven.org/)�
 
 如果访问Maven的中央仓库非常慢，我们可以选择一个速度较快的Maven的镜像仓库。Maven镜像仓库定期从中央仓库同步：
 
-![image-20210507091224316](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210507091224316.png)
+![image-20210507091224316.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210507095556295.png)
 
 中国区用户可以使用阿里云提供的Maven镜像仓库。使用Maven镜像仓库需要一个配置，在用户主目录下进入`.m2`目录，创建一个`settings.xml`配置文件，内容如下：
 
@@ -328,7 +328,7 @@ mvn tomcat:run
 
 在软件开发中，把一个大项目分拆为多个模块是降低软件复杂度的有效方法：
 
-![image-20210507095556295](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210507095556295.png)
+![image-20210507095556295.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210507091224316.png)
 
 对于Maven工程来说，原来是一个大项目：![image-20210507095613011](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210507095613011.png)
 
@@ -338,7 +338,7 @@ Maven可以有效地管理多个模块，我们只需要把每个模块当作一
 
 三个module的pom.xml重复度很高，可以采用这种结构：
 
-![image-20210507100719011](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210507100719011.png)
+![image-20210507100719011.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210507100719011.png)
 
 `parent`本身不含任何Java代码。编写`parent`的`pom.xml`只是为了在各个模块中减少重复的配置。
 
@@ -476,7 +476,7 @@ mvn -N io.takari:maven:0.7.6:wrapper -Dmaven=3.3.3
 
 项目结构
 
-![image-20210507101314481](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210507101314481.png)
+![image-20210507101314481.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210507103421389.png)
 
 多了`mvnw`、`mvnw.cmd`和`.mvn`目录，我们只需要把`mvn`命令改成`mvnw`就可以使用跟项目关联的Maven。例如：
 
@@ -498,7 +498,7 @@ mvnw clean package
 
 先创建Maven工程目录结构如下：
 
-![image-20210507102738176](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210507102738176.png)
+![image-20210507102738176.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210507101314481.png)
 
 ​	在`pom.xml`中添加如下内容：
 
@@ -548,7 +548,7 @@ mvnw clean package
 
 我们直接在项目根目录下运行Maven命令`mvn clean package deploy`，如果一切顺利，我们就可以在`maven-repo`目录下找到部署后的所有文件如下：
 
-![image-20210507103421389](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210507103421389.png)
+![image-20210507103421389.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210507102738176.png)
 
 最后一步，是把这个工程推到GitHub上，并选择`Settings`-`GitHub Pages`，选择`master branch`启用Pages服务：
 

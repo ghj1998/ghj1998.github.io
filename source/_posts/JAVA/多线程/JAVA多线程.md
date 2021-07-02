@@ -75,7 +75,7 @@ Thread.setPriority(int n) // 1~10, 默认值5
 
 ## 2. 进程状态
 
-![image-20210423092711785](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210423092711785.png)
+![image-20210423092711785.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210423092711785.png)
 
 - New：新创建的线程，尚未执行；
 - Runnable：运行中的线程，正在执行`run()`方法的Java代码；
@@ -235,7 +235,7 @@ t.start();
 
 多线程模型下，要保证逻辑正确，对共享变量进行读写时，必须保证一组指令以原子方式执行：即某一个线程执行时，其他线程必须等待：
 
-![image-20210423102653271](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210423102653271.png)
+![image-20210423102653271.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210423102653271.png)
 
 Java程序使用`synchronized`关键字对一个对象进行加锁：
 
@@ -909,11 +909,11 @@ ses.scheduleWithFixedDelay(new Task("fixed-delay"), 2, 3, TimeUnit.SECONDS);
 
 `FixedRate`是指任务总是以固定时间间隔触发，不管任务执行多长时间：
 
-![image-20210509224407824](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210509224407824.png)
+![image-20210509224407824.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210509224407824.png)
 
 `FixedDelay`是指，上一次任务执行完毕后，等待固定的时间间隔，再执行下一次任务：
 
-![image-20210509224432989](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210509224432989.png)
+![image-20210509224432989.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210509224432989.png)
 
 ## 16. Future
 
@@ -1135,7 +1135,7 @@ price: 16.397253746873602
 */
 ```
 
-![image-20210509230825458](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210509230825458.png)
+![image-20210509230825458.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210509230825458.png)
 
 除了`anyOf()`可以实现“任意个`CompletableFuture`只要一个成功”，`allOf()`可以实现“所有`CompletableFuture`都必须成功”，这些组合操作可以实现非常复杂的异步流程控制。
 

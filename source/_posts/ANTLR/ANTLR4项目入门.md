@@ -81,7 +81,7 @@ ANTLR工具中的两个关键部分：
 
    生成文件如下所示：
 
-   ![image-20210510153723801](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210510153723801.png)
+![image-20210510153723801.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210510153723801.png)
 
    生成文件介绍
 
@@ -140,7 +140,7 @@ ANTLR工具中的两个关键部分：
 
    output: 
 
-   ![image-20210510162450230](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210510162450230.png)
+![image-20210510162450230.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210510162450230.png)
 
 ### 2.3 从其他JAVA程序中调用生成的语法分析器
 
@@ -205,7 +205,7 @@ line 2:0 missing '}' at '<EOF>'
 
 对于这个项目需求，我们可以找出通用的翻译逻辑。
 
-![image-20210510174143835](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210510174143835.png)
+![image-20210510174143835.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210510174143835.png)
 
 1. 把{翻译成"；
 2. 把}翻译成"；
@@ -265,5 +265,5 @@ public class Test {
 
 执行结果：
 
-![image-20210511112729050](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210511112729050.png)
+![image-20210511112729050.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210511112729050.png)
 

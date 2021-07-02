@@ -557,7 +557,7 @@ ZonedDateTime zdt = ins.atZone(ZoneId.systemDefault());
 System.out.println(zdt); // 2019-09-16T01:32:40+08:00[Asia/Shanghai]
 ```
 
-![image-20210422214742768](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210422214742768.png)
+![image-20210422214742768.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210422214742768.png)
 
 ## 7. 转化
 

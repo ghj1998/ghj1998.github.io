@@ -92,7 +92,7 @@ ID : [a-z]+ ;             // match lower-case identifiers
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
 ```
 
-![image-20210429165441964](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210429165441964.png)
+![image-20210429165441964.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210429165441964.png)
 
 在其上运行ANTLR工具：
 
@@ -104,13 +104,13 @@ $ javac Hello*.java
 
 执行`antlr4 Hello.g4`后，会自动生成.java文件以及.tokens文件。
 
-![image-20210429165536160](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210429165536160.png)
+![image-20210429165536160.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210429165536160.png)
 
 
 
 执行`javac Hello*.java`会把所有的.java文件编译成.class文件。
 
-![image-20210429165657920](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210429165657920.png)
+![image-20210429165657920.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210429165657920.png)
 
 测试：
 
@@ -134,4 +134,4 @@ grun Hello r -gui
 
 利用gui可以展示语法分析树：
 
-![image-20210426173304589](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210426173304589.png)
+![image-20210426173304589.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210426173304589.png)

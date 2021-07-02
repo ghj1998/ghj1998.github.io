@@ -39,7 +39,7 @@ try {
 
 异常的继承关系：
 
-![image-20210325183327585](https://raw.githubusercontent.com/ghj1998/image_repository/main/image-20210325183327585.png)
+![image-20210325183327585.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/image-20210325183327585.png)
 
 `Throwable`是异常体系的根，它继承自`Object`。
 

@@ -430,7 +430,7 @@ class Student implements Person, Hello { // 实现了两个interface
 
 **继承关系：**
 
-![image-20210321205845624](https://raw.githubusercontent.com/ghj1998/image_repository/main/%E7%BB%A7%E6%89%BF%E5%85%B3%E7%B3%BB.png)
+![1425423424754.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/1425423424754.png)
 
 ## 8.静态字段和静态方法
 
@@ -438,7 +438,7 @@ class Student implements Person, Hello { // 实现了两个interface
 
 静态字段通常使用 `类名.静态字段`访问静态对象。
 
-![image-20210321210415333](https://raw.githubusercontent.com/ghj1998/image_repository/main/%E9%9D%99%E6%80%81%E5%AD%97%E6%AE%B5.png)
+![5567512578452.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/5567512578452.png)
 
 所有实例和类共享同一个静态字段。
 
@@ -476,7 +476,7 @@ public class Person {
 
 还需要按照包结构把上面的Java文件组织起来。
 
-![image-20210321211340003](https://raw.githubusercontent.com/ghj1998/image_repository/main/%E7%9B%AE%E5%BD%95%E5%92%8C%E5%8C%85.png)
+![86765436434898.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/86765436434898.png)
 
 位于同一个包的类，可以访问包作用域的字段和方法。
 
@@ -808,7 +808,7 @@ java -cp ./hello.jar abc.xyz.Hello
 
 jar包的格式如图所示：
 
-![image-20210321230823218](https://raw.githubusercontent.com/ghj1998/image_repository/main/jar%E5%8C%85%E7%9A%84%E6%A0%BC%E5%BC%8F.png)
+![89656879456456456456.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/89656879456456456456.png)
 
 `MANIFEST.MF`文件可以提供jar包的信息，如`Main-Class`，这样可以直接运行jar包。`MANIFEST.MF`是纯文本，可以指定`Main-Class`和其它信息。JVM会自动读取这个`MANIFEST.MF`文件，如果存在`Main-Class`，我们就不必在命令行指定启动的类名，而是用更方便的命令：
 
@@ -832,7 +832,7 @@ java -jar hello.jar
 
 把class封装成包不仅要打包，而且要写入依赖关系。
 
-![image-20210321231547669](https://raw.githubusercontent.com/ghj1998/image_repository/main/%E5%8C%85%E7%9A%84%E7%BB%93%E6%9E%84.png)
+![678678123489796.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/678678123489796.png)
 
 包的机构与Java项目类似，module-info.java如下所示：
 
@@ -867,7 +867,7 @@ public class Main {
 $ javac -d bin src/module-info.java src/com/itranswarp/sample/*.java
 ```
 
-![image-20210321232103842](https://raw.githubusercontent.com/ghj1998/image_repository/main/%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84.png)
+![978645678789789.png](https://ghj1998.oss-cn-beijing.aliyuncs.com/978645678789789.png)
 
 下一步将bin目录下的class打包成jar。传入`--main-class`参数，让这个jar包能自己定位`main`方法所在的类：
 
