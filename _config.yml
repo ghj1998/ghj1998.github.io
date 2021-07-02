@@ -137,12 +137,9 @@ theme: next
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
--  type: git
-   repo: git@github.com:ghj1998/ghj1998.github.io.git
-   branch: main
--  type: git
-   repo: git@47.100.203.79:/var/repo/blog.git
-   branch: master
+  type: git
+  repo: git@github.com:ghj1998/ghj1998.github.io.git
+  branch: main
 
 
 # hexo-admin authentification
